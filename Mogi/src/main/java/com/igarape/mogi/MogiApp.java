@@ -2,6 +2,7 @@ package com.igarape.mogi;
 
 import android.app.Application;
 
+import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 import com.squareup.otto.Bus;
@@ -24,11 +25,11 @@ public class MogiApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //TestFlight.takeOff(this, "850b3886-bb77-474f-8ae7-7843b7541436");
         objectGraph = ObjectGraph.create(new MogiModule(this));
         mBus = new Bus(ThreadEnforcer.ANY);
         FileUtils.setPath("/mnt/extSdCard/smartpolicing/");
         WidgetUtils.UpdateWidget(this.getApplicationContext());
+        ApiClient.setAppContext(this.getApplicationContext());
     }
 
     public ObjectGraph objectGraph() {

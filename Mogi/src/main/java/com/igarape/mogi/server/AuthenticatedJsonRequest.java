@@ -24,7 +24,7 @@ public class AuthenticatedJsonRequest extends JsonObjectRequest {
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         HashMap<String, String> params = new HashMap<String,String>();
-        params.put("Authorization", "Bearer " + accessToken);
+        params.put("Authorization", accessToken);
         return params;
     }
 }

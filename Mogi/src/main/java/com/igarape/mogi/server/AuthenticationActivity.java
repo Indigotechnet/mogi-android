@@ -20,7 +20,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -29,15 +29,16 @@ import com.igarape.mogi.R;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.utils.Identification;
-import com.igarape.mogi.utils.ServerUtils;
 import com.igarape.mogi.utils.WidgetUtils;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 
-import org.apache.http.client.AuthenticationHandler;
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AuthenticationActivity extends Activity {
@@ -213,43 +214,31 @@ public class AuthenticationActivity extends Activity {
     }
 
     private void makeLoginRequest() {
-        StringBuilder url = new StringBuilder();
-        url.append(ServerUtils.getServerUrl("/token?"));
-        url.append("user=" + txtId.getText());
-        url.append("&password=" + txtPwd.getText());
-        url.append("&scope=client");
-        url.append("&gcm_registration=" + regid);
+        RequestParams params = new RequestParams();
+        params.put("user", txtId.getText().toString());
+        params.put("password", txtPwd.getText().toString());
+        params.put("scope", "client");
+        params.put("gcm_registration", regid);
 
         pDialog = ProgressDialog.show(this, "Fazendo login", "Por favor aguarde...", true);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url.toString(), null,
-            new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject jsonObject) {
-                    pDialog.hide();
-                    try {
-                        if ( jsonObject.getBoolean("success") ) {
-                            WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
-                            Identification.setAccessToken(getBaseContext(), jsonObject.getString("access_token"));
-                            Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
-                            startService(new Intent(AuthenticationActivity.this, UpdateLocationService.class));
-                            startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            },  new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(TAG, "Error at login", volleyError);
-                    // Log.d(TAG, volleyError.getMessage());
-                    pDialog.hide();
-                    Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG);
-                }
-            });
+        ApiClient.post("/token", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(String responseBody, Throwable error) {
+                pDialog.hide();
+                Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG).show();
+            }
 
-        queue.add(request);
-        queue.start();
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
+                Identification.setAccessToken(getBaseContext(), responseBody);
+                Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
+                ApiClient.setToken("Bearer " + responseBody);
+                startService(new Intent(AuthenticationActivity.this, UpdateLocationService.class));
+                startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+
+            }
+        });
     }
 }

@@ -9,9 +9,10 @@ dependencies {
     compile 'com.squareup.dagger:dagger:1.0.1'
     compile files('/libs/iocipher.jar')
     compile files('libs/volley.jar')
-    compile files('libs/android-async-http-1.4.3.jar')
+    compile files('libs/android-async-http-1.4.4.jar')
     compile 'com.android.support:support-v4:13.0.0'
     compile 'com.google.android.gms:play-services:3.1.36'
+    compile 'com.google.code.gson:gson:2.2.4'
 }
 
 android {

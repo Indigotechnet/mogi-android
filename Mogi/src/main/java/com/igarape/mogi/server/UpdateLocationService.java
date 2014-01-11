@@ -1,32 +1,24 @@
 package com.igarape.mogi.server;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.igarape.mogi.utils.Identification;
-import com.igarape.mogi.utils.ServerUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by felipeamorim on 27/08/2013.
@@ -66,7 +58,7 @@ public class UpdateLocationService extends Service implements GooglePlayServices
             return;
         }
 
-        String url = ServerUtils.getServerUrl("/locations");
+        String url = ApiClient.getServerUrl("/locations");
         JSONObject json = new JSONObject();
         try {
             json.put("lat", loc.getLatitude());

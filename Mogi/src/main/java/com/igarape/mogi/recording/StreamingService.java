@@ -12,9 +12,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.igarape.mogi.R;
+import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.server.AuthenticatedJsonRequest;
 import com.igarape.mogi.utils.Identification;
-import com.igarape.mogi.utils.ServerUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 
 import net.majorkernelpanic.streaming.Session;
@@ -25,7 +25,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Calendar;
 
 /**
  * Created by felipeamorim on 24/07/2013.
@@ -108,7 +107,7 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
     }
 
     private void makeStartStreamingRequest(String sdp) {
-        String url = ServerUtils.getServerUrl("/streaming/start");
+        String url = ApiClient.getServerUrl("/streaming/start");
         JSONObject json = new JSONObject();
         try {
             json.put("sdp", sdp);
@@ -136,7 +135,7 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
     }
 
     private void makeStopStreamingRequest() {
-        String url = ServerUtils.getServerUrl("/streaming/stop");
+        String url = ApiClient.getServerUrl("/streaming/stop");
 
         AuthenticatedJsonRequest request = new AuthenticatedJsonRequest(
                 Identification.getAccessToken(getBaseContext()), Request.Method.POST, url, null,
