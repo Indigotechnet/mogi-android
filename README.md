@@ -1,2 +1,3 @@
-smartpolicing-android
-=====================
+=======
+mogi-android
+============
