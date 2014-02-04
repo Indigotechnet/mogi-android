@@ -215,7 +215,7 @@ public class AuthenticationActivity extends Activity {
 
     private void makeLoginRequest() {
         RequestParams params = new RequestParams();
-        params.put("user", txtId.getText().toString());
+        params.put("username", txtId.getText().toString());
         params.put("password", txtPwd.getText().toString());
         params.put("scope", "client");
         params.put("gcm_registration", regid);
@@ -226,6 +226,7 @@ public class AuthenticationActivity extends Activity {
             @Override
             public void onFailure(String responseBody, Throwable error) {
                 pDialog.hide();
+                Log.e(TAG, "Error: " + responseBody, error);
                 Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG).show();
             }
 
@@ -234,7 +235,7 @@ public class AuthenticationActivity extends Activity {
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), responseBody);
                 Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
-                ApiClient.setToken("Bearer " + responseBody);
+                ApiClient.setToken(responseBody);
                 startService(new Intent(AuthenticationActivity.this, UpdateLocationService.class));
                 startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
 

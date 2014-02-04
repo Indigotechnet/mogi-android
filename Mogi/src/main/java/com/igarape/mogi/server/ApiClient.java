@@ -30,6 +30,10 @@ public class ApiClient {
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
+    static {
+        client.setURLEncodingEnabled(true);
+    }
+
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.get(getServerUrl(url), params, responseHandler);
     }
@@ -57,7 +61,7 @@ public class ApiClient {
     }
 
     public static void setToken(String token) {
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", "Bearer " + token);
     }
 
     public static String getServerUrl(String path) {
