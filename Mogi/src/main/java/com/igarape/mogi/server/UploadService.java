@@ -3,17 +3,14 @@ package com.igarape.mogi.server;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.igarape.mogi.utils.FileUtils;
-import com.igarape.mogi.utils.Identification;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +32,7 @@ import java.util.TimeZone;
  * Created by felipeamorim on 09/09/2013.
  */
 public class UploadService extends Service {
-
+    public static String TAG = "UploadService";
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
 
@@ -52,7 +49,8 @@ public class UploadService extends Service {
         }
 
         uploadLocations();
-        uploadVideos();
+        //TODO - Vídeos desabilitados
+        //uploadVideos();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -107,7 +105,7 @@ public class UploadService extends Service {
             return;
         }
 
-        File nextVideo = videos.remove(0);
+        final File nextVideo = videos.remove(0);
 
         if ( nextVideo != null && nextVideo.exists()) {
             RequestParams params = new RequestParams();
@@ -125,11 +123,13 @@ public class UploadService extends Service {
             ApiClient.post("/videos", params, new TextHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                    Log.i(TAG, "video uploaded: "+ nextVideo.getName());
                     uploadVideos();
                 }
 
                 @Override
-                public void onFailure(Throwable throwable, String data) {
+                public void onFailure(String responseBody, Throwable error) {
+                    Log.e(TAG, "video not uploaded: "+ nextVideo.getName(), error);
                     stopSelf();
                 }
             });

@@ -84,14 +84,17 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
 
         try {
             mSession = SessionBuilder.getInstance()
-                    .setSurfaceHolder(mSurfaceHolder)
+                    .setSurfaceView(mSurfaceView)
                     .setContext(getApplicationContext())
-                    .setCamera(Camera.CameraInfo.CAMERA_FACING_FRONT)
-                    .setVideoEncoder(SessionBuilder.VIDEO_H264)
+                    .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
+                    .setVideoEncoder(SessionBuilder.VIDEO_H263)
                     .setAudioEncoder(SessionBuilder.AUDIO_AAC)
                     .build();
 
-            mSession.setDestination(InetAddress.getByName(serverAddress));
+            mSurfaceView.getHolder().addCallback(this);
+
+            mSession.setDestination(InetAddress.getByName(serverAddress).getHostAddress());
+            mSession.getAudioTrack().configure();
             String sdp = mSession.getSessionDescription();
             makeStartStreamingRequest(sdp);
             Log.d("SessionDescription", sdp);

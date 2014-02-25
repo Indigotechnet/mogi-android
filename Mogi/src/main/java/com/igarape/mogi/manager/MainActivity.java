@@ -1,6 +1,11 @@
 package com.igarape.mogi.manager;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,9 +15,13 @@ import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.R;
 import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.recording.RecordingService;
+import com.igarape.mogi.recording.RecordingUtil;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
+import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.server.UpdateLocationService;
+import com.igarape.mogi.server.UploadService;
+import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;
 
@@ -27,6 +36,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        registerMyReceiver();
+
         setContentView(R.layout.activity_main);
 
         // Not logged, go to Auth
@@ -38,9 +49,45 @@ public class MainActivity extends BaseActivity {
         WidgetUtils.UpdateWidget(this.getApplicationContext());
 
         startSmartPolicingService(LocationService.class);
-        if (!RecordingService.IsRecording && !StreamingService.IsStreaming ) {
+        if (!RecordingUtil.isInAction()) {
             startSmartPolicingService(RecordingService.class);
         }
+
+        ((Button)findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+                if ( activeNetwork == null ) {
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                    return;
+                }
+                if (!activeNetwork.isConnectedOrConnecting()){
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                    return;
+                }
+
+                if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)){
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
+                    return;
+                }
+                IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                Intent batteryStatus = registerReceiver(null, ifilter);
+
+                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+
+                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        status == BatteryManager.BATTERY_STATUS_FULL;
+
+                if (!isCharging){
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
+                    return;
+                }
+
+                sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
+            }
+        });
 
         ((Button)findViewById(R.id.send_location)).setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -99,6 +146,11 @@ public class MainActivity extends BaseActivity {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
+    }
+
+    private void registerMyReceiver() {
+        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(new ConnectivityStatusReceiver(), mBatteryLevelFilter);
     }
     
 }

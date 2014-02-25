@@ -3,7 +3,6 @@ package com.igarape.mogi.server;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.igarape.mogi.utils.Identification;
 
 import org.json.JSONObject;
 

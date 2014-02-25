@@ -17,5 +17,8 @@
     <string name="send_location">Notify manager</string>
     <string name="logout">Logout</string>
     <string name="force_upload">Begin upload</string>
+    <string name="dialog_upload_no_network">Não existe rede ativa para envio de dados</string>
+    <string name="dialog_upload_not_wifi">É necessário estar conectado a uma rede sem fio</string>
+    <string name="dialog_upload_not_charging">É necessário que o celular esteja carregando</string>
 
 </resources>

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2013 GUIGUI Simon, fyhertz@gmail.com
+ * Copyright (C) 2011-2014 GUIGUI Simon, fyhertz@gmail.com
  * 
- * This file is part of Spydroid (http://code.google.com/p/spydroid-ipcamera/)
+ * This file is part of libstreaming (https://github.com/fyhertz/libstreaming)
  * 
  * Spydroid is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,16 +44,17 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 	private long delay = 0, oldtime = 0;
 	private Statistics stats = new Statistics();
 	private byte[] sps = null, pps = null;
+	byte[] header = new byte[5];	
 	private int count = 0;
 	private int streamType = 1;
 
 
-	public H264Packetizer() throws IOException {
+	public H264Packetizer() {
 		super();
 		socket.setClockFrequency(90000);
 	}
 
-	public void start() throws IOException {
+	public void start() {
 		if (t == null) {
 			t = new Thread(this);
 			t.start();
@@ -142,7 +143,6 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 	@SuppressLint("NewApi")
 	private void send() throws IOException, InterruptedException {
 		int sum = 1, len = 0, type;
-		byte[] header = new byte[5];
 
 		if (streamType == 0) {
 			// NAL units are preceeded by their length, we parse the length
@@ -172,7 +172,7 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 		}
 
 		// Parses the NAL unit type
-		type = header[0]&0x1F;
+		type = header[4]&0x1F;
 
 		// The stream already contains NAL unit type 7 or 8, we don't need 
 		// to add them to the stream ourselves
@@ -229,7 +229,6 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 
 	private int fill(byte[] buffer, int offset,int length) throws IOException {
 		int sum = 0, len;
-
 		while (sum<length) {
 			len = is.read(buffer, offset+sum, length-sum);
 			if (len<0) {
@@ -237,13 +236,10 @@ public class H264Packetizer extends AbstractPacketizer implements Runnable {
 			}
 			else sum+=len;
 		}
-
 		return sum;
-
 	}
 
 	private void resync() throws IOException {
-		byte[] header = new byte[5];
 		int type;
 
 		Log.e(TAG,"Packetizer out of sync ! Let's try to fix that...(NAL length: "+naluLength+")");

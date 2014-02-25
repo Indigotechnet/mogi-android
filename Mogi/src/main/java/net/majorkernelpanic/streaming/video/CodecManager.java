@@ -20,12 +20,10 @@
 
 package net.majorkernelpanic.streaming.video;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
-import android.graphics.ImageFormat;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.Build;
@@ -36,9 +34,22 @@ import android.util.SparseArray;
 public class CodecManager {
 
 	public final static String TAG = "CodecManager";
+	
+	public static final int[] SUPPORTED_COLOR_FORMATS = {
+		MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
+		MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar
+	};
 
 	/**
-	 * Contains a list of encoders and color formats that we may use with a {@link CodecManager.YV12Translator}.  
+	 * There currently is no way to know if an encoder is software or hardware from the MediaCodecInfo class,
+	 * so we need to maintain a list of known software encoders.
+	 */
+	public static final String[] SOFTWARE_ENCODERS = {
+		"OMX.google.h264.encoder"
+	};
+
+	/**
+	 * Contains a list of encoders and color formats that we may use with a {@link net.majorkernelpanic.streaming.video.CodecManager.Translator}.
 	 */
 	static class Codecs {
 		/** A hardware encoder supporting a color format we can use. */
@@ -50,35 +61,10 @@ public class CodecManager {
 	}
 
 	/**
-	 * Iterates through the list of encoders present on the phone, execution of this method can be slow,
-	 * it should be called off the main thread.
-	 * @param The mime type
-	 */
-	public static void findSupportedColorFormats(String mimeType) {
-		if (Build.VERSION.SDK_INT<16) return;
-		Selector.findSupportedColorFormats(mimeType);
-	}
-
-	/**
 	 *  Contains helper functions to choose an encoder and a color format.
 	 */
 	static class Selector {
 
-		public static final int[] SUPPORTED_COLOR_FORMATS = {
-			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
-			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar,
-			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
-			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar
-		};		
-		
-		/**
-		 * There currently is no way to know if an encoder is software or hardware from the MediaCodecInfo class,
-		 * so we need to maintain a list of known software encoders.
-		 */
-		public static final String[] SOFTWARE_ENCODERS = {
-			"OMX.google.h264.encoder"
-		};		
-		
 		private static HashMap<String,SparseArray<ArrayList<String>>> sHardwareCodecs = new HashMap<String, SparseArray<ArrayList<String>>>();
 		private static HashMap<String,SparseArray<ArrayList<String>>> sSoftwareCodecs = new HashMap<String, SparseArray<ArrayList<String>>>();
 
@@ -93,7 +79,7 @@ public class CodecManager {
 
 			// On devices running 4.3, we need an encoder supporting the color format used to work with a Surface
 			if (Build.VERSION.SDK_INT>=18 && tryColorFormatSurface) {
-				int colorFormatSurface = MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411Planar;
+				int colorFormatSurface = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
 				try {
 					// We want a hardware encoder
 					list.hardwareCodec = hardwareCodecs.get(colorFormatSurface).get(0);
@@ -133,35 +119,26 @@ public class CodecManager {
 				} catch (Exception e) {}
 			}
 
-			// Fix for the OMX.SEC.avc.enc that may not work with COLOR_FormatYUV420Planar (http://code.google.com/p/android/issues/detail?id=37769)
-			// The S3 may have this encoder
-			if (hardwareCodecs.get(21).contains("OMX.SEC.avc.enc")) {
-				if (hardwareCodecs.get(21).get(0) != null) {
-					list.hardwareCodec = hardwareCodecs.get(21).get(0);
-					list.hardwareColorFormat = 21;
-				}	
-			}			
-
 			if (list.hardwareCodec != null) {
 				Log.v(TAG,"Choosen primary codec: "+list.hardwareCodec+" with color format: "+list.hardwareColorFormat);
 			} else {
 				Log.e(TAG,"No supported hardware codec found !");
 			}
 			if (list.softwareCodec != null) {
-				Log.v(TAG,"Choosen secondary codec: "+list.softwareCodec+" with color format: "+list.softwareColorFormat);
+				Log.v(TAG,"Choosen secondary codec: "+list.hardwareCodec+" with color format: "+list.softwareColorFormat);
 			} else {
 				Log.e(TAG,"No supported software codec found !");
 			}
 
 			return list;
-		}
+		}			
 
 		/** 
 		 * Returns an associative array of the supported color formats and the names of the encoders for a given mime type
 		 * This can take up to sec on certain phones the first time you run it...
 		 **/
 		@SuppressLint("NewApi")
-		static synchronized void findSupportedColorFormats(String mimeType) {
+		static private void findSupportedColorFormats(String mimeType) {
 			SparseArray<ArrayList<String>> softwareCodecs = new SparseArray<ArrayList<String>>();
 			SparseArray<ArrayList<String>> hardwareCodecs = new SparseArray<ArrayList<String>>();
 
@@ -219,11 +196,7 @@ public class CodecManager {
 
 	}
 
-	/**
-	 *  Translates buffers from YV12 to a some color format specified in MediaCodecInfo.CodecCapabilities
-	 *  Turns out YV12 is buggy on some phones running 4.0 and 4.1 :'(
-	 **/	
-	static class YV12Translator {
+	static class Translator {
 
 		private int mOutputColorFormat;
 		private int mWidth; 
@@ -233,13 +206,10 @@ public class CodecManager {
 		private int mYSize;
 		private int mUVSize;
 		private int bufferSize;
-		private int mMode;
-		private int mApiLevel;
 		private int i;
 		private byte[] tmp;
 
-		public YV12Translator(String encoderName, int outputColorFormat, int width, int height) {
-			mApiLevel = Build.VERSION.SDK_INT;
+		public Translator(int outputColorFormat, int width, int height) {
 			mOutputColorFormat = outputColorFormat;
 			mWidth = width;
 			mHeight = height;
@@ -248,14 +218,7 @@ public class CodecManager {
 			mYSize     = mYStride * mHeight;
 			mUVSize    = mUVStride * mHeight / 2;
 			bufferSize = mYSize + mUVSize * 2;
-			tmp = new byte[bufferSize];
-
-			// Handles the case of the OMX.qcom.video.encoder.avc encoder which do not behave properly on some devices before 4.3
-			if (encoderName.equalsIgnoreCase("OMX.qcom.video.encoder.avc") && mApiLevel<18) mMode = 1;
-
-			// Mode 0 is used by default, it assumes that the encoder works properly...
-			else mMode = 0;
-
+			tmp = new byte[mUVSize*2];
 		}
 
 		public int getBufferSize() {
@@ -270,166 +233,31 @@ public class CodecManager {
 			return mYStride;
 		}
 
-		public void translate(byte[] data, ByteBuffer buffer) {
-			if (data.length>buffer.capacity()) return;
-			buffer.clear();
-
-			// HANDLES THE CASE OF THE OMX.qcom.video.encoder.avc H.264 ENCODER
-			// It may need some padding before the Chroma pane
-			if (mMode == 1) {
-				if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
-
-					int padding = 1024;			
-					if ((mWidth==640 && mHeight==384) || (mWidth==384 && mHeight==256) || 
-							(mWidth==640 && mHeight==480) || (mWidth==1280 && mHeight==720)) 
-						padding = 0;
-
-					// We need to interleave the U and V channel
-
-					buffer.put(data, 0, mYSize); // Y
-					buffer.position(buffer.position()+padding);
-					for (i = 0; i < mUVSize; i++) {
-						tmp[i*2] = data[mYSize + i + mUVSize]; // Cb (U)
-						tmp[i*2+1] = data[mYSize + i]; // Cr (V)
-					}
-					buffer.put(tmp, 0, 2*mUVSize-1);
-					return;
-				}	
-			}
-
-			// HANDLES THE CASE OF NICE ENCODERS
+		public byte[] translate(byte[] buffer) {
 
 			if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar) {
 				// FIXME: May be issues because of padding here :/
-				buffer.put(data, 0, mYSize); // Y
-				buffer.put(data, mYSize+mUVSize, mUVSize);
-				buffer.put(data, mYSize, mUVSize);
-				return;
+				int wh4 = bufferSize/6; //wh4 = width*height/4
+				byte tmp;
+				for (i=wh4*4; i<wh4*5; i++) {
+					tmp = buffer[i];
+					buffer[i] = buffer[i+wh4];
+					buffer[i+wh4] = tmp;
+				}
 			}
 
 			else if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
 				// We need to interleave the U and V channel
-				buffer.put(data, 0, mYSize);
+				System.arraycopy(buffer, mYSize, tmp, 0, mUVSize*2); // Y
 				for (i = 0; i < mUVSize; i++) {
-					tmp[i*2] = data[mYSize + i + mUVSize]; // Cb (U)
-					tmp[i*2+1] = data[mYSize + i]; // Cr (V)
-				}
-				buffer.put(tmp, 0, 2*mUVSize-1);
-				return;
-			}
-
-			// If we do not handle the color format of the encoder we simply return the input
-			buffer.put(data, 0, data.length);
-			return;
-
-		}
-
-	}
-
-	/**
-	 *  Translates buffers from NV21 to a some color format specified in MediaCodecInfo.CodecCapabilities
-	 **/
-	static class NV21Translator {
-
-		private int mOutputColorFormat;
-		private int mWidth; 
-		private int mHeight;
-		private int mBufferSize;
-		private int mMode;
-		private int mApiLevel;
-		private int i;
-
-		public NV21Translator(String encoderName, int outputColorFormat, int width, int height) {
-			mApiLevel = Build.VERSION.SDK_INT;
-			mOutputColorFormat = outputColorFormat;
-			mWidth = width;
-			mHeight = height;
-			mBufferSize = width * height * ImageFormat.getBitsPerPixel(ImageFormat.NV21) / 8;
-
-			// Mode 1 handles the case of the OMX.qcom.video.encoder.avc encoder which do not behave properly on some devices before 4.3
-			if (encoderName.equalsIgnoreCase("OMX.qcom.video.encoder.avc") && mApiLevel<18) mMode = 1;
-
-			// Handles the case of the OMX.SEC.avc.enc present in the S3
-			// Probably those models: GT-I9300, GT-I9305, GT-I9305N, GT-I9305T
-			boolean s3 = android.os.Build.MODEL.startsWith("GT-I930"); 
-			if (encoderName.equalsIgnoreCase("OMX.SEC.avc.enc") && s3 && mApiLevel<18) mMode = 2;				
-
-			// Mode 0 is used by difault, it assumes that the encoder works properly...
-			else mMode = 0;
-			
-		}
-
-		public int getBufferSize() {
-			return mBufferSize;
-		}
-
-		public void translate(byte[] data, ByteBuffer buffer) {
-			if (data.length>buffer.capacity()) return;
-			buffer.clear();
-
-			// HANDLES THE CASE OF THE OMX.qcom.video.encoder.avc H.264 ENCODER
-			// Some padding is needed for some resolutions
-			if (mMode == 1) {
-				if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
-					int padding = 1024;
-					if ((mWidth==640 && mHeight==384) || (mWidth==384 && mHeight==256) || 
-							(mWidth==640 && mHeight==480) || (mWidth==1280 && mHeight==720)) 
-						padding = 0;
-
-					buffer.put(data, 0, mHeight*mWidth);
-					buffer.position(buffer.position()+padding);
-
-					// Swaps the Cb and Cr panes
-					for (i = mWidth*mHeight; i < mBufferSize; i+=2) {
-						buffer.put(data[i+1]);
-						buffer.put(data[i]);
-					}
-					return;
-				}	
-			}
-
-			// HANDLES THE CASE OF OMX.SEC.avc.enc ON THE S3
-			else if (mMode == 2) {
-				if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar) {
-					//buffer.put(data, 0, data.length);
-					buffer.put(data, 0, mHeight*mWidth);
-					// Swaps the Cb and Cr panes
-					for (i = mWidth*mHeight; i < mBufferSize; i += 2) {
-						buffer.put(data[i+1]);
-						buffer.put(data[i]);
-					}
-					return;
+					buffer[mYSize + i*2] = tmp[i + mUVSize]; // Cb (U)
+					buffer[mYSize + i*2+1] = tmp[i]; // Cr (V)
 				}
 			}
 
-			// HANDLES THE CASE OF NICE ENCODERS
+			return buffer;
+		}
 
-			if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar ||
-					mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar) {
-				// Y pane
-				buffer.put(data, 0, mHeight*mWidth);
-				// De-interleave Cb and Cr
-				for (i = mWidth*mHeight; i < mBufferSize; i += 2) buffer.put(data[i+1]);
-				for (i = mWidth*mHeight; i < mBufferSize; i += 2) buffer.put(data[i]);;
-				return;
-			}
-
-			else if (mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar ||
-					mOutputColorFormat == MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar) {
-				buffer.put(data, 0, mHeight*mWidth);
-				// Swaps the Cb and Cr panes
-				for (i = mWidth*mHeight; i < mBufferSize; i += 2) {
-					buffer.put(data[i+1]);
-					buffer.put(data[i]);
-				}
-				return;
-			}
-
-			// If we do not handle the color format of the encoder we simply return the input
-			buffer.put(data, 0, data.length);
-			return;
-
-		}		
 
 	}
 

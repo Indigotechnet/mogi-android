@@ -59,6 +59,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
         mWindowManager.removeView(mSurfaceView);
     }
 
+    @Override
     public void startRecording() {
         if (IsRecording) {
             return;
@@ -108,6 +109,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
         WidgetUtils.BeginUpdating(this);
     }
 
+    @Override
     public void stopRecording() {
         if ( !IsRecording) {
             return;

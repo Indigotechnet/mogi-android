@@ -1,5 +1,6 @@
 package com.igarape.mogi.server;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -18,25 +18,19 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.igarape.mogi.R;
 import com.igarape.mogi.MogiApp;
+import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -221,7 +215,7 @@ public class AuthenticationActivity extends Activity {
         params.put("gcm_registration", regid);
 
         pDialog = ProgressDialog.show(this, "Fazendo login", "Por favor aguarde...", true);
-
+//TODO substituir por JsonResponseHandler - pegando o ip do servidor tb - Identification.java
         ApiClient.post("/token", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(String responseBody, Throwable error) {

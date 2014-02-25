@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2013 GUIGUI Simon, fyhertz@gmail.com
+ * Copyright (C) 2011-2014 GUIGUI Simon, fyhertz@gmail.com
  * 
- * This file is part of Spydroid (http://code.google.com/p/spydroid-ipcamera/)
+ * This file is part of libstreaming (https://github.com/fyhertz/libstreaming)
  * 
  * Spydroid is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ public class VideoQuality {
 	public final static String TAG = "VideoQuality";
 	
 	/** Default video stream quality. */
-	public final static VideoQuality DEFAULT_VIDEO_QUALITY = new VideoQuality(640,480,15,500000);
+	public final static VideoQuality DEFAULT_VIDEO_QUALITY = new VideoQuality(176,144,20,500000);
 
 	/**	Represents a quality for a video stream. */ 
 	public VideoQuality() {}
@@ -47,27 +47,8 @@ public class VideoQuality {
 	 * @param resY The vertical resolution
 	 */
 	public VideoQuality(int resX, int resY) {
-		this.framerate = framerate;
-		this.bitrate = bitrate;
 		this.resX = resX;
 		this.resY = resY;
-		this.orientation = orientation;
-	}	
-	
-	/**
-	 * Represents a quality for a video stream.
-	 * @param resX The horizontal resolution
-	 * @param resY The vertical resolution
-	 * @param framerate The framerate in frame per seconds
-	 * @param bitrate The bitrate in bit per seconds
-	 * @param orientation The orientation of the video in the SurfaceView  
-	 */
-	public VideoQuality(int resX, int resY, int framerate, int bitrate, int orientation) {
-		this.framerate = framerate;
-		this.bitrate = bitrate;
-		this.resX = resX;
-		this.resY = resY;
-		this.orientation = orientation;
 	}	
 
 	/**
@@ -88,23 +69,21 @@ public class VideoQuality {
 	public int bitrate = 0;
 	public int resX = 0;
 	public int resY = 0;
-	public int orientation = 90;
 
 	public boolean equals(VideoQuality quality) {
 		if (quality==null) return false;
 		return (quality.resX == this.resX 				&
 				quality.resY == this.resY 				&
 				quality.framerate == this.framerate	&
-				quality.bitrate == this.bitrate 		&
-				quality.orientation == this.orientation);
+				quality.bitrate == this.bitrate);
 	}
 
 	public VideoQuality clone() {
-		return new VideoQuality(resX,resY,framerate,bitrate,orientation);
+		return new VideoQuality(resX,resY,framerate,bitrate);
 	}
 
 	public static VideoQuality parseQuality(String str) {
-		VideoQuality quality = new VideoQuality(0,0,0,0);
+		VideoQuality quality = DEFAULT_VIDEO_QUALITY.clone();
 		if (str != null) {
 			String[] config = str.split("-");
 			try {
@@ -116,17 +95,6 @@ public class VideoQuality {
 			catch (IndexOutOfBoundsException ignore) {}
 		}
 		return quality;
-	}
-
-	public static VideoQuality merge(VideoQuality videoQuality, VideoQuality withVideoQuality) {
-		if (withVideoQuality != null && videoQuality != null) {
-			if (videoQuality.resX==0) videoQuality.resX = withVideoQuality.resX;
-			if (videoQuality.resY==0) videoQuality.resY = withVideoQuality.resY;
-			if (videoQuality.framerate==0) videoQuality.framerate = withVideoQuality.framerate;
-			if (videoQuality.bitrate==0) videoQuality.bitrate = withVideoQuality.bitrate;
-			if (videoQuality.orientation==90) videoQuality.orientation = withVideoQuality.orientation;
-		}
-		return videoQuality;
 	}
 
 	/** 
@@ -156,45 +124,14 @@ public class VideoQuality {
 		return v;
 	}
 
-	/** 
-	 * Checks if the framerate is supported by the camera.
-	 * If not, it modifies it by a supported one. 
-	 **/	
-	public static VideoQuality determineClosestSupportedFramerate(Camera.Parameters parameters, VideoQuality quality) {
-		VideoQuality v = quality.clone();
-		int minDist = Integer.MAX_VALUE;
-		
-		// Frame rates
-		String supportedFrameRatesStr = "Supported frame rates: ";
-		List<Integer> supportedFrameRates = parameters.getSupportedPreviewFrameRates();
-		for (Iterator<Integer> it = supportedFrameRates.iterator(); it.hasNext();) {
-			supportedFrameRatesStr += it.next()+"fps"+(it.hasNext()?", ":"");
-		}
-		Log.v(TAG,supportedFrameRatesStr);
-
-		if (!supportedFrameRates.contains(quality.framerate)) {
-			for (Iterator<Integer> it = supportedFrameRates.iterator(); it.hasNext();) {
-				int fps = it.next();
-				int dist = Math.abs(fps - quality.framerate);
-				if (dist<minDist) {
-					minDist = dist;
-					v.framerate = fps;
-				}
-			}
-			Log.v(TAG,"Frame rate modified: "+quality.framerate+"->"+v.framerate);
-		}
-		
-		return v;
-	}	
-
 	public static int[] determineMaximumSupportedFramerate(Camera.Parameters parameters) {
 		int[] maxFps = new int[]{0,0};
 		String supportedFpsRangesStr = "Supported frame rates: ";
 		List<int[]> supportedFpsRanges = parameters.getSupportedPreviewFpsRange();
 		for (Iterator<int[]> it = supportedFpsRanges.iterator(); it.hasNext();) {
 			int[] interval = it.next();
-			supportedFpsRangesStr += interval[0]+"-"+interval[1]+"fps"+(it.hasNext()?", ":"");
-			if (interval[1]/1000>maxFps[1]) {
+			supportedFpsRangesStr += interval[0]/1000+"-"+interval[1]/1000+"fps"+(it.hasNext()?", ":"");
+			if (interval[1]>maxFps[1] || (interval[0]>maxFps[0] && interval[1]==maxFps[1])) {
 				maxFps = interval; 
 			}
 		}

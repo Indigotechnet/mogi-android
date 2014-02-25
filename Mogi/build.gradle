@@ -16,11 +16,20 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0.0"
+    compileSdkVersion 19
+    buildToolsVersion "19.0.0"
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 16
+        minSdkVersion 16
+        targetSdkVersion 19
+    }
+
+    buildTypes{
+        debug {
+            buildConfigField "String", "serverUrl", "\"http://192.168.0.119:3000\""
+        }
+        release {
+            buildConfigField "String", "serverUrl", "\"http://projectmogi.com\""
+        }
     }
 }

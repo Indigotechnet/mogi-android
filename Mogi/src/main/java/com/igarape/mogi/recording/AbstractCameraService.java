@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import net.majorkernelpanic.streaming.gl.SurfaceView;
 import android.view.WindowManager;
 
 import com.igarape.mogi.BaseService;
@@ -24,7 +24,7 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
         mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        mSurfaceView = new SurfaceView(this);
+        mSurfaceView = new SurfaceView(this, null);
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
                 1, 1,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
