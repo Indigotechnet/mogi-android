@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.VideoUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -49,9 +50,9 @@ public class UploadService extends Service {
         }
 
         uploadLocations();
-        //TODO - Vídeos desabilitados
-        //uploadVideos();
-
+        if (VideoUtils.isRecordVideos()){
+            uploadVideos();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

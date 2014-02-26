@@ -9,6 +9,7 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import android.view.WindowManager;
 
 import com.igarape.mogi.BaseService;
+import com.igarape.mogi.utils.VideoUtils;
 
 public abstract class AbstractCameraService extends BaseService implements SurfaceHolder.Callback {
     public static int ServiceID = 3;
@@ -22,28 +23,31 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
-        mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        mSurfaceView = new SurfaceView(this, null);
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
-                1, 1,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                PixelFormat.TRANSLUCENT
-        );
-        layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
-        mWindowManager.addView(mSurfaceView, layoutParams);
-        mSurfaceHolder = mSurfaceView.getHolder();
-        mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setFixedSize(1,1);
-
+        if (VideoUtils.isRecordVideos()){
+            // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
+            mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+            mSurfaceView = new SurfaceView(this, null);
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
+                    1, 1,
+                    WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                    PixelFormat.TRANSLUCENT
+            );
+            layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+            mWindowManager.addView(mSurfaceView, layoutParams);
+            mSurfaceHolder = mSurfaceView.getHolder();
+            mSurfaceHolder.addCallback(this);
+            mSurfaceHolder.setFixedSize(1,1);
+        }
         return START_STICKY;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        surfaceCreated = true;
-        startRecording();
+        if (VideoUtils.isRecordVideos()){
+            surfaceCreated = true;
+            startRecording();
+        }
     }
 
     @Override

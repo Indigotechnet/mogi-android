@@ -15,6 +15,7 @@ import com.igarape.mogi.R;
 import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.server.AuthenticatedJsonRequest;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.VideoUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 
 import net.majorkernelpanic.streaming.Session;
@@ -44,28 +45,29 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (VideoUtils.isRecordVideos()){
 
-        if ( IsStreaming ) {
-            return START_STICKY;
+            if ( IsStreaming ) {
+                return START_STICKY;
+            }
+
+            Notification notification = new Notification.Builder(this)
+                    .setContentTitle("SmartPolicing Streaming")
+                    .setContentText("")
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .build();
+
+            queue = Volley.newRequestQueue(getBaseContext());
+
+            stopService(new Intent(this, RecordingService.class));
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            startForeground(ServiceID, notification);
         }
-
-        Notification notification = new Notification.Builder(this)
-                .setContentTitle("SmartPolicing Streaming")
-                .setContentText("")
-                .setSmallIcon(R.drawable.ic_launcher)
-                .build();
-
-        queue = Volley.newRequestQueue(getBaseContext());
-
-        stopService(new Intent(this, RecordingService.class));
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        startForeground(ServiceID, notification);
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -78,34 +80,36 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public void startRecording() {
-        if ( IsStreaming ) {
-            return;
-        }
+        if (VideoUtils.isRecordVideos()){
+            if ( IsStreaming ) {
+                return;
+            }
 
-        try {
-            mSession = SessionBuilder.getInstance()
-                    .setSurfaceView(mSurfaceView)
-                    .setContext(getApplicationContext())
-                    .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
-                    .setVideoEncoder(SessionBuilder.VIDEO_H263)
-                    .setAudioEncoder(SessionBuilder.AUDIO_AAC)
-                    .build();
+            try {
+                mSession = SessionBuilder.getInstance()
+                        .setSurfaceView(mSurfaceView)
+                        .setContext(getApplicationContext())
+                        .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
+                        .setVideoEncoder(SessionBuilder.VIDEO_H263)
+                        .setAudioEncoder(SessionBuilder.AUDIO_AAC)
+                        .build();
 
-            mSurfaceView.getHolder().addCallback(this);
+                mSurfaceView.getHolder().addCallback(this);
 
-            mSession.setDestination(InetAddress.getByName(serverAddress).getHostAddress());
-            mSession.getAudioTrack().configure();
-            String sdp = mSession.getSessionDescription();
-            makeStartStreamingRequest(sdp);
-            Log.d("SessionDescription", sdp);
-            mSession.start();
-            TimeStarted = java.lang.System.currentTimeMillis();
-            IsStreaming = true;
-            WidgetUtils.BeginUpdating(this);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (RuntimeException e) {
-            Log.e(TAG, e.getMessage(), e);
+                mSession.setDestination(InetAddress.getByName(serverAddress).getHostAddress());
+                mSession.getAudioTrack().configure();
+                String sdp = mSession.getSessionDescription();
+                makeStartStreamingRequest(sdp);
+                Log.d("SessionDescription", sdp);
+                mSession.start();
+                TimeStarted = java.lang.System.currentTimeMillis();
+                IsStreaming = true;
+                WidgetUtils.BeginUpdating(this);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(), e);
+            } catch (RuntimeException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
         }
     }
 
