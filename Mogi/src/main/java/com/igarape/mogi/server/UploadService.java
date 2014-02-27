@@ -20,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +65,7 @@ public class UploadService extends Service {
         String[] values;
 
         try {
-            is = new FileInputStream(FileUtils.getPath() + "locations.txt");
+            is = new FileInputStream(FileUtils.getLocationsFilePath());
             br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         } catch (FileNotFoundException e) {
             return;
@@ -92,11 +94,18 @@ public class UploadService extends Service {
         is = null;
 
         ApiClient.post("/locations", locations, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(JSONObject jsonObject) {
-
-                    }
-                });
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                FileWriter out = null;
+                try {
+                    out = new FileWriter(FileUtils.getLocationsFilePath(),true);
+                    out.write("");
+                    out.close();
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        });
     }
 
     private void uploadVideos() {
@@ -124,7 +133,7 @@ public class UploadService extends Service {
             ApiClient.post("/videos", params, new TextHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                    Log.i(TAG, "video uploaded: "+ nextVideo.getName());
+                Log.i(TAG, "video uploaded: "+ nextVideo.getName());
                     uploadVideos();
                 }
 

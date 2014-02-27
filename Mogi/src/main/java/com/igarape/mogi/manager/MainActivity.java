@@ -53,46 +53,42 @@ public class MainActivity extends BaseActivity {
         if (!RecordingUtil.isInAction()) {
             startSmartPolicingService(RecordingService.class);
         }
-        Button forceUploadButton = (Button) findViewById(R.id.force_upload);
-        if (VideoUtils.isRecordVideos()){
-            forceUploadButton.setOnClickListener(new Button.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                    NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-                    if (activeNetwork == null) {
-                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                        return;
-                    }
-                    if (!activeNetwork.isConnectedOrConnecting()) {
-                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                        return;
-                    }
+            NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+            if (activeNetwork == null) {
+                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                return;
+            }
+            if (!activeNetwork.isConnectedOrConnecting()) {
+                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                return;
+            }
 
-                    if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)) {
-                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
-                        return;
-                    }
-                    IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-                    Intent batteryStatus = registerReceiver(null, ifilter);
+            if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)) {
+                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
+                return;
+            }
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = registerReceiver(null, ifilter);
 
-                    int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 
-                    boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                            status == BatteryManager.BATTERY_STATUS_FULL;
+            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL;
 
-                    if (!isCharging) {
-                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
-                        return;
-                    }
+            if (!isCharging) {
+                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
+                return;
+            }
 
-                    sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
-                }
-            });
-        } else {
-            forceUploadButton.setVisibility(View.INVISIBLE);
-        }
+            sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
+            }
+        });
+
 
         ((Button)findViewById(R.id.send_location)).setOnClickListener(new Button.OnClickListener() {
             @Override

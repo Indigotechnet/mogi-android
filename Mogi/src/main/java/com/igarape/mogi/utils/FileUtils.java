@@ -20,9 +20,11 @@ public class FileUtils {
     private static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 
     private static String path = "/mnt/extSdCard/smartpolicing/";
-    // Environment.getExternalStorageDirectory() + "/external_sd/igarape/"
 
     public static void setPath(String path) {
+        if (!path.endsWith(File.separator)){
+            path = path + File.separator;
+        }
         File f = new File(path);
         if (!f.exists()) {
             f.mkdirs();
@@ -62,5 +64,9 @@ public class FileUtils {
         } catch (IOException e) {
             Log.e("FileUtils", e.getMessage());
         }
+    }
+
+    public static String getLocationsFilePath() {
+        return getPath() + "locations.txt";
     }
 }

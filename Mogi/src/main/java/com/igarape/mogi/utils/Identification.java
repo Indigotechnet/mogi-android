@@ -36,7 +36,7 @@ public class Identification {
             SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
             accessToken = sharedPrefs.getString(PREF_ACCESS_TOKEN, null);
         }
-        return "Bearer " + accessToken;
+        return accessToken != null ? "Bearer " + accessToken : null;
     }
 
     public synchronized static void setAccessToken(Context context, String token) {
