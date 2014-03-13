@@ -31,7 +31,7 @@ import java.net.InetAddress;
  * Created by felipeamorim on 24/07/2013.
  */
 public class StreamingService extends AbstractCameraService implements SurfaceHolder.Callback {
-    public static String TAG = "StreamingService";
+    public static String TAG = StreamingService.class.getName();
 
     private final String serverAddress = "54.221.244.181";
 

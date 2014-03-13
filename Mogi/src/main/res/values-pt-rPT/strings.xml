@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SmartPolicing</string>
+    <string name="pref_current_camera">Câmera utilizada</string>
+    <string name="pref_camera_background">Gravar automaticamente</string>
+    <string name="pref_location_enabled">Salvar localização</string>
+    <string name="widget_go_live">Começar Streaming</string>
+    <string name="widget_status_text">Status:</string>
+    <string name="title_activity_main">SmartPolicing</string>
+    <string name="action_settings">Configurações</string>
+    <string name="title_activity_authentication">Logar no SmartPolicing</string>
+    <string name="login_hint">Usuário</string>
+    <string name="password_hint">Senha</string>
+    <string name="login_cancel">Cancelar</string>
+    <string name="login_go">Login</string>
+    <string name="logout">Sair</string>
+    <string name="force_upload">Iniciar envio de dados</string>
+    <string name="dialog_upload_no_network">Não existe rede ativa para envio de dados</string>
+    <string name="dialog_upload_not_wifi">É necessário estar conectado a uma rede sem fio</string>
+    <string name="dialog_upload_not_charging">É necessário que o celular esteja carregando</string>
+    <string name="login_title">Login to SmartPolicing</string>
+    <string name="location_status_online">Conectado</string>
+    <string name="location_status_offline">Sem rede de dados</string>
+</resources>

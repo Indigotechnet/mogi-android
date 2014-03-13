@@ -24,6 +24,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
+import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AuthenticationActivity extends Activity {
-    public static String TAG = "AuthenticationActivity";
+    public static String TAG = AuthenticationActivity.class.getName();
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
@@ -220,17 +221,19 @@ public class AuthenticationActivity extends Activity {
             @Override
             public void onFailure(String responseBody, Throwable error) {
                 pDialog.hide();
+                pDialog = null;
                 Log.e(TAG, "Error: " + responseBody, error);
                 Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                pDialog.hide();
+                pDialog = null;
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), responseBody);
                 Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
                 ApiClient.setToken(responseBody);
-                startService(new Intent(AuthenticationActivity.this, UpdateLocationService.class));
                 startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
 
             }

@@ -1,8 +1,10 @@
 package com.igarape.mogi.location;
 
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -14,12 +16,26 @@ import com.google.android.gms.location.LocationRequest;
 import com.igarape.mogi.R;
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.LocationUtils;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by felipeamorim on 24/07/2013.
  */
 public class LocationService extends BaseService {
-    public static String TAG = "LocationService";
+    public static final int INTERVAL = 20000;
+    public static String TAG = LocationService.class.getName();
     public static int ServiceID = 2;
 
     private LocationClient mLocationClient;
@@ -74,7 +90,7 @@ public class LocationService extends BaseService {
 
             // Request for location updates
             LocationRequest request = LocationRequest.create();
-            request.setInterval(10000);
+            request.setInterval(INTERVAL);
             request.setSmallestDisplacement(1);
             request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationClient.requestLocationUpdates(request, mLocationCallback);
@@ -107,11 +123,62 @@ public class LocationService extends BaseService {
             Log.v(LocationService.TAG, "Location Client connection failed");
         }
 
-        private void handleLocation(Location location) {
+        private void handleLocation(final Location location) {
             Log.v(LocationService.TAG, "LocationChanged == @" + location.getLatitude() + "," + location.getLongitude());
 
-            // Parse to file
-            FileUtils.LogLocation(location);
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            //For 3G check
+            boolean is3g = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+                    .isConnectedOrConnecting();
+            //For WiFi Check
+            boolean isWifi = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                    .isConnectedOrConnecting();
+            if (is3g || isWifi){
+                TimeZone tz = TimeZone.getTimeZone("UTC");
+                DateFormat df = new SimpleDateFormat(FileUtils.DATE_FORMAT);
+                df.setTimeZone(tz);
+
+                try {
+                    JSONObject locationJson = LocationUtils.buildJson(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()), df.format(new Date()));
+                    LocationUtils.sendLocation(locationJson, new JsonHttpResponseHandler() {
+
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                            Log.i(TAG, "location sent successfully");
+                        }
+
+                        @Override
+                        public void onFailure(Throwable e, JSONObject errorResponse) {
+                            Log.e(TAG, "location not sent successfully");
+                            FileUtils.LogLocation(location);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                            Log.e(TAG, "location not sent successfully", e);
+                            FileUtils.LogLocation(location);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
+                            Log.e(TAG, "location not sent successfully", e);
+                            FileUtils.LogLocation(location);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
+                            Log.e(TAG, "location not sent successfully", e);
+                            FileUtils.LogLocation(location);
+                        }
+                    });
+                } catch (JSONException e) {
+                    Log.e(TAG, "error sending location", e);
+                    FileUtils.LogLocation(location);
+                }
+            } else {
+                // Parse to file
+                FileUtils.LogLocation(location);
+            }
             mLastLocation = location;
         }
     }

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Date;
 
 public class RecordingService extends AbstractCameraService implements SurfaceHolder.Callback {
-    public static String TAG = "RecordingService";
+    public static String TAG = RecordingService.class.getName();
 
     private MediaRecorder mMediaRecorder;
     protected Camera mCamera;

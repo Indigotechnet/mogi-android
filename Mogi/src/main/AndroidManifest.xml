@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -58,7 +59,6 @@
         <service android:name="com.igarape.mogi.location.LocationService" />
         <service android:name="com.igarape.mogi.recording.RecordingService" />
         <service android:name="com.igarape.mogi.recording.StreamingService" />
-        <service android:name=".server.UpdateLocationService"/>
         <service android:name=".server.UploadService" />
         <service android:name=".recording.ToggleStreamingService" />
         <service android:name=".widget.WidgetUpdateService" />

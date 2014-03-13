@@ -3,9 +3,11 @@ package com.igarape.mogi.server;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.VideoUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -35,7 +37,7 @@ import java.util.TimeZone;
  * Created by felipeamorim on 09/09/2013.
  */
 public class UploadService extends Service {
-    public static String TAG = "UploadService";
+    public static String TAG = UploadService.class.getName();
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
 
@@ -76,12 +78,7 @@ public class UploadService extends Service {
         try {
             while((line = br.readLine()) != null) {
                 values = line.split(";");
-                curLoc = new JSONObject();
-                curLoc.put("lat", values[0]);
-                curLoc.put("lng", values[1]);
-                curLoc.put("date", values[4]);
-
-                locations.put(curLoc);
+                locations.put(LocationUtils.buildJson(values[0],values[1],values[4]));
             }
             br.close();
         } catch (IOException e) {
@@ -92,21 +89,41 @@ public class UploadService extends Service {
 
         br = null;
         is = null;
+        if (locations.length() != 0) {
 
-        ApiClient.post("/locations", locations, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(JSONObject jsonObject) {
-                FileWriter out = null;
-                try {
-                    out = new FileWriter(FileUtils.getLocationsFilePath(),true);
-                    out.write("");
-                    out.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
+            LocationUtils.sendLocations(locations, new JsonHttpResponseHandler() {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                    File out = null;
+                    out = new File(FileUtils.getLocationsFilePath());
+                    out.delete();
                 }
-            }
-        });
+
+                @Override
+                public void onFailure(Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+            });
+        }
     }
+
+
 
     private void uploadVideos() {
 

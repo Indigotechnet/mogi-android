@@ -21,7 +21,7 @@ import dagger.Provides;
  * Created by felipeamorim on 08/07/2013.
  */
 public class MogiApp extends Application {
-    public static String TAG = "MogiApp";
+    public static String TAG = MogiApp.class.getName();
     private ObjectGraph objectGraph;
     private Bus mBus;
 

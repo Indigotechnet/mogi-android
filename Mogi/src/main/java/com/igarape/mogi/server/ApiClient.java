@@ -25,6 +25,7 @@ public class ApiClient {
 
     static {
         client.setURLEncodingEnabled(true);
+        client.setTimeout(10000);
     }
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {

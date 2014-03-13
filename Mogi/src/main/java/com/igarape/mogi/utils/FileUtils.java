@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 /**
@@ -17,7 +16,9 @@ import java.util.TimeZone;
  */
 public class FileUtils {
 
-    private static DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+    public static final String LOCATIONS_TXT = "locations.txt";
+    public static final String BATTERY_TXT = "battery.txt";
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     private static String path = "/mnt/extSdCard/smartpolicing/";
 
@@ -38,15 +39,15 @@ public class FileUtils {
     }
 
     public static void LogBattery(int level, int status) {
-        LogToFile("battery.txt", level + ";" + status);
+        LogToFile(BATTERY_TXT, level + ";" + status);
     }
 
     public static void LogLocation(Location location) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
         df.setTimeZone(tz);
 
-        LogToFile("locations.txt",
+        LogToFile(LOCATIONS_TXT,
                 location.getLatitude() + ";" +
                 location.getLongitude() + ";" +
                 location.getAccuracy() + ";" +
@@ -56,7 +57,6 @@ public class FileUtils {
     }
 
     private static void LogToFile(String file, String data) {
-        data = data + ";" + isoDateFormat.format(new Date());
         try {
             FileWriter writer = new FileWriter(getPath() + file, true);
             writer.write(data + "\n");
@@ -67,6 +67,6 @@ public class FileUtils {
     }
 
     public static String getLocationsFilePath() {
-        return getPath() + "locations.txt";
+        return getPath() + LOCATIONS_TXT;
     }
 }
