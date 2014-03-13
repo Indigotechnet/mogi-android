@@ -20,6 +20,14 @@
 
 package net.majorkernelpanic.streaming.rtsp;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.util.Log;
+
+import net.majorkernelpanic.streaming.Session;
+import net.majorkernelpanic.streaming.Stream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,13 +42,6 @@ import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.majorkernelpanic.streaming.Session;
-import net.majorkernelpanic.streaming.Stream;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.util.Log;
 
 /**
  * RFC 2326.

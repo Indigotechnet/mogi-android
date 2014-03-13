@@ -3,7 +3,6 @@ package com.igarape.mogi.server;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.igarape.mogi.utils.FileUtils;
@@ -22,8 +21,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;

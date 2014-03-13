@@ -24,7 +24,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
-import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;

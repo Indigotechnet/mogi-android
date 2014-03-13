@@ -1,7 +1,6 @@
 package net.majorkernelpanic.streaming.video;
 
 import android.graphics.ImageFormat;
-import android.media.MediaCodecInfo;
 
 import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar;
 import static android.media.MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar;

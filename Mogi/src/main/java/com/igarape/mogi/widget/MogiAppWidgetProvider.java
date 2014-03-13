@@ -11,9 +11,8 @@ import android.widget.RemoteViews;
 
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
-import com.igarape.mogi.recording.RecordingUtil;
-import com.igarape.mogi.recording.ToggleStreamingService;
 import com.igarape.mogi.recording.StreamingService;
+import com.igarape.mogi.recording.ToggleStreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.utils.Identification;
 

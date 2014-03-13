@@ -20,12 +20,12 @@
 
 package net.majorkernelpanic.streaming.rtp;
 
+import net.majorkernelpanic.streaming.rtcp.SenderReport;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Random;
-
-import net.majorkernelpanic.streaming.rtcp.SenderReport;
 
 /**
  * 

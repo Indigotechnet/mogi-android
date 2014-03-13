@@ -1,13 +1,9 @@
 package com.igarape.mogi.gcm;
 
 import android.app.Activity;
-import android.app.IntentService;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
-import android.util.SparseArray;
 
 /**
  * Created by felipeamorim on 26/08/2013.

@@ -3,8 +3,6 @@ package com.igarape.mogi.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.igarape.mogi.R;
-
 /**
  * Created by brunosiqueira on 19/02/2014.
  */

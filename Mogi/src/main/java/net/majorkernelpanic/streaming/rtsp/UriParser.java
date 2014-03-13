@@ -20,19 +20,7 @@
 
 package net.majorkernelpanic.streaming.rtsp;
 
-import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_AAC;
-import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_AMRNB;
-import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_NONE;
-import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_H263;
-import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_H264;
-import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_NONE;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.List;
+import android.hardware.Camera.CameraInfo;
 
 import net.majorkernelpanic.streaming.MediaStream;
 import net.majorkernelpanic.streaming.Session;
@@ -43,7 +31,19 @@ import net.majorkernelpanic.streaming.video.VideoQuality;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
-import android.hardware.Camera.CameraInfo;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.util.List;
+
+import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_AAC;
+import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_AMRNB;
+import static net.majorkernelpanic.streaming.SessionBuilder.AUDIO_NONE;
+import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_H263;
+import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_H264;
+import static net.majorkernelpanic.streaming.SessionBuilder.VIDEO_NONE;
 
 /**
  * This class parses URIs received by the RTSP server and configures a Session accordingly.

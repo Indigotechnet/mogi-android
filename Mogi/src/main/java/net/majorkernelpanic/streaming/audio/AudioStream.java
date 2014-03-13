@@ -20,11 +20,12 @@
 
 package net.majorkernelpanic.streaming.audio;
 
-import java.io.IOException;
-
-import net.majorkernelpanic.streaming.MediaStream;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import net.majorkernelpanic.streaming.MediaStream;
+
+import java.io.IOException;
 
 /** 
  * Don't use this class directly.

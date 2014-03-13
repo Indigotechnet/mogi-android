@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
-import net.majorkernelpanic.streaming.gl.SurfaceView;
 import android.view.WindowManager;
 
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.utils.VideoUtils;
+
+import net.majorkernelpanic.streaming.gl.SurfaceView;
 
 public abstract class AbstractCameraService extends BaseService implements SurfaceHolder.Callback {
     public static int ServiceID = 3;

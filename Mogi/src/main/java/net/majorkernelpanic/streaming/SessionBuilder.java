@@ -20,8 +20,9 @@
 
 package net.majorkernelpanic.streaming;
 
-import java.io.IOException;
-import java.net.InetAddress;
+import android.content.Context;
+import android.hardware.Camera.CameraInfo;
+import android.preference.PreferenceManager;
 
 import net.majorkernelpanic.streaming.audio.AACStream;
 import net.majorkernelpanic.streaming.audio.AMRNBStream;
@@ -32,9 +33,6 @@ import net.majorkernelpanic.streaming.video.H263Stream;
 import net.majorkernelpanic.streaming.video.H264Stream;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 import net.majorkernelpanic.streaming.video.VideoStream;
-import android.content.Context;
-import android.hardware.Camera.CameraInfo;
-import android.preference.PreferenceManager;
 
 /**
  * Call {@link #getInstance()} to get access to the SessionBuilder.

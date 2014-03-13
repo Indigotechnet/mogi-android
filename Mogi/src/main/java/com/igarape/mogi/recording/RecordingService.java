@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.net.LocalServerSocket;
-import android.net.LocalSocket;
-import android.net.LocalSocketAddress;
 import android.os.IBinder;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -19,7 +16,6 @@ import com.igarape.mogi.utils.VideoUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 public class RecordingService extends AbstractCameraService implements SurfaceHolder.Callback {

@@ -20,13 +20,12 @@
 
 package net.majorkernelpanic.streaming.audio;
 
+import android.media.MediaRecorder;
+
+import net.majorkernelpanic.streaming.rtp.AMRNBPacketizer;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
-
-import net.majorkernelpanic.streaming.SessionBuilder;
-import net.majorkernelpanic.streaming.rtp.AMRNBPacketizer;
-import android.media.MediaRecorder;
-import android.service.textservice.SpellCheckerService.Session;
 
 /**
  * A class for streaming AAC from the camera of an android device using RTP.

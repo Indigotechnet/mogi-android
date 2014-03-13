@@ -20,14 +20,12 @@
 
 package net.majorkernelpanic.streaming.rtcp;
 
+import android.os.SystemClock;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.nio.channels.IllegalSelectorException;
-
-import android.os.SystemClock;
-import android.util.Log;
 
 /**
  * Implementation of Sender Report RTCP packets.

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.recording.ToggleStreamingService;
 
