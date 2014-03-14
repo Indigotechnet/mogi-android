@@ -227,7 +227,7 @@ public class AuthenticationActivity extends Activity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                pDialog.hide();
+                pDialog.dismiss();
                 pDialog = null;
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), responseBody);

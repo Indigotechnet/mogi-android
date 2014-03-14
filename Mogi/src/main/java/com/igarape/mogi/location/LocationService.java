@@ -32,6 +32,7 @@ public class LocationService extends BaseService {
     private static final long INTERVAL = 20000;
     private static final String TAG = LocationService.class.getName();
     public static final int CALL_GPS_INTERVAL = 2000;
+    public static final String GPS_PROVIDER = LocationManager.NETWORK_PROVIDER;
     public static int ServiceID = 2;
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
@@ -79,17 +80,16 @@ public class LocationService extends BaseService {
             public void onProviderDisabled(String provider) {}
         };
 
-        mLastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mLastKnownLocation = mLocationManager.getLastKnownLocation(GPS_PROVIDER);
         if (mLastKnownLocation != null){
             handleLocation(mLastKnownLocation);
         }
         // Register the listener with the Location Manager to receive location updates
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, CALL_GPS_INTERVAL, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(GPS_PROVIDER, CALL_GPS_INTERVAL, 0, mLocationListener);
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mLocationManager.removeUpdates(mLocationListener);
     }
 
