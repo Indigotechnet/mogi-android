@@ -203,10 +203,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void registerMyReceiver() {
-//TODO Improve calls to this service
-//        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-//        connectivityStatusReceiver = new ConnectivityStatusReceiver();
-//        registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
+        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        connectivityStatusReceiver = new ConnectivityStatusReceiver();
+        registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
     }
     
 }

@@ -1,11 +1,14 @@
 package com.igarape.mogi.utils;
 
+import com.google.gson.stream.JsonWriter;
 import com.igarape.mogi.server.ApiClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * Created by brunosiqueira on 08/03/2014.

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.gson.stream.JsonWriter;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.VideoUtils;
@@ -17,7 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,10 +28,15 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TimeZone;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by felipeamorim on 09/09/2013.
@@ -86,40 +94,47 @@ public class UploadService extends Service {
 
         br = null;
         is = null;
-        if (locations.length() != 0) {
 
-            LocationUtils.sendLocations(locations, new JsonHttpResponseHandler() {
 
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                    File out = null;
-                    out = new File(FileUtils.getLocationsFilePath());
-                    out.delete();
-                }
+        LocationUtils.sendLocations(locations, new JsonHttpResponseHandler() {
+            private void deleteFile() {
+                File out = new File(FileUtils.getLocationsFilePath());
+                out.delete();
+                Log.i(TAG, "location sent successfully");
+            }
 
-                @Override
-                public void onFailure(Throwable e, JSONObject errorResponse) {
-                    Log.e(TAG, "location not sent successfully");
-                }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                deleteFile();
+            }
 
-                @Override
-                public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                    Log.e(TAG, "location not sent successfully", e);
-                }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
-                    Log.e(TAG, "location not sent successfully", e);
-                }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {//
+                deleteFile();
+            }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
-                    Log.e(TAG, "location not sent successfully", e);
-                }
-            });
-        }
+            @Override
+            public void onFailure(Throwable e, JSONObject errorResponse) {
+                Log.e(TAG, "location not sent successfully");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                Log.e(TAG, "location not sent successfully", e);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
+                Log.e(TAG, "location not sent successfully", e);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
+                Log.e(TAG, "location not sent successfully", e);
+            }
+        });
     }
-
 
 
     private void uploadVideos() {

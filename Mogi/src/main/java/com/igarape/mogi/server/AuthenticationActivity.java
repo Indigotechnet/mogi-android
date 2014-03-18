@@ -219,16 +219,20 @@ public class AuthenticationActivity extends Activity {
         ApiClient.post("/token", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(String responseBody, Throwable error) {
-                pDialog.hide();
-                pDialog = null;
+                if (pDialog != null){
+                    pDialog.dismiss();
+                    pDialog = null;
+                }
                 Log.e(TAG, "Error: " + responseBody, error);
                 Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                pDialog.dismiss();
-                pDialog = null;
+                if (pDialog != null){
+                    pDialog.dismiss();
+                    pDialog = null;
+                }
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), responseBody);
                 Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
