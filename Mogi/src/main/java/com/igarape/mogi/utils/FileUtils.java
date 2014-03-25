@@ -23,7 +23,7 @@ public class FileUtils {
     private static String path = "/mnt/extSdCard/smartpolicing/";
 
     public static void setPath(String path) {
-        if (!path.endsWith(File.separator)){
+        if (!path.endsWith(File.separator)) {
             path = path + File.separator;
         }
         File f = new File(path);
@@ -49,10 +49,10 @@ public class FileUtils {
 
         LogToFile(LOCATIONS_TXT,
                 location.getLatitude() + ";" +
-                location.getLongitude() + ";" +
-                location.getAccuracy() + ";" +
-                location.getProvider() + ";" +
-                df.format(new Date())
+                        location.getLongitude() + ";" +
+                        location.getAccuracy() + ";" +
+                        location.getProvider() + ";" +
+                        df.format(new Date())
         );
     }
 

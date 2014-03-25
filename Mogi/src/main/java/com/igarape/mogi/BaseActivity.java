@@ -19,7 +19,7 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((MogiApp)getApplication()).objectGraph().inject(this);
+        ((MogiApp) getApplication()).objectGraph().inject(this);
     }
 
     @Override

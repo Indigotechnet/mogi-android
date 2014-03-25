@@ -3,19 +3,17 @@ package com.igarape.mogi.server;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.stream.JsonWriter;
 import com.igarape.mogi.BuildConfig;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -51,12 +49,11 @@ public class ApiClient {
     }
 
     public static void post(String url, JSONArray body, JsonHttpResponseHandler responseHandler) {
+
         try {
-            client.post(appContext, getServerUrl(url), new BufferedHttpEntity(new StringEntity(body.toString())), "application/json", responseHandler);
+            ByteArrayEntity entity = new ByteArrayEntity(body.toString().getBytes("UTF-8"));
+            client.post(appContext, getServerUrl(url), entity, "application/json", responseHandler);
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, e.getMessage());
-            responseHandler.onFailure(e, new JSONObject());
-        } catch (IOException e) {
             Log.e(TAG, e.getMessage());
             responseHandler.onFailure(e, new JSONObject());
         }

@@ -70,20 +70,20 @@ public class AuthenticationActivity extends Activity {
             }
         }
 
-        txtId = (EditText)findViewById(R.id.txtLoginUser);
+        txtId = (EditText) findViewById(R.id.txtLoginUser);
         txtId.setText(Identification.getUserLogin(this));
 
-        txtPwd = (EditText)findViewById(R.id.txtLoginPassword);
+        txtPwd = (EditText) findViewById(R.id.txtLoginPassword);
 
         queue = Volley.newRequestQueue(this);
-        ((Button)findViewById(R.id.btn_login_ok)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.btn_login_ok)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 makeLoginRequest();
             }
         });
 
-        ((Button)findViewById(R.id.btn_login_cancel)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.btn_login_cancel)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
@@ -174,7 +174,7 @@ public class AuthenticationActivity extends Activity {
     }
 
     private void registerInBackground() {
-        new AsyncTask<Void,Void,String>() {
+        new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 String msg = "";
@@ -200,7 +200,7 @@ public class AuthenticationActivity extends Activity {
             protected void onPostExecute(String msg) {
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG);
 
-                if (Identification.getAccessToken(context) != null ) {
+                if (Identification.getAccessToken(context) != null) {
                     startActivity(new Intent(context, MainActivity.class));
                 }
             }
@@ -219,7 +219,7 @@ public class AuthenticationActivity extends Activity {
         ApiClient.post("/token", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(String responseBody, Throwable error) {
-                if (pDialog != null){
+                if (pDialog != null) {
                     pDialog.dismiss();
                     pDialog = null;
                 }
@@ -229,7 +229,7 @@ public class AuthenticationActivity extends Activity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                if (pDialog != null){
+                if (pDialog != null) {
                     pDialog.dismiss();
                     pDialog = null;
                 }

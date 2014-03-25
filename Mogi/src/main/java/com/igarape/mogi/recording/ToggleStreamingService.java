@@ -16,7 +16,7 @@ public class ToggleStreamingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if ( StreamingService.IsStreaming ) {
+        if (StreamingService.IsStreaming) {
             stopService(new Intent(this, StreamingService.class));
             startService(new Intent(this, RecordingService.class));
         } else {

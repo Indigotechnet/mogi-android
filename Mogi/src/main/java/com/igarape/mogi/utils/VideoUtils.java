@@ -4,7 +4,11 @@ package com.igarape.mogi.utils;
  * Created by brunosiqueira on 26/02/2014.
  */
 public class VideoUtils {
-    private static boolean recordVideos = false;
+    public static final int DEGREES = 90;
+    public static final int MAX_DURATION_MS = 10000;
+    private static final String CAMERA_PARAM_ORIENTATION = "orientation";
+    private static final String CAMERA_PARAM_PORTRAIT = "portrait";
+    private static boolean recordVideos = true;
 
     public static boolean isRecordVideos() {
         return recordVideos;

@@ -16,13 +16,13 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(
-    injects = {
-        MainActivity.class,
-        LocationService.class,
-        ConnectivityStatusReceiver.class,
-        RecordingService.class,
-        StreamingService.class,
-    }
+        injects = {
+                MainActivity.class,
+                LocationService.class,
+                ConnectivityStatusReceiver.class,
+                RecordingService.class,
+                StreamingService.class,
+        }
 )
 public class MogiModule {
     private final Context appContext;

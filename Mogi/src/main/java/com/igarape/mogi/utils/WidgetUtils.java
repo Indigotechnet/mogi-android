@@ -19,20 +19,18 @@ public class WidgetUtils {
 
         @Override
         public void run() {
-            try{
+            try {
                 UpdateWidget(context);
 
-                if ( isUpdating ) {
+                if (isUpdating) {
                     handler.postDelayed(this, 1000);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Error updating widget");
                 e.printStackTrace();
-            }
-            finally{
+            } finally {
                 //also call the same runnable
-                if ( isUpdating ) {
+                if (isUpdating) {
                     handler.postDelayed(this, 1000);
                 }
             }
@@ -40,7 +38,7 @@ public class WidgetUtils {
     };
 
     public static void BeginUpdating(Context ctx) {
-        if ( !isUpdating) {
+        if (!isUpdating) {
             context = ctx;
             UpdateWidget(ctx);
             //handler.postDelayed(runnable, 1000);
@@ -53,11 +51,11 @@ public class WidgetUtils {
 
     public static void UpdateWidget(Context ctx) {
         context = ctx;
-        Intent intent = new Intent(context,MogiAppWidgetProvider.class);
+        Intent intent = new Intent(context, MogiAppWidgetProvider.class);
         intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
         int[] ids = AppWidgetManager.getInstance(context.getApplicationContext())
                 .getAppWidgetIds(new ComponentName(context.getApplicationContext(), MogiAppWidgetProvider.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         context.sendBroadcast(intent);
     }
 }

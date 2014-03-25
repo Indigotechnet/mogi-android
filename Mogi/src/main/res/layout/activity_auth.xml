@@ -15,17 +15,18 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/login_title"
         android:id="@+id/textView"
-        android:layout_alignParentTop="true"/>
+        android:layout_alignParentTop="true" />
 
     <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtLoginUser"
-            android:hint="@string/login_hint"
-            android:layout_below="@+id/textView"
-            android:layout_alignLeft="@+id/relativeLayout"
-            android:layout_marginTop="16dp"
-            android:inputType="text" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtLoginUser"
+        android:hint="@string/login_hint"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/relativeLayout"
+        android:layout_marginTop="16dp"
+        android:inputType="text" />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,47 +37,51 @@
         android:inputType="textPassword" />
 
     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/relativeLayout">
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="1dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_alignParentTop="true" />
+
+        <View
+            android:id="@+id/ViewColorPickerHelper"
+            android:layout_width="1dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:id="@+id/relativeLayout">
-        <View
-                android:layout_width="match_parent"
-                android:layout_height="1dip"
-                android:layout_marginLeft="4dip"
-                android:layout_marginRight="4dip"
-                android:background="?android:attr/dividerVertical"
-                android:layout_alignParentTop="true"/>
-        <View
-                android:id="@+id/ViewColorPickerHelper"
-                android:layout_width="1dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="4dip"
-                android:layout_marginTop="4dip"
-                android:background="?android:attr/dividerVertical"
-                android:layout_centerHorizontal="true"/>
+            android:layout_marginBottom="4dip"
+            android:layout_marginTop="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_centerHorizontal="true" />
+
         <Button
-                android:id="@+id/btn_login_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@id/ViewColorPickerHelper"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="@android:string/cancel"
-                android:layout_alignParentBottom="true"/>
+            android:id="@+id/btn_login_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/ViewColorPickerHelper"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@android:string/cancel"
+            android:layout_alignParentBottom="true" />
+
         <Button
-                android:id="@+id/btn_login_ok"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="@android:string/ok"
-                android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@id/ViewColorPickerHelper"/>
+            android:id="@+id/btn_login_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@android:string/ok"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/ViewColorPickerHelper" />
     </RelativeLayout>
 
 </RelativeLayout>

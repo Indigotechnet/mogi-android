@@ -9,13 +9,14 @@ import com.squareup.otto.Bus;
 import javax.inject.Inject;
 
 public abstract class BaseService extends Service {
-    @Inject protected Bus bus;
+    @Inject
+    protected Bus bus;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        ((MogiApp)getApplication()).objectGraph().inject(this);
+        ((MogiApp) getApplication()).objectGraph().inject(this);
         bus.register(this);
     }
 

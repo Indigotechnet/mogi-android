@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="@dimen/widget_padding">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_padding">
 
     <LinearLayout
         android:orientation="vertical"
@@ -46,7 +46,7 @@
                 android:visibility="gone"
                 android:layout_height="32dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp" />
 
             <LinearLayout
                 android:layout_toRightOf="@id/widget_streaming_dot"
@@ -61,8 +61,7 @@
                     android:textAllCaps="true"
                     android:text="Active"
                     android:layout_marginLeft="8dp"
-                    style="@style/WidgetStatusOn"
-                    />
+                    style="@style/WidgetStatusOn" />
 
                 <TextView
                     android:id="@+id/widget_status_info"
@@ -70,8 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:text="Logged in for XX minutes"
-                    style="?android:textAppearance"
-                    />
+                    style="?android:textAppearance" />
             </LinearLayout>
 
             <ImageButton

@@ -51,7 +51,8 @@ public class MogiApp extends Application {
         return objectGraph;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public Bus providesBus() {
         return mBus;
     }

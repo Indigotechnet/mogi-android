@@ -33,8 +33,8 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (VideoUtils.isRecordVideos()){
-            if ( IsRecording ) {
+        if (VideoUtils.isRecordVideos()) {
+            if (IsRecording) {
                 return START_STICKY;
             }
 
@@ -45,15 +45,15 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
                     .build();
 
             startForeground(ServiceID, notification);
-            return super.onStartCommand(intent,flags,startId);
+            return super.onStartCommand(intent, flags, startId);
         }
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        if (VideoUtils.isRecordVideos()){
-            if ( IsRecording ) {
+        if (VideoUtils.isRecordVideos()) {
+            if (IsRecording) {
                 stopRecording();
             }
 
@@ -63,13 +63,13 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public void startRecording() {
-        if (VideoUtils.isRecordVideos()){
+        if (VideoUtils.isRecordVideos()) {
             if (IsRecording) {
                 return;
             }
 
-            mCamera = Camera.open(1);
-            mCamera.setDisplayOrientation(90);
+            mCamera = Camera.open(0);
+            mCamera.setDisplayOrientation(VideoUtils.DEGREES);
             mMediaRecorder = new MediaRecorder();
 
             mCamera.unlock();
@@ -79,30 +79,34 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
 
-            mLastFileRecorded = FileUtils.getPath()+
-                    DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime())+
+            mLastFileRecorded = FileUtils.getPath() +
+                    DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()) +
                     ".mp4";
 
             mMediaRecorder.setOutputFile(mLastFileRecorded);
 
-            mMediaRecorder.setMaxDuration(600000); // 10mins
+            mMediaRecorder.setMaxDuration(VideoUtils.MAX_DURATION_MS); // 10mins
             mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
                 @Override
                 public void onInfo(MediaRecorder mediaRecorder, int what, int extra) {
-                    if ( what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED ) {
+                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
                         stopRecording();
                         startRecording();
                     }
                 }
             });
 
-            try { mMediaRecorder.prepare(); } catch (Exception e) {
+            try {
+                mMediaRecorder.prepare();
+            } catch (Exception e) {
                 mCamera.release();
                 mCamera = null;
                 Log.e(TAG, "Could not prepare media recorder", e);
                 return;
             }
-            try { mMediaRecorder.start(); } catch (RuntimeException e) {
+            try {
+                mMediaRecorder.start();
+            } catch (RuntimeException e) {
                 mCamera.release();
                 mCamera = null;
                 Log.e(TAG, "Could not start camera", e);
@@ -115,8 +119,8 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public void stopRecording() {
-        if (VideoUtils.isRecordVideos()){
-            if ( !IsRecording) {
+        if (VideoUtils.isRecordVideos()) {
+            if (!IsRecording) {
                 return;
             }
 

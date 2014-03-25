@@ -13,9 +13,10 @@
         android:text="@string/location_status_online"
         android:id="@+id/location_status"
 
-        style="@style/LocationStatus"/>
+        style="@style/LocationStatus" />
 
-    <Button android:id="@+id/force_upload"
+    <Button
+        android:id="@+id/force_upload"
         android:text="@string/force_upload"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -30,7 +31,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="12dp" />
-
 
 
 </RelativeLayout>

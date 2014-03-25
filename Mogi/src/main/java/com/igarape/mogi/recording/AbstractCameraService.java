@@ -24,7 +24,7 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (VideoUtils.isRecordVideos()){
+        if (VideoUtils.isRecordVideos()) {
             // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
             mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
             mSurfaceView = new SurfaceView(this, null);
@@ -38,14 +38,14 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
             mWindowManager.addView(mSurfaceView, layoutParams);
             mSurfaceHolder = mSurfaceView.getHolder();
             mSurfaceHolder.addCallback(this);
-            mSurfaceHolder.setFixedSize(1,1);
+            mSurfaceHolder.setFixedSize(1, 1);
         }
         return START_STICKY;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if (VideoUtils.isRecordVideos()){
+        if (VideoUtils.isRecordVideos()) {
             surfaceCreated = true;
             startRecording();
         }

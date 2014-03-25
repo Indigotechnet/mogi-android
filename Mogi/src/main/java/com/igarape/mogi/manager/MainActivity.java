@@ -29,9 +29,9 @@ import com.igarape.mogi.utils.WidgetUtils;
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
 
-    private final Class[] activeServices = new Class[] {
-        LocationService.class,
-        RecordingService.class
+    private final Class[] activeServices = new Class[]{
+            LocationService.class,
+            RecordingService.class
     };
     private BroadcastReceiver connectivityReceiver = null;
     private TextView locationTextView;
@@ -46,13 +46,13 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         // Not logged, go to Auth
-        if (Identification.getAccessToken(this) == null ) {
+        if (Identification.getAccessToken(this) == null) {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
 
         WidgetUtils.UpdateWidget(this.getApplicationContext());
-        locationTextView = (TextView)findViewById(R.id.location_status);
+        locationTextView = (TextView) findViewById(R.id.location_status);
 
         startSmartPolicingService(LocationService.class);
         if (!RecordingUtil.isInAction()) {
@@ -61,40 +61,40 @@ public class MainActivity extends BaseActivity {
         ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-            ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-            if (activeNetwork == null) {
-                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                return;
-            }
-            if (!activeNetwork.isConnectedOrConnecting()) {
-                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                return;
-            }
+                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+                if (activeNetwork == null) {
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                    return;
+                }
+                if (!activeNetwork.isConnectedOrConnecting()) {
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                    return;
+                }
 
-            if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)) {
-                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
-                return;
-            }
-            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            Intent batteryStatus = registerReceiver(null, ifilter);
+                if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)) {
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
+                    return;
+                }
+                IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                Intent batteryStatus = registerReceiver(null, ifilter);
 
-            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 
-            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL;
+                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        status == BatteryManager.BATTERY_STATUS_FULL;
 
-            if (!isCharging) {
-                AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
-                return;
-            }
+                if (!isCharging) {
+                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
+                    return;
+                }
 
-            sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
+                sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
             }
         });
 
-        ((Button)findViewById(R.id.logout)).setOnClickListener(new Button.OnClickListener() {
+        ((Button) findViewById(R.id.logout)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 stopServices();
@@ -125,7 +125,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        try{
+        try {
             unregisterReceiver(connectivityReceiver);
         } catch (IllegalArgumentException e) {
             connectivityReceiver = null;
@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity {
         boolean isWifi = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
                 .isConnectedOrConnecting();
 
-        if (is3g || isWifi){
+        if (is3g || isWifi) {
             locationTextView.setText(getString(R.string.location_status_online));
             locationTextView.setBackgroundColor(Color.GREEN);
         } else {
@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void startServices() {
-        for(Class clazz:activeServices) {
+        for (Class clazz : activeServices) {
             startSmartPolicingService(clazz);
         }
     }
@@ -193,7 +193,7 @@ public class MainActivity extends BaseActivity {
             //Thread td = new Thread() {
             //    @Override
             //    public void run() {
-                    stopService(new Intent(MainActivity.this, clazz));
+            stopService(new Intent(MainActivity.this, clazz));
             //    }
             //};
             //td.start();
@@ -207,5 +207,5 @@ public class MainActivity extends BaseActivity {
         connectivityStatusReceiver = new ConnectivityStatusReceiver();
         registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
     }
-    
+
 }

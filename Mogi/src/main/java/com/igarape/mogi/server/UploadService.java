@@ -3,9 +3,9 @@ package com.igarape.mogi.server;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.stream.JsonWriter;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.VideoUtils;
@@ -18,9 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,15 +26,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.TimeZone;
-import java.util.zip.GZIPOutputStream;
+import java.util.Date;
 
 /**
  * Created by felipeamorim on 09/09/2013.
@@ -45,24 +40,33 @@ public class UploadService extends Service {
     public static String TAG = UploadService.class.getName();
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
+    public static boolean isUploading = false;
 
     public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        if ( videos == null || videos.size() == 0 ) {
+    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+        if (isUploading) {
+            return START_STICKY;
+        }
+        if (videos == null || videos.size() == 0) {
             File dir = new File(FileUtils.getPath());
             videos = new ArrayList<File>(Arrays.asList(dir.listFiles(filter)));
         }
 
         uploadLocations();
-        if (VideoUtils.isRecordVideos()){
+        if (VideoUtils.isRecordVideos()) {
             uploadVideos();
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isUploading = false;
     }
 
     private void uploadLocations() {
@@ -70,9 +74,15 @@ public class UploadService extends Service {
         BufferedReader br;
         String line;
         String[] values;
-
+        File file = new File(FileUtils.getLocationsFilePath());
+        if (!file.exists()) {
+            if (videos.isEmpty()) {
+                isUploading = false;
+            }
+            return;
+        }
         try {
-            is = new FileInputStream(FileUtils.getLocationsFilePath());
+            is = new FileInputStream(file);
             br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         } catch (FileNotFoundException e) {
             return;
@@ -81,9 +91,11 @@ public class UploadService extends Service {
         JSONArray locations = new JSONArray();
         JSONObject curLoc;
         try {
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 values = line.split(";");
-                locations.put(LocationUtils.buildJson(values[0],values[1],values[4]));
+                if (!TextUtils.isEmpty(values[0]) && !TextUtils.isEmpty(values[2]) && !TextUtils.isEmpty(values[4])) {
+                    locations.put(LocationUtils.buildJson(values[0], values[1], values[4]));
+                }
             }
             br.close();
         } catch (IOException e) {
@@ -139,14 +151,15 @@ public class UploadService extends Service {
 
     private void uploadVideos() {
 
-        if ( videos.size() == 0 ) {
+        if (videos.size() == 0) {
+            isUploading = false;
             stopSelf();
             return;
         }
 
         final File nextVideo = videos.remove(0);
 
-        if ( nextVideo != null && nextVideo.exists()) {
+        if (nextVideo != null && nextVideo.exists()) {
             RequestParams params = new RequestParams();
             try {
                 params.put("video", nextVideo);
@@ -156,19 +169,26 @@ public class UploadService extends Service {
                 uploadVideos();
                 return;
             }
-
-            params.put("date", TimeZone.getDefault().getDisplayName());
+            DateFormat df = new SimpleDateFormat(FileUtils.DATE_FORMAT);
+            params.put("date", df.format(new Date(nextVideo.lastModified())));
 
             ApiClient.post("/videos", params, new TextHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                Log.i(TAG, "video uploaded: "+ nextVideo.getName());
+                    Log.i(TAG, "video uploaded: " + nextVideo.getName());
+                    nextVideo.delete();
                     uploadVideos();
                 }
 
                 @Override
                 public void onFailure(String responseBody, Throwable error) {
-                    Log.e(TAG, "video not uploaded: "+ nextVideo.getName(), error);
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
+                    stopSelf();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
                     stopSelf();
                 }
             });

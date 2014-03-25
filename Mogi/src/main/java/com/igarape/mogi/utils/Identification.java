@@ -32,7 +32,7 @@ public class Identification {
     }
 
     public synchronized static String getAccessToken(Context context) {
-        if ( accessToken == null ) {
+        if (accessToken == null) {
             SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
             accessToken = sharedPrefs.getString(PREF_ACCESS_TOKEN, null);
         }
@@ -54,7 +54,7 @@ public class Identification {
     }
 
     public synchronized static String getUserLogin(Context context) {
-        if ( userLogin == null ) {
+        if (userLogin == null) {
             SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
             userLogin = sharedPrefs.getString(PREF_USER_LOGIN, null);
         }

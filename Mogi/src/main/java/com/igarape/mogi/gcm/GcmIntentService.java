@@ -47,9 +47,9 @@ public class GcmIntentService extends IntentService {
 //                    startService(new Intent(this, LocationService.class));
 //                } else
 
-                if ( key.equals(KEY_STREAMING_START) && !StreamingService.IsStreaming ) {
+                if (key.equals(KEY_STREAMING_START) && !StreamingService.IsStreaming) {
                     startService(new Intent(this, ToggleStreamingService.class));
-                } else if ( key.equals(KEY_STREAMING_STOP) && StreamingService.IsStreaming ) {
+                } else if (key.equals(KEY_STREAMING_STOP) && StreamingService.IsStreaming) {
                     stopService(new Intent(this, ToggleStreamingService.class));
                 }
             }

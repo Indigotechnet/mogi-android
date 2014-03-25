@@ -45,9 +45,9 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (VideoUtils.isRecordVideos()){
+        if (VideoUtils.isRecordVideos()) {
 
-            if ( IsStreaming ) {
+            if (IsStreaming) {
                 return START_STICKY;
             }
 
@@ -80,8 +80,8 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
 
     @Override
     public void startRecording() {
-        if (VideoUtils.isRecordVideos()){
-            if ( IsStreaming ) {
+        if (VideoUtils.isRecordVideos()) {
+            if (IsStreaming) {
                 return;
             }
 
@@ -123,19 +123,20 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
         }
 
         AuthenticatedJsonRequest request = new AuthenticatedJsonRequest(
-            Identification.getAccessToken(getBaseContext()), Request.Method.POST, url, json,
-            new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject jsonObject) {
-                    Log.d(TAG, jsonObject.toString());
-                }
-            }, new Response.ErrorListener() {
+                Identification.getAccessToken(getBaseContext()), Request.Method.POST, url, json,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.d(TAG, jsonObject.toString());
+                    }
+                }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 stopRecording();
                 Log.d(TAG, "Errror sending stream");
             }
-        });
+        }
+        );
 
         queue.add(request);
         queue.start();
@@ -156,7 +157,8 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
             public void onErrorResponse(VolleyError volleyError) {
                 Log.d(TAG, "Unable to cancel streaming on the server.");
             }
-        });
+        }
+        );
 
         queue.add(request);
         queue.start();

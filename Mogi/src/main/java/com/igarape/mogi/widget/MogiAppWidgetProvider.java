@@ -26,7 +26,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
         final int N = appWidgetIds.length;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             int appWidgetId = appWidgetIds[i];
 
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
@@ -35,7 +35,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             PendingIntent mainIntent;
 
             // User is not logged
-            if (Identification.getAccessToken(context) == null ) {
+            if (Identification.getAccessToken(context) == null) {
                 views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_offline);
                 views.setTextViewText(R.id.widget_status_title, "Login");
                 views.setTextColor(R.id.widget_status_title, Color.BLACK);
@@ -79,7 +79,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
     }
 
     private String toNowInMinutes(long before) {
-        if ( before < 0 ) {
+        if (before < 0) {
             return "";
         }
         long time = (java.lang.System.currentTimeMillis() - before) / 60000;

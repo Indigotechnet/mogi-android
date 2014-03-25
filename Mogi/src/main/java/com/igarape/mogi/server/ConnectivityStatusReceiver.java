@@ -18,10 +18,10 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         mConnectivityManager =
-                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-        if ( activeNetwork == null ) {
+        if (activeNetwork == null) {
             return;
         }
         boolean isConnected = activeNetwork.isConnectedOrConnecting();
@@ -32,7 +32,7 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL;
 
-        if ( isCharging && isConnected && isWiFi ) {
+        if (isCharging && isConnected && isWiFi) {
             context.startService(new Intent(context, UploadService.class));
         }
     }
