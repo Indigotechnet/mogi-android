@@ -69,15 +69,17 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             }
 
             mCamera = Camera.open(0);
+
             mCamera.setDisplayOrientation(VideoUtils.DEGREES);
             mMediaRecorder = new MediaRecorder();
 
             mCamera.unlock();
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
+            mMediaRecorder.setOrientationHint(VideoUtils.DEGREES);
             mMediaRecorder.setCamera(mCamera);
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+            mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
 
             mLastFileRecorded = FileUtils.getPath() +
                     DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()) +

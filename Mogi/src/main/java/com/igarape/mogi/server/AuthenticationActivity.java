@@ -25,12 +25,16 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
+import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -216,7 +220,7 @@ public class AuthenticationActivity extends Activity {
 
         pDialog = ProgressDialog.show(this, "Fazendo login", "Por favor aguarde...", true);
 //TODO substituir por JsonResponseHandler - pegando o ip do servidor tb - Identification.java
-        ApiClient.post("/token", params, new TextHttpResponseHandler() {
+        ApiClient.post("/token", params, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(String responseBody, Throwable error) {
                 if (pDialog != null) {
@@ -228,16 +232,40 @@ public class AuthenticationActivity extends Activity {
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+            public void onSuccess(JSONObject response) {
+                successResponse(response);
+            }
+
+            private void successResponse(JSONObject response) {
+                String token = null;
+                try {
+                    token = (String) response.get("token");
+                    String ipAddress = (String) response.get("ipAddress");
+                    if (ipAddress != null){
+                        StreamingService.serverAddress = ipAddress;
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "error on login", e);
+                }
                 if (pDialog != null) {
                     pDialog.dismiss();
                     pDialog = null;
                 }
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
-                Identification.setAccessToken(getBaseContext(), responseBody);
+                Identification.setAccessToken(getBaseContext(), token);
                 Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
-                ApiClient.setToken(responseBody);
+                ApiClient.setToken(token);
                 startActivity(new Intent(AuthenticationActivity.this, MainActivity.class));
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                try {
+                    successResponse(new JSONObject(responseBody));
+                } catch (JSONException e) {
+                    Log.e(TAG, "error on login", e);
+                }
 
             }
         });

@@ -33,7 +33,7 @@ import java.net.InetAddress;
 public class StreamingService extends AbstractCameraService implements SurfaceHolder.Callback {
     public static String TAG = StreamingService.class.getName();
 
-    private final String serverAddress = "54.221.244.181";
+    public static String serverAddress = "54.221.244.181";
 
     private Session mSession;
 
@@ -97,7 +97,9 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
                 mSurfaceView.getHolder().addCallback(this);
 
                 mSession.setDestination(InetAddress.getByName(serverAddress).getHostAddress());
-                mSession.getAudioTrack().configure();
+
+                mSession.configure();
+                //mSession.getAudioTrack().configure();
                 String sdp = mSession.getSessionDescription();
                 makeStartStreamingRequest(sdp);
                 Log.d("SessionDescription", sdp);
@@ -114,7 +116,7 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
     }
 
     private void makeStartStreamingRequest(String sdp) {
-        String url = ApiClient.getServerUrl("/streaming/start");
+        String url = ApiClient.getServerUrl("/streams");
         JSONObject json = new JSONObject();
         try {
             json.put("sdp", sdp);
@@ -133,7 +135,7 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 stopRecording();
-                Log.d(TAG, "Errror sending stream");
+                Log.e(TAG, "Error sending stream", volleyError);
             }
         }
         );
@@ -143,10 +145,10 @@ public class StreamingService extends AbstractCameraService implements SurfaceHo
     }
 
     private void makeStopStreamingRequest() {
-        String url = ApiClient.getServerUrl("/streaming/stop");
+        String url = ApiClient.getServerUrl("/streams");
 
         AuthenticatedJsonRequest request = new AuthenticatedJsonRequest(
-                Identification.getAccessToken(getBaseContext()), Request.Method.POST, url, null,
+                Identification.getAccessToken(getBaseContext()), Request.Method.DELETE, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {

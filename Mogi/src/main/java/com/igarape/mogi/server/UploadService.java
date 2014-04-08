@@ -1,11 +1,19 @@
 package com.igarape.mogi.server;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.VideoUtils;
@@ -41,6 +49,7 @@ public class UploadService extends Service {
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
     public static boolean isUploading = false;
+    private Intent intent;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -51,6 +60,7 @@ public class UploadService extends Service {
         if (isUploading) {
             return START_STICKY;
         }
+        this.intent = intent;
         if (videos == null || videos.size() == 0) {
             File dir = new File(FileUtils.getPath());
             videos = new ArrayList<File>(Arrays.asList(dir.listFiles(filter)));
@@ -151,7 +161,8 @@ public class UploadService extends Service {
 
     private void uploadVideos() {
 
-        if (videos.size() == 0) {
+        ConnectivityManager systemService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (videos.size() == 0 || FileUtils.canUpload(systemService.getActiveNetworkInfo(), this.intent)) {
             isUploading = false;
             stopSelf();
             return;

@@ -1,6 +1,10 @@
 package com.igarape.mogi.utils;
 
+import android.content.Intent;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.BatteryManager;
 import android.util.Log;
 
 import java.io.File;
@@ -68,5 +72,20 @@ public class FileUtils {
 
     public static String getLocationsFilePath() {
         return getPath() + LOCATIONS_TXT;
+    }
+
+    public static boolean canUpload(NetworkInfo activeNetwork, Intent intent){
+        if (activeNetwork == null) {
+            return false;
+        }
+        boolean isConnected = activeNetwork.isConnectedOrConnecting();
+        boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+        int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+
+        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL;
+
+        return isCharging && isConnected && isWiFi;
     }
 }

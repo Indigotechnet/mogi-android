@@ -42,11 +42,6 @@ public class GcmIntentService extends IntentService {
 
                 String key = extras.getString("collapse_key");
 
-//TODO sending evey 20 seconds
-//                if ( key.equals(KEY_LOCATION) ) {
-//                    startService(new Intent(this, LocationService.class));
-//                } else
-
                 if (key.equals(KEY_STREAMING_START) && !StreamingService.IsStreaming) {
                     startService(new Intent(this, ToggleStreamingService.class));
                 } else if (key.equals(KEY_STREAMING_STOP) && StreamingService.IsStreaming) {

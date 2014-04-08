@@ -34,9 +34,9 @@ import java.util.TimeZone;
  * Created by felipeamorim on 24/07/2013.
  */
 public class LocationService extends BaseService {
-    private static final long INTERVAL = 20000;
+    private static final long INTERVAL = 10000;
     private static final String TAG = LocationService.class.getName();
-    public static final int CALL_GPS_INTERVAL = 2000;
+    public static final int CALL_GPS_INTERVAL = 1000;
     public static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     public static int ServiceID = 2;
     private LocationManager mLocationManager;
@@ -98,7 +98,8 @@ public class LocationService extends BaseService {
 
             // Request for location updates
             LocationRequest request = LocationRequest.create();
-            request.setInterval(CALL_GPS_INTERVAL);
+            request.setFastestInterval(CALL_GPS_INTERVAL);
+            request.setInterval(CALL_GPS_INTERVAL * 2);
             request.setSmallestDisplacement(0);
             request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationClient.requestLocationUpdates(request, mLocationCallback);

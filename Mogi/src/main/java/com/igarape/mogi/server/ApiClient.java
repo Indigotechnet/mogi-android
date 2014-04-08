@@ -29,7 +29,11 @@ public class ApiClient {
         client = new AsyncHttpClient();
         client.setURLEncodingEnabled(true);
         client.setTimeout(DEFAULT_TIMEOUT);
+        client.setMaxConnections(5);
+        client.addHeader("Content-Type", "multipart/form-data");
     }
+
+    private static String globalToken;
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.get(getServerUrl(url), params, responseHandler);
@@ -60,6 +64,7 @@ public class ApiClient {
     }
 
     public static void setToken(String token) {
+        globalToken = token;
         client.addHeader("Authorization", "Bearer " + token);
     }
 
