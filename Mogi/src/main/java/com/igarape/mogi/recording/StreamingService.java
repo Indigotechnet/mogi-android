@@ -1,176 +1,169 @@
 package com.igarape.mogi.recording;
 
 import android.app.Notification;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
+import android.view.WindowManager;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
+import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
-import com.igarape.mogi.server.ApiClient;
-import com.igarape.mogi.server.AuthenticatedJsonRequest;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.VideoUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
+import net.majorkernelpanic.streaming.audio.AudioQuality;
+import net.majorkernelpanic.streaming.gl.SurfaceView;
+import net.majorkernelpanic.streaming.rtsp.RtspClient;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Created by felipeamorim on 24/07/2013.
  */
-public class StreamingService extends AbstractCameraService implements SurfaceHolder.Callback {
+public class StreamingService extends BaseService implements RtspClient.Callback, Session.Callback, SurfaceHolder.Callback {
     public static String TAG = StreamingService.class.getName();
 
-    public static String serverAddress = "54.221.244.181";
-
+    private SurfaceView mSurfaceView;
     private Session mSession;
-
-    RequestQueue queue;
-
-    public static long TimeStarted = 0;
-
+    private RtspClient mClient;
+    private WindowManager mWindowManager;
     public static boolean IsStreaming = false;
+    public static int Duration = 0;
+    private int ServiceID = 5;
+    private SurfaceHolder mSurfaceHolder;
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (VideoUtils.isRecordVideos()) {
+        super.onStartCommand(intent, flags, startId);
 
-            if (IsStreaming) {
-                return START_STICKY;
-            }
+        mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
 
-            Notification notification = new Notification.Builder(this)
-                    .setContentTitle("SmartPolicing Streaming")
-                    .setContentText("")
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .build();
+        mSurfaceView = new SurfaceView(this, null);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
+                1, 1,
+                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                PixelFormat.TRANSLUCENT
+        );
+        layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
 
-            queue = Volley.newRequestQueue(getBaseContext());
+        mWindowManager.addView(mSurfaceView, layoutParams);
+        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurfaceHolder.addCallback(this);
 
-            stopService(new Intent(this, RecordingService.class));
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle("SmartPolicing Streaming")
+                .setContentText("")
+                .setSmallIcon(R.drawable.ic_launcher)
+                .build();
 
-            startForeground(ServiceID, notification);
-        }
-        return super.onStartCommand(intent, flags, startId);
+        startForeground(ServiceID, notification);
+
+        return START_STICKY;
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopRecording();
-        mWindowManager.removeView(mSurfaceView);
-    }
-
-    @Override
-    public void startRecording() {
-        if (VideoUtils.isRecordVideos()) {
-            if (IsStreaming) {
-                return;
-            }
-
-            try {
-                mSession = SessionBuilder.getInstance()
-                        .setSurfaceView(mSurfaceView)
-                        .setContext(getApplicationContext())
-                        .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
-                        .setVideoEncoder(SessionBuilder.VIDEO_H263)
-                        .setAudioEncoder(SessionBuilder.AUDIO_AAC)
-                        .build();
-
-                mSurfaceView.getHolder().addCallback(this);
-
-                mSession.setDestination(InetAddress.getByName(serverAddress).getHostAddress());
-
-                mSession.configure();
-                //mSession.getAudioTrack().configure();
-                String sdp = mSession.getSessionDescription();
-                makeStartStreamingRequest(sdp);
-                Log.d("SessionDescription", sdp);
-                mSession.start();
-                TimeStarted = java.lang.System.currentTimeMillis();
-                IsStreaming = true;
-                WidgetUtils.BeginUpdating(this);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-            } catch (RuntimeException e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-        }
-    }
-
-    private void makeStartStreamingRequest(String sdp) {
-        String url = ApiClient.getServerUrl("/streams");
-        JSONObject json = new JSONObject();
-        try {
-            json.put("sdp", sdp);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        AuthenticatedJsonRequest request = new AuthenticatedJsonRequest(
-                Identification.getAccessToken(getBaseContext()), Request.Method.POST, url, json,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        Log.d(TAG, jsonObject.toString());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                stopRecording();
-                Log.e(TAG, "Error sending stream", volleyError);
-            }
-        }
-        );
-
-        queue.add(request);
-        queue.start();
-    }
-
-    private void makeStopStreamingRequest() {
-        String url = ApiClient.getServerUrl("/streams");
-
-        AuthenticatedJsonRequest request = new AuthenticatedJsonRequest(
-                Identification.getAccessToken(getBaseContext()), Request.Method.DELETE, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        Log.d(TAG, jsonObject.toString());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Log.d(TAG, "Unable to cancel streaming on the server.");
-            }
-        }
-        );
-
-        queue.add(request);
-        queue.start();
-    }
-
-    @Override
-    public void stopRecording() {
-        mSession.stop();
+        mClient.release();
+        mSession.release();
         IsStreaming = false;
-        makeStopStreamingRequest();
         WidgetUtils.StopUpdating();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (mClient == null || !mClient.isStreaming()) {
+            // Configures the SessionBuilder
+            mSession = SessionBuilder.getInstance()
+                    .setCamera(0)
+                    .setContext(getApplicationContext())
+                    .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+                    .setAudioQuality(new AudioQuality(8000,16000))
+                    .setVideoEncoder(SessionBuilder.VIDEO_H264)
+                    .setSurfaceView(mSurfaceView)
+                    .setPreviewOrientation(VideoUtils.DEGREES)
+                    .setCallback(this)
+                    .build();
+
+            // Configures the RTSP client
+            mClient = new RtspClient();
+            mClient.setSession(mSession);
+            mClient.setCallback(this);
+
+            mSession.startPreview();
+
+
+            mClient.setCredentials(Identification.getStreamingUser(), Identification.getStreamingPassword());
+            mClient.setServerAddress(Identification.getServerIpAddress(), Identification.getStreamingPort());
+            mClient.setStreamPath(Identification.getStreamingPath());
+            mClient.startStream();
+            IsStreaming = true;
+            WidgetUtils.BeginUpdating(this);
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mClient.stopStream();
+    }
+
+    @Override
+    public void onBitrareUpdate(long bitrate) {
+        Log.i(TAG, bitrate / 1000 + " kbps");
+    }
+
+
+    @Override
+    public void onSessionError(int reason, int streamType, Exception e) {
+        Log.e(TAG, "On Session Error", e);
+    }
+
+    @Override
+    public void onPreviewStarted() {
+
+    }
+
+    @Override
+    public void onSessionConfigured() {
+
+    }
+
+    @Override
+    public void onSessionStarted() {
+
+    }
+
+    @Override
+    public void onSessionStopped() {
+
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onRtspUpdate(int message, Exception e) {
+        Log.e(TAG, "RTSP update", e);
     }
 }

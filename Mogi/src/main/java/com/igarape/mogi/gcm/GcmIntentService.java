@@ -13,9 +13,6 @@ public class GcmIntentService extends IntentService {
 
     public static String TAG = GcmIntentService.class.getName();
 
-    //TODO sending evey 20 seconds
-    // private static final String KEY_LOCATION = "sendLocation";
-
     private static final String KEY_STREAMING_START = "startStreaming";
 
     private static final String KEY_STREAMING_STOP = "stopStreaming";
@@ -45,7 +42,7 @@ public class GcmIntentService extends IntentService {
                 if (key.equals(KEY_STREAMING_START) && !StreamingService.IsStreaming) {
                     startService(new Intent(this, ToggleStreamingService.class));
                 } else if (key.equals(KEY_STREAMING_STOP) && StreamingService.IsStreaming) {
-                    stopService(new Intent(this, ToggleStreamingService.class));
+                    startService(new Intent(this, ToggleStreamingService.class));
                 }
             }
         }

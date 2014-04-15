@@ -16,6 +16,11 @@ public class Identification {
     private static final String PREF_TIME_LOGIN = "PREF_TIME_LOGIN";
     private static String accessToken = null;
     private static String userLogin = null;
+    private static String serverIpAddress = "";
+    private static Integer streamingPort = 1935;
+    private static String streamingUser  = "";
+    private static String streamingPassword = "";
+    private static String streamingPath = "";
 
     public synchronized static String id(Context context) {
         if (uniqueID == null) {
@@ -66,5 +71,45 @@ public class Identification {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(PREF_USER_LOGIN, login);
         editor.commit();
+    }
+
+    public static void setServerIpAddress(String serverIpAddress) {
+        Identification.serverIpAddress = serverIpAddress;
+    }
+
+    public static String getServerIpAddress() {
+        return serverIpAddress;
+    }
+
+    public static void setStreamingPort(Integer streamingPort) {
+        Identification.streamingPort = streamingPort;
+    }
+
+    public static void setStreamingUser(String streamingUser) {
+        Identification.streamingUser = streamingUser;
+    }
+
+    public static void setStreamingPassword(String streamingPassword) {
+        Identification.streamingPassword = streamingPassword;
+    }
+
+    public static void setStreamingPath(String streamingPath) {
+        Identification.streamingPath = streamingPath;
+    }
+
+    public static Integer getStreamingPort() {
+        return streamingPort;
+    }
+
+    public static String getStreamingUser() {
+        return streamingUser;
+    }
+
+    public static String getStreamingPassword() {
+        return streamingPassword;
+    }
+
+    public static String getStreamingPath() {
+        return streamingPath;
     }
 }

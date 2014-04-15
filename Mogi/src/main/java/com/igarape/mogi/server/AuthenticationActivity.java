@@ -219,7 +219,7 @@ public class AuthenticationActivity extends Activity {
         params.put("gcm_registration", regid);
 
         pDialog = ProgressDialog.show(this, "Fazendo login", "Por favor aguarde...", true);
-//TODO substituir por JsonResponseHandler - pegando o ip do servidor tb - Identification.java
+
         ApiClient.post("/token", params, new JsonHttpResponseHandler() {
             @Override
             public void onFailure(String responseBody, Throwable error) {
@@ -229,6 +229,11 @@ public class AuthenticationActivity extends Activity {
                 }
                 Log.e(TAG, "Error: " + responseBody, error);
                 Toast.makeText(AuthenticationActivity.this, "Unable to login!", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Throwable e, JSONObject errorResponse) {
+                onFailure("", e);
             }
 
             @Override
@@ -242,7 +247,7 @@ public class AuthenticationActivity extends Activity {
                     token = (String) response.get("token");
                     String ipAddress = (String) response.get("ipAddress");
                     if (ipAddress != null){
-                        StreamingService.serverAddress = ipAddress;
+                        Identification.setServerIpAddress(ipAddress);
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "error on login", e);
@@ -250,6 +255,14 @@ public class AuthenticationActivity extends Activity {
                 if (pDialog != null) {
                     pDialog.dismiss();
                     pDialog = null;
+                }
+                try {
+                    Identification.setStreamingPort(Integer.parseInt((String) response.get("streamingPort")));
+                    Identification.setStreamingUser((String) response.get("streamingUser"));
+                    Identification.setStreamingPassword((String) response.get("streamingPassword"));
+                    Identification.setStreamingPath((String) response.get("streamingPath"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
                 WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), token);

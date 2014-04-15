@@ -29,10 +29,6 @@ import com.igarape.mogi.utils.WidgetUtils;
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
 
-    private final Class[] activeServices = new Class[]{
-            LocationService.class,
-            RecordingService.class
-    };
     private BroadcastReceiver connectivityReceiver = null;
     private TextView locationTextView;
     private ConnectivityStatusReceiver connectivityStatusReceiver;
@@ -41,7 +37,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        registerMyReceiver();
 
         setContentView(R.layout.activity_main);
 
@@ -50,6 +45,7 @@ public class MainActivity extends BaseActivity {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
+        registerMyReceiver();
 
         WidgetUtils.UpdateWidget(this.getApplicationContext());
         locationTextView = (TextView) findViewById(R.id.location_status);
@@ -149,12 +145,6 @@ public class MainActivity extends BaseActivity {
             locationTextView.setBackgroundColor(Color.RED);
         }
 
-    }
-
-    private void startServices() {
-        for (Class clazz : activeServices) {
-            startSmartPolicingService(clazz);
-        }
     }
 
     private void startSmartPolicingService(final Class clazz) {

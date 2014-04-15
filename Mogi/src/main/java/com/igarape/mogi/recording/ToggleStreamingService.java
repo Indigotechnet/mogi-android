@@ -20,7 +20,7 @@ public class ToggleStreamingService extends Service {
             stopService(new Intent(this, StreamingService.class));
             startService(new Intent(this, RecordingService.class));
         } else {
-            startService(new Intent(this, RecordingService.class));
+            stopService(new Intent(this, RecordingService.class));
             startService(new Intent(this, StreamingService.class));
         }
 
