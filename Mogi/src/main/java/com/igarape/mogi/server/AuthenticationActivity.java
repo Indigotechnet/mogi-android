@@ -33,6 +33,7 @@ import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -232,9 +233,10 @@ public class AuthenticationActivity extends Activity {
             }
 
             @Override
-            public void onFailure(Throwable e, JSONObject errorResponse) {
-                onFailure("", e);
+            public void onFailure(int statusCode, Header[] headers, String responseBody, Throwable e) {
+                onFailure(responseBody, e);
             }
+
 
             @Override
             public void onSuccess(JSONObject response) {

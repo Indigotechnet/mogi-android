@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.media.MediaCodecList;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,6 +26,7 @@ import net.majorkernelpanic.streaming.SessionBuilder;
 import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
+import net.majorkernelpanic.streaming.video.VideoQuality;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +40,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
     private SurfaceView mSurfaceView;
     private Session mSession;
-    private RtspClient mClient;
+    private static RtspClient mClient;
     private WindowManager mWindowManager;
     public static boolean IsStreaming = false;
     public static int Duration = 0;
@@ -49,6 +51,9 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        if (IsStreaming){
+            return START_STICKY;
+        }
 
         mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
 
@@ -78,6 +83,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mClient.stopStream();
         mClient.release();
         mSession.release();
         IsStreaming = false;
@@ -91,39 +97,46 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        if (mClient == null || !mClient.isStreaming()) {
-            // Configures the SessionBuilder
-            mSession = SessionBuilder.getInstance()
-                    .setCamera(0)
-                    .setContext(getApplicationContext())
-                    .setAudioEncoder(SessionBuilder.AUDIO_NONE)
-                    .setAudioQuality(new AudioQuality(8000,16000))
-                    .setVideoEncoder(SessionBuilder.VIDEO_H264)
-                    .setSurfaceView(mSurfaceView)
-                    .setPreviewOrientation(VideoUtils.DEGREES)
-                    .setCallback(this)
-                    .build();
 
+        SessionBuilder builder = SessionBuilder.getInstance()
+                .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
+                .setContext(getApplicationContext())
+                .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+                .setAudioQuality(new AudioQuality(8000, 16000))
+                .setVideoEncoder(SessionBuilder.VIDEO_H264)
+                .setSurfaceView(mSurfaceView)
+                .setPreviewOrientation(VideoUtils.DEGREES)
+                .setCallback(this);
+
+        if (android.os.Build.VERSION.SDK_INT <= 16) {
+            builder = builder.setVideoQuality(new VideoQuality(176, 144, 15, 500000));
+        }
+        // Configures the SessionBuilder
+        mSession = builder.setCallback(this)
+                .build();
+
+        if (mClient == null || !mClient.isStreaming()) {
             // Configures the RTSP client
             mClient = new RtspClient();
-            mClient.setSession(mSession);
-            mClient.setCallback(this);
-
-            mSession.startPreview();
-
 
             mClient.setCredentials(Identification.getStreamingUser(), Identification.getStreamingPassword());
             mClient.setServerAddress(Identification.getServerIpAddress(), Identification.getStreamingPort());
             mClient.setStreamPath(Identification.getStreamingPath());
-            mClient.startStream();
-            IsStreaming = true;
-            WidgetUtils.BeginUpdating(this);
         }
+        
+        mClient.setSession(mSession);
+        mClient.setCallback(this);
+
+        mSession.startPreview();
+        mClient.startStream();
+        IsStreaming = true;
+        WidgetUtils.BeginUpdating(this);
+
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mClient.stopStream();
+
     }
 
     @Override
