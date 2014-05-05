@@ -80,6 +80,8 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+            mMediaRecorder.setVideoFrameRate(15);
+
 
             mLastFileRecorded = FileUtils.getPath() +
                     DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()) +

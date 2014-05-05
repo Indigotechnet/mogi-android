@@ -34,6 +34,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -193,13 +194,13 @@ public class UploadService extends Service {
 
                 @Override
                 public void onFailure(String responseBody, Throwable error) {
-                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName()+ " - " + responseBody, error);
                     stopSelf();
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error );
                     stopSelf();
                 }
             });

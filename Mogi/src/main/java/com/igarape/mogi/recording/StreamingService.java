@@ -39,7 +39,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     public static String TAG = StreamingService.class.getName();
 
     private SurfaceView mSurfaceView;
-    private Session mSession;
+    private static Session mSession;
     private static RtspClient mClient;
     private WindowManager mWindowManager;
     public static boolean IsStreaming = false;
@@ -115,14 +115,14 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         mSession = builder.setCallback(this)
                 .build();
 
-        if (mClient == null || !mClient.isStreaming()) {
-            // Configures the RTSP client
-            mClient = new RtspClient();
 
-            mClient.setCredentials(Identification.getStreamingUser(), Identification.getStreamingPassword());
-            mClient.setServerAddress(Identification.getServerIpAddress(), Identification.getStreamingPort());
-            mClient.setStreamPath(Identification.getStreamingPath());
-        }
+        // Configures the RTSP client
+        mClient = new RtspClient();
+
+        mClient.setCredentials(Identification.getStreamingUser(), Identification.getStreamingPassword());
+        mClient.setServerAddress(Identification.getServerIpAddress(), Identification.getStreamingPort());
+        mClient.setStreamPath(Identification.getStreamingPath());
+
         
         mClient.setSession(mSession);
         mClient.setCallback(this);
