@@ -13,7 +13,7 @@ import com.igarape.mogi.server.UploadService;
 /**
  * Created by brunosiqueira on 07/05/2014.
  */
-public enum State{
+public enum State {
 
     NOT_LOGGED {
         @Override
@@ -76,17 +76,14 @@ public enum State{
             stopSmartPolicingService(UploadService.class, context);
         }
     };
-
-    public abstract void start(Context context);
-    public abstract void stop(Context context);
     private static final String TAG = State.class.getName();
 
-    private static void startSmartPolicingService(final Class clazz,final Context context) {
+    private static void startSmartPolicingService(final Class clazz, final Context context) {
         try {
             Thread td = new Thread() {
                 @Override
                 public void run() {
-                    if (!isMyServiceRunning(clazz,context)) {
+                    if (!isMyServiceRunning(clazz, context)) {
                         context.startService(new Intent(context, clazz));
                     }
                 }
@@ -102,7 +99,7 @@ public enum State{
             //Thread td = new Thread() {
             //    @Override
             //    public void run() {
-            if (isMyServiceRunning(clazz,context)) {
+            if (isMyServiceRunning(clazz, context)) {
                 context.stopService(new Intent(context, clazz));
             }
             //    }
@@ -122,5 +119,9 @@ public enum State{
         }
         return false;
     }
+
+    public abstract void start(Context context);
+
+    public abstract void stop(Context context);
 
 }

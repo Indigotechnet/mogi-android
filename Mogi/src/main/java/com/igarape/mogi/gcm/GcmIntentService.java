@@ -11,11 +11,9 @@ import com.igarape.mogi.states.StateMachine;
 
 public class GcmIntentService extends IntentService {
 
-    public static String TAG = GcmIntentService.class.getName();
-
     private static final String KEY_STREAMING_START = "startStreaming";
-
     private static final String KEY_STREAMING_STOP = "stopStreaming";
+    public static String TAG = GcmIntentService.class.getName();
 
     public GcmIntentService() {
         super(TAG);
@@ -38,7 +36,7 @@ public class GcmIntentService extends IntentService {
                 Log.d(TAG, extras.toString());
 
                 String key = extras.getString("collapse_key");
-                if (KEY_STREAMING_START.equals(key)){
+                if (KEY_STREAMING_START.equals(key)) {
                     StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext());
                 } else {
                     StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());

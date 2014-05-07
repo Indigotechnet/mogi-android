@@ -25,15 +25,12 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
-import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.WidgetUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,13 +38,11 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AuthenticationActivity extends Activity {
-    public static String TAG = AuthenticationActivity.class.getName();
-
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
+    public static String TAG = AuthenticationActivity.class.getName();
     GoogleCloudMessaging gcm;
     AtomicInteger msgId = new AtomicInteger();
     SharedPreferences prefs;
@@ -59,6 +54,17 @@ public class AuthenticationActivity extends Activity {
     EditText txtId;
     EditText txtPwd;
     ProgressDialog pDialog;
+
+    private static int getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,17 +169,6 @@ public class AuthenticationActivity extends Activity {
         editor.commit();
     }
 
-    private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
     private SharedPreferences getGCMPreferences(Context context) {
         return getSharedPreferences("AUTH", Context.MODE_PRIVATE);
     }
@@ -248,7 +243,7 @@ public class AuthenticationActivity extends Activity {
                 try {
                     token = (String) response.get("token");
                     String ipAddress = (String) response.get("ipAddress");
-                    if (ipAddress != null){
+                    if (ipAddress != null) {
                         Identification.setServerIpAddress(ipAddress);
                     }
                 } catch (JSONException e) {

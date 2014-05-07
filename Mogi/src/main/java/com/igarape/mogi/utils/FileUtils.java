@@ -1,10 +1,6 @@
 package com.igarape.mogi.utils;
 
-import android.content.Intent;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.BatteryManager;
 import android.util.Log;
 
 import java.io.File;
@@ -26,6 +22,10 @@ public class FileUtils {
 
     private static String path = "/mnt/extSdCard/smartpolicing/";
 
+    public static String getPath() {
+        return path;
+    }
+
     public static void setPath(String path) {
         if (!path.endsWith(File.separator)) {
             path = path + File.separator;
@@ -36,10 +36,6 @@ public class FileUtils {
         }
 
         FileUtils.path = path;
-    }
-
-    public static String getPath() {
-        return path;
     }
 
     public static void LogBattery(int level, int status) {

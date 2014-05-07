@@ -15,10 +15,10 @@ import android.widget.TextView;
 
 import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.R;
-import com.igarape.mogi.states.State;
-import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.NetworkUtils;
@@ -147,7 +147,6 @@ public class MainActivity extends BaseActivity {
             connectivityStatusReceiver = null;
         }
     }
-
 
 
     private void registerMyReceiver() {

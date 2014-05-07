@@ -14,13 +14,11 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 
 public abstract class AbstractCameraService extends BaseService implements SurfaceHolder.Callback {
     public static int ServiceID = 3;
-
+    public static int Duration = 0;
+    public boolean surfaceCreated = false;
     protected WindowManager mWindowManager;
     protected SurfaceView mSurfaceView;
     protected SurfaceHolder mSurfaceHolder;
-
-    public static int Duration = 0;
-    public boolean surfaceCreated = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

@@ -20,12 +20,10 @@ import java.util.Date;
 
 public class RecordingService extends AbstractCameraService implements SurfaceHolder.Callback {
     public static String TAG = RecordingService.class.getName();
-
-    private MediaRecorder mMediaRecorder;
-    protected Camera mCamera;
-
-    private String mLastFileRecorded;
     private static boolean IsRecording = false;
+    protected Camera mCamera;
+    private MediaRecorder mMediaRecorder;
+    private String mLastFileRecorded;
 
     public IBinder onBind(Intent intent) {
         return null;

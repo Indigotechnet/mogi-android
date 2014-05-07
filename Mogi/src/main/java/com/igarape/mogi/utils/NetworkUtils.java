@@ -1,18 +1,15 @@
 package com.igarape.mogi.utils;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
-
-import com.igarape.mogi.R;
 
 /**
  * Created by brunosiqueira on 07/05/2014.
  */
 public class NetworkUtils {
-    public static boolean canUpload(NetworkInfo activeNetwork, Intent intent){
+    public static boolean canUpload(NetworkInfo activeNetwork, Intent intent) {
         if (activeNetwork == null) {
             return false;
         }

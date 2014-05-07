@@ -1,15 +1,11 @@
 package com.igarape.mogi.recording;
 
 import android.app.Notification;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.media.MediaCodecList;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -28,22 +24,18 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * Created by felipeamorim on 24/07/2013.
  */
 public class StreamingService extends BaseService implements RtspClient.Callback, Session.Callback, SurfaceHolder.Callback {
     public static String TAG = StreamingService.class.getName();
-
-    private SurfaceView mSurfaceView;
+    public static int Duration = 0;
     private static Session mSession;
     private static RtspClient mClient;
-    private WindowManager mWindowManager;
     private static boolean IsStreaming = false;
-    public static int Duration = 0;
+    private SurfaceView mSurfaceView;
+    private WindowManager mWindowManager;
     private int ServiceID = 5;
     private SurfaceHolder mSurfaceHolder;
 
@@ -51,7 +43,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if (IsStreaming){
+        if (IsStreaming) {
             return START_STICKY;
         }
 
@@ -80,6 +72,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
         return START_STICKY;
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -123,7 +116,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         mClient.setServerAddress(Identification.getServerIpAddress(), Identification.getStreamingPort());
         mClient.setStreamPath(Identification.getStreamingPath());
 
-        
+
         mClient.setSession(mSession);
         mClient.setCallback(this);
 

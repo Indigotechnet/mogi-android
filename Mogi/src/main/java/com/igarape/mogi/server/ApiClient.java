@@ -21,8 +21,8 @@ import java.io.UnsupportedEncodingException;
  */
 public class ApiClient {
     public static final String TAG = ApiClient.class.getName();
-    private static Context appContext;
     private static final int DEFAULT_TIMEOUT = 30000;
+    private static Context appContext;
     private static AsyncHttpClient client;
 
     static {

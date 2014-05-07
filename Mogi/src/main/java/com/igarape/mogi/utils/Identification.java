@@ -9,16 +9,16 @@ import java.util.UUID;
  * Created by felipeamorim on 26/08/2013.
  */
 public class Identification {
-    private static String uniqueID = null;
     private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
     private static final String PREF_ACCESS_TOKEN = "PREF_ACCESS_TOKEN";
     private static final String PREF_USER_LOGIN = "PREF_USER_LOGIN";
     private static final String PREF_TIME_LOGIN = "PREF_TIME_LOGIN";
+    private static String uniqueID = null;
     private static String accessToken = null;
     private static String userLogin = null;
     private static String serverIpAddress = "";
     private static Integer streamingPort = 1935;
-    private static String streamingUser  = "";
+    private static String streamingUser = "";
     private static String streamingPassword = "";
     private static String streamingPath = "";
 
@@ -73,43 +73,43 @@ public class Identification {
         editor.commit();
     }
 
-    public static void setServerIpAddress(String serverIpAddress) {
-        Identification.serverIpAddress = serverIpAddress;
-    }
-
     public static String getServerIpAddress() {
         return serverIpAddress;
     }
 
-    public static void setStreamingPort(Integer streamingPort) {
-        Identification.streamingPort = streamingPort;
-    }
-
-    public static void setStreamingUser(String streamingUser) {
-        Identification.streamingUser = streamingUser;
-    }
-
-    public static void setStreamingPassword(String streamingPassword) {
-        Identification.streamingPassword = streamingPassword;
-    }
-
-    public static void setStreamingPath(String streamingPath) {
-        Identification.streamingPath = streamingPath;
+    public static void setServerIpAddress(String serverIpAddress) {
+        Identification.serverIpAddress = serverIpAddress;
     }
 
     public static Integer getStreamingPort() {
         return streamingPort;
     }
 
+    public static void setStreamingPort(Integer streamingPort) {
+        Identification.streamingPort = streamingPort;
+    }
+
     public static String getStreamingUser() {
         return streamingUser;
+    }
+
+    public static void setStreamingUser(String streamingUser) {
+        Identification.streamingUser = streamingUser;
     }
 
     public static String getStreamingPassword() {
         return streamingPassword;
     }
 
+    public static void setStreamingPassword(String streamingPassword) {
+        Identification.streamingPassword = streamingPassword;
+    }
+
     public static String getStreamingPath() {
         return streamingPath;
+    }
+
+    public static void setStreamingPath(String streamingPath) {
+        Identification.streamingPath = streamingPath;
     }
 }

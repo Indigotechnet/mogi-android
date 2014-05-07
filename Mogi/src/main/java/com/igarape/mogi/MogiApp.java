@@ -21,11 +21,10 @@ import dagger.Provides;
  * Created by felipeamorim on 08/07/2013.
  */
 public class MogiApp extends Application {
+    public static final String SENDER_ID = "319635303076";
     public static String TAG = MogiApp.class.getName();
     private ObjectGraph objectGraph;
     private Bus mBus;
-
-    public static final String SENDER_ID = "319635303076";
 
     @Override
     public void onCreate() {

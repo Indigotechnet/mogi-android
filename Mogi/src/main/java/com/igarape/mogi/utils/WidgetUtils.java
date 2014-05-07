@@ -10,10 +10,9 @@ import android.util.Log;
 import com.igarape.mogi.widget.MogiAppWidgetProvider;
 
 public class WidgetUtils {
+    private static final Handler handler = new Handler();
     private static boolean isUpdating = false;
     private static String TAG = WidgetUtils.class.getName();
-
-    private static final Handler handler = new Handler();
     private static Context context;
     private static Runnable runnable = new Runnable() {
 

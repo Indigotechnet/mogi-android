@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -44,11 +43,11 @@ import java.util.Date;
  */
 public class UploadService extends Service {
     public static String TAG = UploadService.class.getName();
+    public static boolean isUploading = false;
+    private static int ServiceID = 4;
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
-    public static boolean isUploading = false;
     private Intent intent;
-    private static int ServiceID = 4;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -200,13 +199,13 @@ public class UploadService extends Service {
 
                 @Override
                 public void onFailure(String responseBody, Throwable error) {
-                    Log.e(TAG, "video not uploaded: " + nextVideo.getName()+ " - " + responseBody, error);
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName() + " - " + responseBody, error);
                     stopSelf();
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error );
+                    Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
                     stopSelf();
                 }
             });
