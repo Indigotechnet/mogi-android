@@ -4,6 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
+
 /**
  * Created by felipeamorim on 19/10/2013.
  */
@@ -16,12 +19,10 @@ public class ToggleStreamingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (StreamingService.IsStreaming) {
-            stopService(new Intent(this, StreamingService.class));
-            startService(new Intent(this, RecordingService.class));
+        if (StateMachine.getInstance().isInState(State.STREAMING)) {
+            StateMachine.getInstance().startServices(State.RECORDING_ONLINE, this.getApplicationContext());
         } else {
-            stopService(new Intent(this, RecordingService.class));
-            startService(new Intent(this, StreamingService.class));
+            StateMachine.getInstance().startServices(State.STREAMING, this.getApplicationContext());
         }
 
         stopSelf();

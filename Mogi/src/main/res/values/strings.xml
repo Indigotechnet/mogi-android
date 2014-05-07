@@ -25,4 +25,10 @@
     <string name="start_upload">Start upload of videos and locations? This action will stop video\'s recording.</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
+    <string name="notification_upload_title">Smart Policing Upload</string>
+    <string name="notification_upload_description">Uploading data...</string>
+    <string name="notification_location_title">SmartPolicing Location</string>
+    <string name="notification_location_description">Recording GPS data</string>
+    <string name="notification_record_title">Smart Policing Camera</string>
+    <string name="notification_record_description">Recording on SDCard</string>
 </resources>

@@ -52,8 +52,8 @@ public class LocationService extends BaseService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("SmartPolicing Location")
-                .setContentText("Recording GPS data")
+                .setContentTitle(getString(R.string.notification_location_title))
+                .setContentText(getString(R.string.notification_location_description))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .build();
 

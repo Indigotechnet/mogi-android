@@ -74,18 +74,4 @@ public class FileUtils {
         return getPath() + LOCATIONS_TXT;
     }
 
-    public static boolean canUpload(NetworkInfo activeNetwork, Intent intent){
-        if (activeNetwork == null) {
-            return false;
-        }
-        boolean isConnected = activeNetwork.isConnectedOrConnecting();
-        boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-
-        int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-
-        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                status == BatteryManager.BATTERY_STATUS_FULL;
-
-        return isCharging && isConnected && isWiFi;
-    }
 }

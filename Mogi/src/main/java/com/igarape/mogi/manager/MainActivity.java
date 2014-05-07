@@ -9,21 +9,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.R;
-import com.igarape.mogi.location.LocationService;
-import com.igarape.mogi.recording.RecordingService;
-import com.igarape.mogi.recording.RecordingUtil;
-import com.igarape.mogi.recording.StreamingService;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 
 public class MainActivity extends BaseActivity {
@@ -50,10 +48,8 @@ public class MainActivity extends BaseActivity {
         WidgetUtils.UpdateWidget(this.getApplicationContext());
         locationTextView = (TextView) findViewById(R.id.location_status);
 
-        startSmartPolicingService(LocationService.class);
-        if (!RecordingUtil.isInAction()) {
-            startSmartPolicingService(RecordingService.class);
-        }
+        StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+
         ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,7 +89,7 @@ public class MainActivity extends BaseActivity {
         ((Button) findViewById(R.id.logout)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stopServices();
+                StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
                 Identification.setAccessToken(getApplicationContext(), null);
                 WidgetUtils.UpdateWidget(MainActivity.this);
                 unregisterReceiver(connectivityReceiver);
@@ -130,14 +126,8 @@ public class MainActivity extends BaseActivity {
 
     private void changeLocationStatusGUI() {
         ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        //For 3G check
-        boolean is3g = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
-                .isConnectedOrConnecting();
-        //For WiFi Check
-        boolean isWifi = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-                .isConnectedOrConnecting();
 
-        if (is3g || isWifi) {
+        if (NetworkUtils.hasConnection(mConnectivityManager)) {
             locationTextView.setText(getString(R.string.location_status_online));
             locationTextView.setBackgroundColor(Color.GREEN);
         } else {
@@ -147,30 +137,10 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void startSmartPolicingService(final Class clazz) {
-        try {
-            Thread td = new Thread() {
-                @Override
-                public void run() {
-                    startService(new Intent(MainActivity.this, clazz));
-                }
-            };
-            td.start();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void stopServices() {
-        stopSmartPolicingService(LocationService.class);
-        stopSmartPolicingService(RecordingService.class);
-        stopSmartPolicingService(StreamingService.class);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopServices();
+        StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
         try {
             unregisterReceiver(connectivityStatusReceiver);
         } catch (IllegalArgumentException e) {
@@ -178,19 +148,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void stopSmartPolicingService(final Class clazz) {
-        try {
-            //Thread td = new Thread() {
-            //    @Override
-            //    public void run() {
-            stopService(new Intent(MainActivity.this, clazz));
-            //    }
-            //};
-            //td.start();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
+
 
     private void registerMyReceiver() {
         IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);

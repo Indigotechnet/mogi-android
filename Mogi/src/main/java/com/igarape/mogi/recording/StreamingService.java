@@ -42,7 +42,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     private static Session mSession;
     private static RtspClient mClient;
     private WindowManager mWindowManager;
-    public static boolean IsStreaming = false;
+    private static boolean IsStreaming = false;
     public static int Duration = 0;
     private int ServiceID = 5;
     private SurfaceHolder mSurfaceHolder;

@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.igarape.mogi.recording.StreamingService;
-import com.igarape.mogi.recording.ToggleStreamingService;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 
 public class GcmIntentService extends IntentService {
 
@@ -38,11 +38,10 @@ public class GcmIntentService extends IntentService {
                 Log.d(TAG, extras.toString());
 
                 String key = extras.getString("collapse_key");
-
-                if (key.equals(KEY_STREAMING_START) && !StreamingService.IsStreaming) {
-                    startService(new Intent(this, ToggleStreamingService.class));
-                } else if (key.equals(KEY_STREAMING_STOP) && StreamingService.IsStreaming) {
-                    startService(new Intent(this, ToggleStreamingService.class));
+                if (KEY_STREAMING_START.equals(key)){
+                    StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext());
+                } else {
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
                 }
             }
         }

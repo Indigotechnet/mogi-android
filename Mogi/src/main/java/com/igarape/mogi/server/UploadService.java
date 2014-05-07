@@ -1,21 +1,19 @@
 package com.igarape.mogi.server;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.igarape.mogi.R;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
+import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.VideoUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -34,7 +32,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,6 +48,7 @@ public class UploadService extends Service {
     private ArrayList<File> videos = new ArrayList<File>();
     public static boolean isUploading = false;
     private Intent intent;
+    private static int ServiceID = 4;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -58,6 +56,14 @@ public class UploadService extends Service {
 
     @Override
     public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle(getString(R.string.notification_upload_title))
+                .setContentText(getString(R.string.notification_upload_description))
+                .setSmallIcon(R.drawable.ic_launcher)
+                .build();
+
+        startForeground(ServiceID, notification);
+
         if (isUploading) {
             return START_STICKY;
         }
@@ -163,7 +169,7 @@ public class UploadService extends Service {
     private void uploadVideos() {
 
         ConnectivityManager systemService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (videos.size() == 0 || FileUtils.canUpload(systemService.getActiveNetworkInfo(), this.intent)) {
+        if (videos.size() == 0 || NetworkUtils.canUpload(systemService.getActiveNetworkInfo(), this.intent)) {
             isUploading = false;
             stopSelf();
             return;

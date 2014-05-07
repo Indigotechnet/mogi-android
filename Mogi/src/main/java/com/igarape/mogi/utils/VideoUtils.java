@@ -8,6 +8,7 @@ public class VideoUtils {
     public static final int MAX_DURATION_MS = 600000;
     private static final String CAMERA_PARAM_ORIENTATION = "orientation";
     private static final String CAMERA_PARAM_PORTRAIT = "portrait";
+    public static final long MAX_SIZE_BYTES = 10000000;
     private static boolean recordVideos = true;
 
     public static boolean isRecordVideos() {

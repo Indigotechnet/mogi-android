@@ -25,7 +25,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
     protected Camera mCamera;
 
     private String mLastFileRecorded;
-    public static boolean IsRecording = false;
+    private static boolean IsRecording = false;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -39,8 +39,8 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             }
 
             Notification notification = new Notification.Builder(this)
-                    .setContentTitle("SmartPolicing Camera")
-                    .setContentText("")
+                    .setContentTitle(getString(R.string.notification_record_title))
+                    .setContentText(getString(R.string.notification_record_description))
                     .setSmallIcon(R.drawable.ic_launcher)
                     .build();
 
@@ -90,10 +90,12 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             mMediaRecorder.setOutputFile(mLastFileRecorded);
 
             mMediaRecorder.setMaxDuration(VideoUtils.MAX_DURATION_MS); // 10mins
+            mMediaRecorder.setMaxFileSize(VideoUtils.MAX_SIZE_BYTES);
             mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
                 @Override
                 public void onInfo(MediaRecorder mediaRecorder, int what, int extra) {
-                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED ||
+                            what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
                         stopRecording();
                         startRecording();
                     }

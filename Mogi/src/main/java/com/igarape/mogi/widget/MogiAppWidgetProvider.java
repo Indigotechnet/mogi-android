@@ -14,6 +14,8 @@ import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.recording.ToggleStreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.Identification;
 
 /**
@@ -44,7 +46,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             } else {
                 views.setViewVisibility(R.id.widget_action_button, View.VISIBLE);
                 Intent actionIntent = new Intent(context, ToggleStreamingService.class);
-                if (StreamingService.IsStreaming) {
+                if (StateMachine.getInstance().isInState(State.STREAMING)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_pause_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
                     views.setTextViewText(R.id.widget_status_title, "Streaming");
