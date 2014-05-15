@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.igarape.mogi"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -21,6 +21,10 @@
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="com.igarape.mogi.permission.C2D_MESSAGE" />
+    <!-- Permissions used for  lock screen functionality -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <permission
         android:name="com.igarape.mogi.permission.C2D_MESSAGE"
@@ -31,12 +35,12 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.AppCompat.Light" >
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <receiver android:name="com.igarape.mogi.widget.MogiAppWidgetProvider">
+        <receiver android:name="com.igarape.mogi.widget.MogiAppWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -46,43 +50,91 @@
                 android:resource="@xml/appwidget_info" />
         </receiver>
         <receiver
-            android:name=".gcm.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+            android:name="com.igarape.mogi.gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.igarape.mogi" />
             </intent-filter>
         </receiver>
-        <!--<receiver android:name=".server.ConnectivityStatusReceiver">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>-->
-        <!--<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>-->
-        <!--</intent-filter>-->
-        <!--</receiver>-->
+        <!-- <receiver android:name=".server.ConnectivityStatusReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/> -->
+        <!-- <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
 
-        <service android:name=".gcm.GcmIntentService" />
-
+        <service android:name="com.igarape.mogi.gcm.GcmIntentService" />
         <service android:name="com.igarape.mogi.location.LocationService" />
         <service android:name="com.igarape.mogi.recording.RecordingService" />
         <service android:name="com.igarape.mogi.recording.StreamingService" />
-        <service android:name=".server.UploadService" />
-        <service android:name=".recording.ToggleStreamingService" />
-        <service android:name=".widget.WidgetUpdateService" />
+        <service android:name="com.igarape.mogi.server.UploadService" />
+        <service android:name="com.igarape.mogi.recording.ToggleStreamingService" />
+        <service android:name="com.igarape.mogi.widget.WidgetUpdateService" />
 
         <activity
             android:name="com.igarape.mogi.server.AuthenticationActivity"
-            android:noHistory="true"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:taskAffinity="com.igarape.mogi.server.AuthenticationActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".manager.MainActivity"
+            android:name="com.igarape.mogi.manager.MainActivity"
             android:label="@string/title_activity_main"
-            android:screenOrientation="portrait"></activity>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:screenOrientation="portrait" >
+            </activity>
+        <activity
+            android:name="com.igarape.mogi.lock.LockScreenActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:taskAffinity="com.igarape.mogi.lock.LockScreenActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
+            <!--<intent-filter>-->
+
+                <!--&lt;!&ndash; <action android:name="android.intent.action.MAIN" /> &ndash;&gt;-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
+        <!--<activity-->
+            <!--android:name=".lock.StartLockScreenActivity"-->
+            <!--android:theme="@style/Theme.Transparent" >-->
+
+            <!--&lt;!&ndash;-->
+            <!--<intent-filter >-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<category android:name="android.intent.category.HOME" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+
+
+            <!--</intent-filter>-->
+            <!--&ndash;&gt;-->
+        <!--</activity>-->
+
+        <!--<service android:name="com.igarape.mogi.lock.LockScreenService" >-->
+        <!--</service>-->
+
+        <!--<receiver-->
+            <!--android:name="com.igarape.mogi.lock.LockScreenReceiver"-->
+            <!--android:enabled="true" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

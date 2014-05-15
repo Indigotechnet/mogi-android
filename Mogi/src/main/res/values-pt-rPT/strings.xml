@@ -31,4 +31,7 @@
     <string name="notification_location_description">Recording GPS data</string>
     <string name="notification_record_title">Smart Policing Camera</string>
     <string name="notification_record_description">Recording on SDCard</string>
+    <string name="location_status_uploading">Uploading</string>
+    <string name="unauthorized_login">Login or Password invalid</string>
+    <string name="no_server_login">Unable to contact the server</string>
 </resources>

@@ -87,7 +87,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
 
             mMediaRecorder.setOutputFile(mLastFileRecorded);
 
-            mMediaRecorder.setMaxDuration(VideoUtils.MAX_DURATION_MS); // 10mins
+            mMediaRecorder.setMaxDuration(VideoUtils.MAX_DURATION_MS);
             mMediaRecorder.setMaxFileSize(VideoUtils.MAX_SIZE_BYTES);
             mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
                 @Override

@@ -5,4 +5,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="lock_icon_large_dimension">180dp</dimen>
+    <dimen name="lock_header_height">40dp</dimen>
+
 </resources>

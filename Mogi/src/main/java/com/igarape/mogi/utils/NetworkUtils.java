@@ -10,7 +10,7 @@ import android.os.BatteryManager;
  */
 public class NetworkUtils {
     public static boolean canUpload(NetworkInfo activeNetwork, Intent intent) {
-        if (activeNetwork == null) {
+        if (activeNetwork == null || intent == null) {
             return false;
         }
         boolean isConnected = activeNetwork.isConnectedOrConnecting();

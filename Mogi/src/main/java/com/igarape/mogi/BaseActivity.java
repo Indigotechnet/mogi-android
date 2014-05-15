@@ -2,7 +2,10 @@ package com.igarape.mogi;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
 
+import com.igarape.mogi.utils.Identification;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
@@ -33,4 +36,6 @@ public abstract class BaseActivity extends FragmentActivity {
         super.onPause();
         bus.unregister(this);
     }
+
+
 }

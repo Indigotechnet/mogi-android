@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/lock_header_height"
+        android:id="@+id/headerLayout"
+        android:clickable="true"
+        android:layout_alignParentStart="true"
+        style="@style/SideContent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/loggedUserLabel"
+            style="@style/SideContent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="43dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/mainLayout"
+        android:layout_below="@+id/headerLayout"
+        style="@style/MainContent">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/lock_icon_large_dimension"
+            android:id="@+id/imageView"
+            android:src="@drawable/launcher_uploading"
+            android:layout_marginTop="91dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="@android:dimen/notification_large_icon_width"
+            android:id="@+id/switchLayout"
+            style="@style/SideContent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/switchUnlock"
+                android:checked="false"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <!--
+            <Button
+            android:id="@+id/lockk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:text="@string/unloack" />
+    -->
+
+</RelativeLayout>

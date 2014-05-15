@@ -34,7 +34,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
 
             views.setViewVisibility(R.id.widget_streaming_dot, View.GONE);
-            PendingIntent mainIntent;
+            PendingIntent mainIntent = null;
 
             // User is not logged
             if (Identification.getAccessToken(context) == null) {
@@ -45,7 +45,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                 mainIntent = PendingIntent.getActivity(context, 0, new Intent(context, AuthenticationActivity.class), 0);
             } else {
                 views.setViewVisibility(R.id.widget_action_button, View.VISIBLE);
-                Intent actionIntent = new Intent(context, ToggleStreamingService.class);
+                Intent actionIntent = null;
                 if (StateMachine.getInstance().isInState(State.STREAMING)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_pause_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
@@ -54,6 +54,15 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextViewText(R.id.widget_status_info,
                             "Streaming for " + StreamingService.Duration + "minutes");
                     views.setViewVisibility(R.id.widget_streaming_dot, View.VISIBLE);
+
+                    actionIntent = new Intent(context, ToggleStreamingService.class);
+                } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
+                    views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_upload_button);
+                    views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_upload);
+                    views.setTextViewText(R.id.widget_status_title, "Uploading");
+                    views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_blue));
+                    views.setTextViewText(R.id.widget_status_info,
+                            "Uploading files to server");
                 } else {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_play_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_play);
@@ -61,16 +70,25 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_green));
                     views.setTextViewText(R.id.widget_status_info,
                             "Logged in for " + toNowInMinutes(Identification.getTimeLogin(context)));
+                    actionIntent = new Intent(context, ToggleStreamingService.class);
                 }
-
-                mainIntent = PendingIntent.getService(context, 0, actionIntent, 0);
+                if (actionIntent != null) {
+                    mainIntent = PendingIntent.getService(context, 0, actionIntent, 0);
+                }
+            }
+            if (mainIntent != null) {
+                views.setOnClickPendingIntent(R.id.widget_action_bg, mainIntent);
+                views.setOnClickPendingIntent(R.id.widget_action_button, mainIntent);
             }
 
-            views.setOnClickPendingIntent(R.id.widget_action_bg, mainIntent);
-            views.setOnClickPendingIntent(R.id.widget_action_button, mainIntent);
-
-            PendingIntent settingsIntent = PendingIntent.getActivity(
-                    context, 0, new Intent(context, MainActivity.class), 0);
+            PendingIntent settingsIntent = null;
+            if (!StateMachine.getInstance().isInState(State.NOT_LOGGED)){
+                settingsIntent = PendingIntent.getActivity(
+                        context, 0, new Intent(context, MainActivity.class), Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+            } else {
+                settingsIntent = PendingIntent.getActivity(
+                        context, 0, new Intent(context, AuthenticationActivity.class), Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+            }
 
             views.setOnClickPendingIntent(R.id.widget_settings_button, settingsIntent);
 

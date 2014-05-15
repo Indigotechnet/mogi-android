@@ -17,62 +17,62 @@ public enum State {
 
     NOT_LOGGED {
         @Override
-        public void start(Context context) {
+        protected void start(Context context) {
 
         }
 
         @Override
-        public void stop(Context context) {
+        protected void stop(Context context) {
 
         }
     },
     RECORDING_OFFLINE {
         @Override
-        public void start(Context context) {
+        protected void start(Context context) {
             startSmartPolicingService(LocationService.class, context);
             startSmartPolicingService(RecordingService.class, context);
         }
 
         @Override
-        public void stop(Context context) {
+        protected void stop(Context context) {
             stopSmartPolicingService(LocationService.class, context);
             stopSmartPolicingService(RecordingService.class, context);
         }
     },
     RECORDING_ONLINE {
         @Override
-        public void start(Context context) {
+        protected void start(Context context) {
             startSmartPolicingService(LocationService.class, context);
             startSmartPolicingService(RecordingService.class, context);
         }
 
         @Override
-        public void stop(Context context) {
+        protected void stop(Context context) {
             stopSmartPolicingService(LocationService.class, context);
             stopSmartPolicingService(RecordingService.class, context);
         }
     },
     STREAMING {
         @Override
-        public void start(Context context) {
+        protected void start(Context context) {
             startSmartPolicingService(LocationService.class, context);
             startSmartPolicingService(StreamingService.class, context);
         }
 
         @Override
-        public void stop(Context context) {
+        protected void stop(Context context) {
             stopSmartPolicingService(LocationService.class, context);
             stopSmartPolicingService(StreamingService.class, context);
         }
     },
     UPLOADING {
         @Override
-        public void start(Context context) {
+        protected void start(Context context) {
             startSmartPolicingService(UploadService.class, context);
         }
 
         @Override
-        public void stop(Context context) {
+        protected void stop(Context context) {
             stopSmartPolicingService(UploadService.class, context);
         }
     };
@@ -120,8 +120,8 @@ public enum State {
         return false;
     }
 
-    public abstract void start(Context context);
+    protected abstract void start(Context context);
 
-    public abstract void stop(Context context);
+    protected abstract void stop(Context context);
 
 }

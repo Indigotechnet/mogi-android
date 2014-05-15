@@ -16,6 +16,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -160,12 +162,14 @@ public class LocationService extends BaseService {
             }
 
             // Request for location updates
-            LocationRequest request = LocationRequest.create();
-            request.setFastestInterval(CALL_GPS_INTERVAL);
-            request.setInterval(CALL_GPS_INTERVAL * 2);
-            request.setSmallestDisplacement(0);
-            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationClient.requestLocationUpdates(request, mLocationCallback);
+            if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE) || StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)) {
+                LocationRequest request = LocationRequest.create();
+                request.setFastestInterval(CALL_GPS_INTERVAL);
+                request.setInterval(CALL_GPS_INTERVAL * 2);
+                request.setSmallestDisplacement(0);
+                request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                mLocationClient.requestLocationUpdates(request, mLocationCallback);
+            }
         }
 
         @Override

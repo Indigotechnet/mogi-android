@@ -21,6 +21,7 @@ public class Identification {
     private static String streamingUser = "";
     private static String streamingPassword = "";
     private static String streamingPath = "";
+    private static String userName = null;
 
     public synchronized static String id(Context context) {
         if (uniqueID == null) {
@@ -111,5 +112,13 @@ public class Identification {
 
     public static void setStreamingPath(String streamingPath) {
         Identification.streamingPath = streamingPath;
+    }
+
+    public static void setUserName(String userName) {
+        Identification.userName = userName;
+    }
+
+    public static String getUserName() {
+        return userName;
     }
 }

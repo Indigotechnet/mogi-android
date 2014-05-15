@@ -6,6 +6,7 @@ import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.recording.RecordingService;
 import com.igarape.mogi.recording.StreamingService;
+import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -21,6 +22,7 @@ import dagger.Provides;
                 LocationService.class,
                 ConnectivityStatusReceiver.class,
                 RecordingService.class,
+                AuthenticationActivity.class,
                 StreamingService.class,
         }
 )

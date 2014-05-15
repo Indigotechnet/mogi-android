@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <!-- Colors widget Play/Pause (normal and pressed) -->
 
-    <!--Play-->
+
+    <!-- Play -->
     <color name="widget_play_normal">#B302B21F</color>
     <color name="widget_play_pressed">#B3065513</color>
 
@@ -10,14 +12,20 @@
     <color name="widget_pause_normal">#B3FF0000</color>
     <color name="widget_pause_pressed">#B3620303</color>
 
-    <!-- Regular colors-->
+    <!-- Regular colors -->
     <color name="widget_status_red">#A00505</color>
     <color name="widget_status_green">#235514</color>
+    <color name="widget_status_blue">#477dbc</color>
 
     <!-- Solid red (rec dot) -->
     <color name="red_solid">#FF0000</color>
 
-    <!-- Bottom white block background-->
-    <color name="bg_white_block">#E6FFFFFF</color>
+    <!-- Bottom white block background -->
+    <color name="bg_white_block">#E6FFFF</color>
+    <color name="black_overlay">#66000000</color>
 
+    <color name="bg_dark_block">#182a3e</color>
+    <color name="text_dark_block">#ffffff</color>
+    <color name="bg_blue_block">#477dbc</color>
+    <color name="text_blue_block">#ffffff</color>
 </resources>

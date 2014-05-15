@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.R;
+import com.igarape.mogi.lock.LockScreenReceiver;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.states.State;
@@ -30,6 +31,7 @@ public class MainActivity extends BaseActivity {
     private BroadcastReceiver connectivityReceiver = null;
     private TextView locationTextView;
     private ConnectivityStatusReceiver connectivityStatusReceiver;
+    private LockScreenReceiver lockScreenReceiver;
 
 
     @Override
@@ -39,16 +41,18 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         // Not logged, go to Auth
-        if (Identification.getAccessToken(this) == null) {
+        if (Identification.getAccessToken(this) == null || isTokenInvalid(this)) {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
+        if (Identification.getUserName()!=null) {
+            getActionBar().setTitle(Identification.getUserName());
+        }
+        StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
         registerMyReceiver();
 
         WidgetUtils.UpdateWidget(this.getApplicationContext());
         locationTextView = (TextView) findViewById(R.id.location_status);
-
-        StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
 
         ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -98,6 +102,10 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private boolean isTokenInvalid(Context context) {
+        return false;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -125,14 +133,16 @@ public class MainActivity extends BaseActivity {
     }
 
     private void changeLocationStatusGUI() {
-        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (NetworkUtils.hasConnection(mConnectivityManager)) {
+        if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)) {
             locationTextView.setText(getString(R.string.location_status_online));
             locationTextView.setBackgroundColor(Color.GREEN);
-        } else {
+        } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
             locationTextView.setText(getString(R.string.location_status_offline));
             locationTextView.setBackgroundColor(Color.RED);
+        } else if (StateMachine.getInstance().isInState(State.UPLOADING)){
+            locationTextView.setText(getString(R.string.location_status_uploading));
+            locationTextView.setBackgroundColor(Color.BLUE);
         }
 
     }
@@ -146,6 +156,11 @@ public class MainActivity extends BaseActivity {
         } catch (IllegalArgumentException e) {
             connectivityStatusReceiver = null;
         }
+        try {
+            unregisterReceiver(lockScreenReceiver);
+        } catch (IllegalArgumentException e) {
+            lockScreenReceiver = null;
+        }
     }
 
 
@@ -153,6 +168,12 @@ public class MainActivity extends BaseActivity {
         IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         connectivityStatusReceiver = new ConnectivityStatusReceiver();
         registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_BOOT_COMPLETED);
+//        lockScreenReceiver = new LockScreenReceiver();
+//        registerReceiver(lockScreenReceiver, filter);
     }
 
 }
