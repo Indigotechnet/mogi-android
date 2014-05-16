@@ -2,11 +2,14 @@ package com.igarape.mogi.states;
 
 import android.content.Context;
 
+import com.igarape.mogi.utils.WidgetUtils;
+
 /**
  * Created by brunosiqueira on 06/05/2014.
  */
 public class StateMachine {
 
+    private static final String TAG = StateMachine.class.getName();
     private static StateMachine _instance;
     private State currentState;
 
@@ -32,7 +35,7 @@ public class StateMachine {
         currentState.stop(context);
         currentState = state;
         currentState.start(context);
-
+        WidgetUtils.BeginUpdating(context);
     }
 
 

@@ -14,7 +14,6 @@ import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.VideoUtils;
-import com.igarape.mogi.utils.WidgetUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -72,7 +71,6 @@ public class UploadService extends Service {
             File dir = new File(FileUtils.getPath());
             videos = new ArrayList<File>(Arrays.asList(dir.listFiles(filter)));
         }
-        WidgetUtils.BeginUpdating(this);
         uploadLocations();
         if (VideoUtils.isRecordVideos()) {
             uploadVideos();

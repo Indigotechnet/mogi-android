@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.FileUtils;
-import com.igarape.mogi.utils.WidgetUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -32,7 +31,6 @@ public class MogiApp extends Application {
         objectGraph = ObjectGraph.create(new MogiModule(this));
         mBus = new Bus(ThreadEnforcer.ANY);
         FileUtils.setPath(getAlbumStorageDir("smartpolicing").getAbsolutePath());
-        WidgetUtils.UpdateWidget(this.getApplicationContext());
         ApiClient.setAppContext(this.getApplicationContext());
     }
 

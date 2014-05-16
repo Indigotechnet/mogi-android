@@ -1,11 +1,6 @@
 package com.igarape.mogi.lock;
 
-import com.igarape.mogi.R;
-import com.igarape.mogi.util.SystemUiHider;
-import com.igarape.mogi.utils.Identification;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -14,6 +9,10 @@ import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.igarape.mogi.R;
+import com.igarape.mogi.util.SystemUiHider;
+import com.igarape.mogi.utils.Identification;
 
 
 /**
@@ -35,8 +34,8 @@ public class LockScreenActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
 
@@ -48,43 +47,42 @@ public class LockScreenActivity extends Activity {
         switchUnlock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+                if (isChecked) {
                     LockScreenActivity.this.finish();
                 }
             }
         });
 
-        if(getIntent()!=null&&getIntent().hasExtra("kill")&&getIntent().getExtras().getInt("kill")==1){
+        if (getIntent() != null && getIntent().hasExtra("kill") && getIntent().getExtras().getInt("kill") == 1) {
             // Toast.makeText(this, "" + "kill activityy", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        try{
+        try {
             // initialize receiver
 
 
-
             StateListener phoneStateListener = new StateListener();
-            TelephonyManager telephonyManager =(TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             // TODO: handle exception
         }
 
     }
-    class StateListener extends PhoneStateListener{
+
+    class StateListener extends PhoneStateListener {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
 
             super.onCallStateChanged(state, incomingNumber);
-            switch(state){
+            switch (state) {
                 case TelephonyManager.CALL_STATE_RINGING:
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     System.out.println("call Activity off hook");
                     finish();
-
 
 
                     break;
@@ -120,11 +118,11 @@ public class LockScreenActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
 
-        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)||(keyCode == KeyEvent.KEYCODE_POWER)||(keyCode == KeyEvent.KEYCODE_VOLUME_UP)||(keyCode == KeyEvent.KEYCODE_CAMERA)) {
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) || (keyCode == KeyEvent.KEYCODE_POWER) || (keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_CAMERA)) {
             //this is where I can do my stuff
             return true; //because I handled the event
         }
-        if((keyCode == KeyEvent.KEYCODE_HOME)){
+        if ((keyCode == KeyEvent.KEYCODE_HOME)) {
 
             return true;
         }
@@ -134,11 +132,11 @@ public class LockScreenActivity extends Activity {
     }
 
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_POWER ||(event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)||(event.getKeyCode() == KeyEvent.KEYCODE_POWER)) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_POWER || (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) || (event.getKeyCode() == KeyEvent.KEYCODE_POWER)) {
 
             return false;
         }
-        if((event.getKeyCode() == KeyEvent.KEYCODE_HOME)){
+        if ((event.getKeyCode() == KeyEvent.KEYCODE_HOME)) {
 
             System.out.println("alokkkkkkkkkkkkkkkkk");
             return true;
@@ -147,7 +145,7 @@ public class LockScreenActivity extends Activity {
     }
 
 
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
     }
 }

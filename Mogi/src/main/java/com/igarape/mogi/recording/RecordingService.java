@@ -13,7 +13,6 @@ import android.view.SurfaceHolder;
 import com.igarape.mogi.R;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.VideoUtils;
-import com.igarape.mogi.utils.WidgetUtils;
 
 import java.io.File;
 import java.util.Date;
@@ -117,7 +116,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
                 return;
             }
             IsRecording = true;
-            WidgetUtils.BeginUpdating(this);
+
         }
     }
 
@@ -141,7 +140,6 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             mCamera.lock();
             mCamera.release();
             IsRecording = false;
-            WidgetUtils.StopUpdating();
         }
     }
 }

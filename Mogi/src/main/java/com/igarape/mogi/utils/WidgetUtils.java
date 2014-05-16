@@ -4,9 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.util.Log;
 
 import com.igarape.mogi.widget.MogiAppWidgetProvider;
 

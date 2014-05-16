@@ -17,6 +17,7 @@ import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.WidgetUtils;
 
 /**
  * Created by felipeamorim on 08/07/2013.
@@ -73,21 +74,19 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 }
                 if (actionIntent != null) {
-                    mainIntent = PendingIntent.getService(context, 0, actionIntent, 0);
+                    mainIntent = PendingIntent.getService(context, appWidgetId, actionIntent, 0);
                 }
             }
+
+            PendingIntent settingsIntent = PendingIntent.getActivity(
+                    context, appWidgetId, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
             if (mainIntent != null) {
                 views.setOnClickPendingIntent(R.id.widget_action_bg, mainIntent);
                 views.setOnClickPendingIntent(R.id.widget_action_button, mainIntent);
-            }
-
-            PendingIntent settingsIntent = null;
-            if (!StateMachine.getInstance().isInState(State.NOT_LOGGED)){
-                settingsIntent = PendingIntent.getActivity(
-                        context, 0, new Intent(context, MainActivity.class), Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
             } else {
-                settingsIntent = PendingIntent.getActivity(
-                        context, 0, new Intent(context, AuthenticationActivity.class), Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                views.setOnClickPendingIntent(R.id.widget_action_bg, settingsIntent);
+                views.setOnClickPendingIntent(R.id.widget_action_button, settingsIntent);
             }
 
             views.setOnClickPendingIntent(R.id.widget_settings_button, settingsIntent);
@@ -96,6 +95,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
+        WidgetUtils.StopUpdating();
     }
 
     private String toNowInMinutes(long before) {

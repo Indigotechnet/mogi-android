@@ -22,8 +22,6 @@ import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
-import com.igarape.mogi.utils.NetworkUtils;
-import com.igarape.mogi.utils.WidgetUtils;
 
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
@@ -37,21 +35,21 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
         // Not logged, go to Auth
-        if (Identification.getAccessToken(this) == null || isTokenInvalid(this)) {
+        if (Identification.getAccessToken(this) == null) {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
-        if (Identification.getUserName()!=null) {
+        if (Identification.getUserName() != null) {
             getActionBar().setTitle(Identification.getUserName());
         }
-        StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+        if (StateMachine.getInstance().isInState(State.NOT_LOGGED)) {
+            StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+        }
         registerMyReceiver();
 
-        WidgetUtils.UpdateWidget(this.getApplicationContext());
         locationTextView = (TextView) findViewById(R.id.location_status);
 
         ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
@@ -90,20 +88,15 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        ((Button) findViewById(R.id.logout)).setOnClickListener(new Button.OnClickListener() {
+        findViewById(R.id.logout).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
                 Identification.setAccessToken(getApplicationContext(), null);
-                WidgetUtils.UpdateWidget(MainActivity.this);
                 unregisterReceiver(connectivityReceiver);
                 finish();
             }
         });
-    }
-
-    private boolean isTokenInvalid(Context context) {
-        return false;
     }
 
     @Override
@@ -137,10 +130,10 @@ public class MainActivity extends BaseActivity {
         if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)) {
             locationTextView.setText(getString(R.string.location_status_online));
             locationTextView.setBackgroundColor(Color.GREEN);
-        } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
+        } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)) {
             locationTextView.setText(getString(R.string.location_status_offline));
             locationTextView.setBackgroundColor(Color.RED);
-        } else if (StateMachine.getInstance().isInState(State.UPLOADING)){
+        } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
             locationTextView.setText(getString(R.string.location_status_uploading));
             locationTextView.setBackgroundColor(Color.BLUE);
         }
@@ -175,5 +168,6 @@ public class MainActivity extends BaseActivity {
 //        lockScreenReceiver = new LockScreenReceiver();
 //        registerReceiver(lockScreenReceiver, filter);
     }
+
 
 }

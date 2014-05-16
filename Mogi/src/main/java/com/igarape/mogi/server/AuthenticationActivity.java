@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -23,14 +22,12 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.Identification;
-import com.igarape.mogi.utils.WidgetUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -39,9 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class AuthenticationActivity extends BaseActivity {
+public class AuthenticationActivity extends Activity {
+    public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -70,10 +67,8 @@ public class AuthenticationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Identification.setAccessToken(this, null);
         StateMachine.getInstance().startServices(State.NOT_LOGGED, getBaseContext());
-        WidgetUtils.UpdateWidget(this);
 
         setContentView(R.layout.activity_auth);
         context = getApplicationContext();
@@ -236,7 +231,7 @@ public class AuthenticationActivity extends BaseActivity {
                     pDialog.dismiss();
                     pDialog = null;
                 }
-                if (statusCode == 401){
+                if (statusCode == 401) {
                     Toast.makeText(AuthenticationActivity.this, AuthenticationActivity.this.getString(R.string.unauthorized_login), Toast.LENGTH_LONG).show();
                 } else {
                     Log.e(TAG, "Error: " + responseBody, e);
@@ -274,14 +269,12 @@ public class AuthenticationActivity extends BaseActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                WidgetUtils.UpdateWidget(AuthenticationActivity.this.getApplicationContext());
                 Identification.setAccessToken(getBaseContext(), token);
                 Identification.setUserLogin(getBaseContext(), txtId.getText().toString());
                 ApiClient.setToken(token);
                 Intent intent = new Intent(AuthenticationActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
-                super.onSuccess(response);
+                AuthenticationActivity.this.finish();
             }
 
             @Override
