@@ -14,7 +14,9 @@ import android.view.WindowManager;
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.UserUtils;
 import com.igarape.mogi.utils.VideoUtils;
+import com.igarape.mogi.utils.WidgetUtils;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
@@ -79,6 +81,11 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         mClient.release();
         mSession.release();
         IsStreaming = false;
+
+        /**
+         * Here we`ll tell node(server) that user stopped streaming
+         */
+        UserUtils.notifyStreamingStop();
     }
 
     @Override
@@ -121,6 +128,10 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         mSession.startPreview();
         mClient.startStream();
         IsStreaming = true;
+        /**
+         * Here we`ll tell node(server) that user is streaming
+         */
+        UserUtils.notifyStreamingStart();
     }
 
     @Override

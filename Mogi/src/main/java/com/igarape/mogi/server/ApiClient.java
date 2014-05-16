@@ -43,6 +43,14 @@ public class ApiClient {
         client.post(getServerUrl(url), params, responseHandler);
     }
 
+    public static void post(String url, AsyncHttpResponseHandler responseHandler){
+        client.post(getServerUrl(url), responseHandler);
+    }
+
+    public static void delete(String url, AsyncHttpResponseHandler responseHandler){
+        client.delete(getServerUrl(url), responseHandler);
+    }
+
     public static void post(String url, JSONObject body, JsonHttpResponseHandler responseHandler) {
         try {
             client.post(appContext, getServerUrl(url), new StringEntity(body.toString()), "application/json", responseHandler);
