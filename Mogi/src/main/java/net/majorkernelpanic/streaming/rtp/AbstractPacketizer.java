@@ -20,8 +20,6 @@
 
 package net.majorkernelpanic.streaming.rtp;
 
-import net.majorkernelpanic.streaming.rtcp.SenderReport;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -50,21 +48,25 @@ abstract public class AbstractPacketizer {
         socket.setSSRC(ssrc);
     }
 
+    /**
+     * For debugging purposes.
+     */
+    protected static String printBuffer(byte[] buffer, int start, int end) {
+        String str = "";
+        for (int i = start; i < end; i++) str += "," + Integer.toHexString(buffer[i] & 0xFF);
+        return str;
+    }
+
     public RtpSocket getRtpSocket() {
         return socket;
     }
 
-    public SenderReport getRtcpSocket() {
-        return socket.getRtcpSocket();
+    public int getSSRC() {
+        return socket.getSSRC();
     }
-
 
     public void setSSRC(int ssrc) {
         socket.setSSRC(ssrc);
-    }
-
-    public int getSSRC() {
-        return socket.getSSRC();
     }
 
     public void setInputStream(InputStream is) {
@@ -101,15 +103,6 @@ abstract public class AbstractPacketizer {
      */
     protected void send(int length) throws IOException {
         socket.commitBuffer(length);
-    }
-
-    /**
-     * For debugging purposes.
-     */
-    protected static String printBuffer(byte[] buffer, int start, int end) {
-        String str = "";
-        for (int i = start; i < end; i++) str += "," + Integer.toHexString(buffer[i] & 0xFF);
-        return str;
     }
 
     /**

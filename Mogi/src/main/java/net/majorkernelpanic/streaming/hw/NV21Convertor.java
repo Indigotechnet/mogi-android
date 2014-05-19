@@ -29,13 +29,13 @@ import java.nio.ByteBuffer;
  */
 public class NV21Convertor {
 
+    ByteBuffer mCopy;
     private int mSliceHeight, mHeight;
     private int mStride, mWidth;
     private int mSize;
     private boolean mPlanar, mPanesReversed = false;
     private int mYPadding;
     private byte[] mBuffer;
-    ByteBuffer mCopy;
 
     public void setSize(int width, int height) {
         mHeight = height;
@@ -43,22 +43,6 @@ public class NV21Convertor {
         mSliceHeight = height;
         mStride = width;
         mSize = mWidth * mHeight;
-    }
-
-    public void setStride(int width) {
-        mStride = width;
-    }
-
-    public void setSliceHeigth(int height) {
-        mSliceHeight = height;
-    }
-
-    public void setPlanar(boolean planar) {
-        mPlanar = planar;
-    }
-
-    public void setYPadding(int padding) {
-        mYPadding = padding;
     }
 
     public int getBufferSize() {
@@ -87,17 +71,32 @@ public class NV21Convertor {
         return mStride;
     }
 
+    public void setStride(int width) {
+        mStride = width;
+    }
+
     public int getSliceHeigth() {
         return mSliceHeight;
+    }
+
+    public void setSliceHeigth(int height) {
+        mSliceHeight = height;
     }
 
     public int getYPadding() {
         return mYPadding;
     }
 
+    public void setYPadding(int padding) {
+        mYPadding = padding;
+    }
 
     public boolean getPlanar() {
         return mPlanar;
+    }
+
+    public void setPlanar(boolean planar) {
+        mPlanar = planar;
     }
 
     public boolean getUVPanesReversed() {
@@ -106,7 +105,8 @@ public class NV21Convertor {
 
     public void convert(byte[] data, ByteBuffer buffer) {
         byte[] result = convert(data);
-        buffer.put(result, 0, result.length);
+        int min = buffer.capacity() < data.length ? buffer.capacity() : data.length;
+        buffer.put(result, 0, min);
     }
 
     public byte[] convert(byte[] data) {

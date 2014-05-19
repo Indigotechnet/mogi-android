@@ -46,15 +46,15 @@ public abstract class AudioStream extends MediaStream {
         mAudioSource = audioSource;
     }
 
-    public void setAudioQuality(AudioQuality quality) {
-        mRequestedQuality = quality;
-    }
-
     /**
      * Returns the quality of the stream.
      */
     public AudioQuality getAudioQuality() {
         return mQuality;
+    }
+
+    public void setAudioQuality(AudioQuality quality) {
+        mRequestedQuality = quality;
     }
 
     protected void setAudioEncoder(int audioEncoder) {
@@ -92,7 +92,6 @@ public abstract class AudioStream extends MediaStream {
         try {
             // mReceiver.getInputStream contains the data from the camera
             // the mPacketizer encapsulates this stream in an RTP stream and send it over the network
-            mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
             mPacketizer.setInputStream(mReceiver.getInputStream());
             mPacketizer.start();
             mStreaming = true;

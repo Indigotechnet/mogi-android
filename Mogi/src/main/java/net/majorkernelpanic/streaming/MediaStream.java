@@ -31,6 +31,7 @@ import android.util.Log;
 import net.majorkernelpanic.streaming.rtp.AbstractPacketizer;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.Random;
 
@@ -40,13 +41,11 @@ import java.util.Random;
  */
 public abstract class MediaStream implements Stream {
 
-    protected static final String TAG = "MediaStream";
-
     /**
      * Raw audio/video will be encoded using the MediaRecorder API.
      */
     public static final byte MODE_MEDIARECORDER_API = 0x01;
-
+    protected static byte sSuggestedMode = MODE_MEDIARECORDER_API;
     /**
      * Raw audio/video will be encoded using the MediaCodec API with buffers.
      */
@@ -56,30 +55,25 @@ public abstract class MediaStream implements Stream {
      * Raw audio/video will be encoded using the MediaCode API with a surface.
      */
     public static final byte MODE_MEDIACODEC_API_2 = 0x05;
-
+    protected static final String TAG = "MediaStream";
     /**
      * Prefix that will be used for all shared preferences saved by libstreaming
      */
     protected static final String PREF_PREFIX = "libstreaming-";
-
     /**
      * The packetizer that will read the output of the camera and send RTP packets over the networkd.
      */
     protected AbstractPacketizer mPacketizer = null;
-
-    protected static byte sSuggestedMode = MODE_MEDIARECORDER_API;
     protected byte mMode, mRequestedMode;
 
     protected boolean mStreaming = false, mConfigured = false;
     protected int mRtpPort = 0, mRtcpPort = 0;
+    protected byte mChannelIdentifier = 0;
+    protected OutputStream mOutputStream = null;
     protected InetAddress mDestination;
     protected LocalSocket mReceiver, mSender = null;
-    private LocalServerSocket mLss = null;
-    private int mSocketId, mTTL = 64;
-
     protected MediaRecorder mMediaRecorder;
     protected MediaCodec mMediaCodec;
-
     static {
         // We determine wether or not the MediaCodec API should be used
         try {
@@ -92,6 +86,8 @@ public abstract class MediaStream implements Stream {
             Log.i(TAG, "Phone does not support the MediaCodec API");
         }
     }
+    private LocalServerSocket mLss = null;
+    private int mSocketId, mTTL = 64;
 
     public MediaStream() {
         mRequestedMode = sSuggestedMode;
@@ -109,25 +105,6 @@ public abstract class MediaStream implements Stream {
 
     /**
      * Sets the destination ports of the stream.
-     * If an odd number is supplied for the destination port then the next
-     * lower even number will be used for RTP and it will be used for RTCP.
-     * If an even number is supplied, it will be used for RTP and the next odd
-     * number will be used for RTCP.
-     *
-     * @param dport The destination port
-     */
-    public void setDestinationPorts(int dport) {
-        if (dport % 2 == 1) {
-            mRtpPort = dport - 1;
-            mRtcpPort = dport;
-        } else {
-            mRtpPort = dport;
-            mRtcpPort = dport + 1;
-        }
-    }
-
-    /**
-     * Sets the destination ports of the stream.
      *
      * @param rtpPort  Destination port that will be used for RTP
      * @param rtcpPort Destination port that will be used for RTCP
@@ -135,6 +112,17 @@ public abstract class MediaStream implements Stream {
     public void setDestinationPorts(int rtpPort, int rtcpPort) {
         mRtpPort = rtpPort;
         mRtcpPort = rtcpPort;
+        mOutputStream = null;
+    }
+
+    /**
+     * If a TCP is used as the transport protocol for the RTP session,
+     * the output stream to which RTP packets will be written to must
+     * be specified with this method.
+     */
+    public void setOutputStream(OutputStream stream, byte channelIdentifier) {
+        mOutputStream = stream;
+        mChannelIdentifier = channelIdentifier;
     }
 
     /**
@@ -159,14 +147,30 @@ public abstract class MediaStream implements Stream {
     }
 
     /**
+     * Sets the destination ports of the stream.
+     * If an odd number is supplied for the destination port then the next
+     * lower even number will be used for RTP and it will be used for RTCP.
+     * If an even number is supplied, it will be used for RTP and the next odd
+     * number will be used for RTCP.
+     *
+     * @param dport The destination port
+     */
+    public void setDestinationPorts(int dport) {
+        if (dport % 2 == 1) {
+            mRtpPort = dport - 1;
+            mRtcpPort = dport;
+        } else {
+            mRtpPort = dport;
+            mRtcpPort = dport + 1;
+        }
+    }
+
+    /**
      * Returns a pair of source ports, the first one is the
      * one used for RTP and the second one is used for RTCP.
      */
     public int[] getLocalPorts() {
-        return new int[]{
-                this.mPacketizer.getRtpSocket().getLocalPort(),
-                this.mPacketizer.getRtcpSocket().getLocalPort()
-        };
+        return mPacketizer.getRtpSocket().getLocalPorts();
     }
 
     /**
@@ -220,6 +224,10 @@ public abstract class MediaStream implements Stream {
      */
     public synchronized void configure() throws IllegalStateException, IOException {
         if (mStreaming) throw new IllegalStateException("Can't be called while streaming.");
+        if (mPacketizer != null) {
+            mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
+            mPacketizer.getRtpSocket().setOutputStream(mOutputStream, mChannelIdentifier);
+        }
         mMode = mRequestedMode;
         mConfigured = true;
     }
@@ -308,7 +316,7 @@ public abstract class MediaStream implements Stream {
         mReceiver = new LocalSocket();
         mReceiver.connect(new LocalSocketAddress(LOCAL_ADDR + mSocketId));
         mReceiver.setReceiveBufferSize(500000);
-        mReceiver.setSoTimeout(10000);
+        mReceiver.setSoTimeout(3000);
         mSender = mLss.accept();
         mSender.setSendBufferSize(500000);
     }

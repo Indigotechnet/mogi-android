@@ -103,6 +103,14 @@ public class EncoderDebugger {
     private byte[][] mVideo, mDecodedVideo;
     private String mB64PPS, mB64SPS;
 
+    private EncoderDebugger(SharedPreferences prefs, int width, int height) {
+        mPreferences = prefs;
+        mWidth = width;
+        mHeight = height;
+        mSize = width * height;
+        reset();
+    }
+
     public synchronized static void asyncDebug(final Context context, final int width, final int height) {
         new Thread(new Runnable() {
             @Override
@@ -155,14 +163,6 @@ public class EncoderDebugger {
      */
     public String getErrorLog() {
         return mErrorLog;
-    }
-
-    private EncoderDebugger(SharedPreferences prefs, int width, int height) {
-        mPreferences = prefs;
-        mWidth = width;
-        mHeight = height;
-        mSize = width * height;
-        reset();
     }
 
     private void reset() {

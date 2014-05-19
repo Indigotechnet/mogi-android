@@ -53,18 +53,6 @@ import java.nio.ByteBuffer;
 public class AACStream extends AudioStream {
 
     public final static String TAG = "AACStream";
-
-    /**
-     * MPEG-4 Audio Object Types supported by ADTS. *
-     */
-    private static final String[] AUDIO_OBJECT_TYPES = {
-            "NULL",                              // 0
-            "AAC Main",                          // 1
-            "AAC LC (Low Complexity)",          // 2
-            "AAC SSR (Scalable Sample Rate)", // 3
-            "AAC LTP (Long Term Prediction)"  // 4
-    };
-
     /**
      * There are 13 supported frequencies by ADTS. *
      */
@@ -86,7 +74,16 @@ public class AACStream extends AudioStream {
             -1,   // 14
             -1,   // 15
     };
-
+    /**
+     * MPEG-4 Audio Object Types supported by ADTS. *
+     */
+    private static final String[] AUDIO_OBJECT_TYPES = {
+            "NULL",                              // 0
+            "AAC Main",                          // 1
+            "AAC LC (Low Complexity)",          // 2
+            "AAC SSR (Scalable Sample Rate)", // 3
+            "AAC LTP (Long Term Prediction)"  // 4
+    };
     private String mSessionDescription = null;
     private int mProfile, mSamplingRateIndex, mChannel, mConfig;
     private SharedPreferences mSettings = null;
@@ -126,8 +123,8 @@ public class AACStream extends AudioStream {
 
     @Override
     public synchronized void start() throws IllegalStateException, IOException {
-        configure();
         if (!mStreaming) {
+            configure();
             super.start();
         }
     }
@@ -154,8 +151,9 @@ public class AACStream extends AudioStream {
             } else {
                 mPacketizer = new AACLATMPacketizer();
             }
+            mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
+            mPacketizer.getRtpSocket().setOutputStream(mOutputStream, mChannelIdentifier);
         }
-
 
         if (mMode == MODE_MEDIARECORDER_API) {
 
@@ -243,7 +241,6 @@ public class AACStream extends AudioStream {
         mThread.start();
 
         // The packetizer encapsulates this stream in an RTP stream and send it over the network
-        mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
         mPacketizer.setInputStream(inputStream);
         mPacketizer.start();
 

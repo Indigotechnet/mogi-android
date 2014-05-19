@@ -39,15 +39,13 @@ import java.nio.ByteBuffer;
 public class MediaCodecInputStream extends InputStream {
 
     public final String TAG = "MediaCodecInputStream";
-
+    public MediaFormat mMediaFormat;
     private MediaCodec mMediaCodec = null;
     private BufferInfo mBufferInfo = new BufferInfo();
     private ByteBuffer[] mBuffers = null;
     private ByteBuffer mBuffer = null;
     private int mIndex = -1;
     private boolean mClosed = false;
-
-    public MediaFormat mMediaFormat;
 
     public MediaCodecInputStream(MediaCodec mediaCodec) {
         mMediaCodec = mediaCodec;

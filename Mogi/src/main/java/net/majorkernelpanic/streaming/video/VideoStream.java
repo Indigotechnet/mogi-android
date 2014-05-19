@@ -36,8 +36,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
-import com.igarape.mogi.utils.VideoUtils;
-
 import net.majorkernelpanic.streaming.MediaStream;
 import net.majorkernelpanic.streaming.exceptions.CameraInUseException;
 import net.majorkernelpanic.streaming.exceptions.ConfNotSupportedException;
@@ -66,7 +64,7 @@ public abstract class VideoStream extends MediaStream {
     protected SurfaceView mSurfaceView = null;
     protected SharedPreferences mSettings = null;
     protected int mVideoEncoder, mCameraId = 0;
-    protected int mRequestedOrientation = VideoUtils.DEGREES, mOrientation = VideoUtils.DEGREES;
+    protected int mRequestedOrientation = 0, mOrientation = 0;
     protected Camera mCamera;
     protected Thread mCameraThread;
     protected Looper mCameraLooper;
@@ -76,6 +74,7 @@ public abstract class VideoStream extends MediaStream {
     protected boolean mSurfaceReady = false;
     protected boolean mUnlocked = false;
     protected boolean mPreviewStarted = false;
+    protected boolean mUpdated = false;
 
     protected String mMimeType;
     protected String mEncoderName;
@@ -103,24 +102,6 @@ public abstract class VideoStream extends MediaStream {
     }
 
     /**
-     * Sets the camera that will be used to capture video.
-     * You can call this method at any time and changes will take effect next time you start the stream.
-     *
-     * @param camera Can be either CameraInfo.CAMERA_FACING_BACK or CameraInfo.CAMERA_FACING_FRONT
-     */
-    public void setCamera(int camera) {
-        CameraInfo cameraInfo = new CameraInfo();
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.getCameraInfo(i, cameraInfo);
-            if (cameraInfo.facing == camera) {
-                mCameraId = i;
-                break;
-            }
-        }
-    }
-
-    /**
      * Switch between the front facing and the back facing camera of the phone.
      * If {@link #startPreview()} has been called, the preview will be  briefly interrupted.
      * If {@link #start()} has been called, the stream will be  briefly interrupted.
@@ -142,8 +123,31 @@ public abstract class VideoStream extends MediaStream {
         if (streaming) start();
     }
 
+    /**
+     * Returns the id of the camera currently selected.
+     * Can be either {@link android.hardware.Camera.CameraInfo#CAMERA_FACING_BACK} or
+     * {@link android.hardware.Camera.CameraInfo#CAMERA_FACING_FRONT}.
+     */
     public int getCamera() {
         return mCameraId;
+    }
+
+    /**
+     * Sets the camera that will be used to capture video.
+     * You can call this method at any time and changes will take effect next time you start the stream.
+     *
+     * @param camera Can be either CameraInfo.CAMERA_FACING_BACK or CameraInfo.CAMERA_FACING_FRONT
+     */
+    public void setCamera(int camera) {
+        CameraInfo cameraInfo = new CameraInfo();
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == camera) {
+                mCameraId = i;
+                break;
+            }
+        }
     }
 
     /**
@@ -177,6 +181,21 @@ public abstract class VideoStream extends MediaStream {
             mSurfaceView.getHolder().addCallback(mSurfaceHolderCallback);
             mSurfaceReady = true;
         }
+    }
+
+    /**
+     * Toggles the LED of the phone if it has one.
+     * You can get the current state of the flash with {@link net.majorkernelpanic.streaming.video.VideoStream#getFlashState()}.
+     */
+    public synchronized void toggleFlash() {
+        setFlashState(!mFlashEnabled);
+    }
+
+    /**
+     * Indicates whether or not the flash of the phone is on.
+     */
+    public boolean getFlashState() {
+        return mFlashEnabled;
     }
 
     /**
@@ -216,28 +235,21 @@ public abstract class VideoStream extends MediaStream {
     }
 
     /**
-     * Toggle the LED of the phone if it has one.
-     */
-    public synchronized void toggleFlash() {
-        setFlashState(!mFlashEnabled);
-    }
-
-    /**
-     * Indicates whether or not the flash of the phone is on.
-     */
-    public boolean getFlashState() {
-        return mFlashEnabled;
-    }
-
-    /**
      * Sets the orientation of the preview.
      *
      * @param orientation The orientation of the preview
      */
     public void setPreviewOrientation(int orientation) {
         mRequestedOrientation = orientation;
+        mUpdated = false;
     }
 
+    /**
+     * Returns the quality of the stream.
+     */
+    public VideoQuality getVideoQuality() {
+        return mRequestedQuality;
+    }
 
     /**
      * Sets the configuration of the stream. You can call this method at any time
@@ -246,14 +258,10 @@ public abstract class VideoStream extends MediaStream {
      * @param videoQuality Quality of the stream
      */
     public void setVideoQuality(VideoQuality videoQuality) {
-        mRequestedQuality = videoQuality.clone();
-    }
-
-    /**
-     * Returns the quality of the stream.
-     */
-    public VideoQuality getVideoQuality() {
-        return mRequestedQuality;
+        if (!mRequestedQuality.equals(videoQuality)) {
+            mRequestedQuality = videoQuality.clone();
+            mUpdated = false;
+        }
     }
 
     /**
@@ -313,20 +321,12 @@ public abstract class VideoStream extends MediaStream {
     public synchronized void startPreview()
             throws CameraInUseException,
             InvalidSurfaceException,
-            ConfNotSupportedException,
             RuntimeException {
 
         mCameraOpenedManually = true;
         if (!mPreviewStarted) {
             createCamera();
             updateCamera();
-            try {
-                mCamera.startPreview();
-                mPreviewStarted = true;
-            } catch (RuntimeException e) {
-                destroyCamera();
-                throw e;
-            }
         }
     }
 
@@ -341,7 +341,7 @@ public abstract class VideoStream extends MediaStream {
     /**
      * Video encoding is done by a MediaRecorder.
      */
-    protected void encodeWithMediaRecorder() throws IOException {
+    protected void encodeWithMediaRecorder() throws IOException, ConfNotSupportedException {
 
         Log.d(TAG, "Video encoded using the MediaRecorder API");
 
@@ -397,7 +397,6 @@ public abstract class VideoStream extends MediaStream {
         }
 
         // The packetizer encapsulates the bit stream in an RTP stream and send it over the network
-        mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
         mPacketizer.setInputStream(mReceiver.getInputStream());
         mPacketizer.start();
 
@@ -477,6 +476,7 @@ public abstract class VideoStream extends MediaStream {
                     int bufferIndex = mMediaCodec.dequeueInputBuffer(500000);
                     if (bufferIndex >= 0) {
                         inputBuffers[bufferIndex].clear();
+                        if (data == null) Log.d(TAG, "ERRORRR");
                         convertor.convert(data, inputBuffers[bufferIndex]);
                         mMediaCodec.queueInputBuffer(bufferIndex, 0, inputBuffers[bufferIndex].position(), now, 0);
                     } else {
@@ -492,7 +492,6 @@ public abstract class VideoStream extends MediaStream {
         mCamera.setPreviewCallbackWithBuffer(callback);
 
         // The packetizer encapsulates the bit stream in an RTP stream and send it over the network
-        mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
         mPacketizer.setInputStream(new MediaCodecInputStream(mMediaCodec));
         mPacketizer.start();
 
@@ -530,7 +529,6 @@ public abstract class VideoStream extends MediaStream {
         mMediaCodec.start();
 
         // The packetizer encapsulates the bit stream in an RTP stream and send it over the network
-        mPacketizer.setDestination(mDestination, mRtpPort, mRtcpPort);
         mPacketizer.setInputStream(new MediaCodecInputStream(mMediaCodec));
         mPacketizer.start();
 
@@ -583,6 +581,7 @@ public abstract class VideoStream extends MediaStream {
 
         if (mCamera == null) {
             openCamera();
+            mUpdated = false;
             mUnlocked = false;
             mCamera.setErrorCallback(new Camera.ErrorCallback() {
                 @Override
@@ -604,7 +603,7 @@ public abstract class VideoStream extends MediaStream {
             try {
 
                 // If the phone has a flash, we turn it on/off according to mFlashEnabled
-                // setRecordingHint(true) is a very nice optimisation if you plane to only use the Camera for recording
+                // setRecordingHint(true) is a very nice optimization if you plane to only use the Camera for recording
                 Parameters parameters = mCamera.getParameters();
                 if (parameters.getFlashMode() != null) {
                     parameters.setFlashMode(mFlashEnabled ? Parameters.FLASH_MODE_TORCH : Parameters.FLASH_MODE_OFF);
@@ -650,6 +649,10 @@ public abstract class VideoStream extends MediaStream {
     }
 
     protected synchronized void updateCamera() throws RuntimeException {
+
+        // The camera is already correctly configured
+        if (mUpdated) return;
+
         if (mPreviewStarted) {
             mPreviewStarted = false;
             mCamera.stopPreview();
@@ -658,6 +661,10 @@ public abstract class VideoStream extends MediaStream {
         Parameters parameters = mCamera.getParameters();
         mQuality = VideoQuality.determineClosestSupportedResolution(parameters, mQuality);
         int[] max = VideoQuality.determineMaximumSupportedFramerate(parameters);
+
+        double ratio = (double) mQuality.resX / (double) mQuality.resY;
+        mSurfaceView.requestAspectRatio(ratio);
+
         parameters.setPreviewFormat(mCameraImageFormat);
         parameters.setPreviewSize(mQuality.resX, mQuality.resY);
         parameters.setPreviewFpsRange(max[0], max[1]);
@@ -667,6 +674,7 @@ public abstract class VideoStream extends MediaStream {
             mCamera.setDisplayOrientation(mOrientation);
             mCamera.startPreview();
             mPreviewStarted = true;
+            mUpdated = true;
         } catch (RuntimeException e) {
             destroyCamera();
             throw e;

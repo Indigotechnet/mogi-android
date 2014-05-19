@@ -21,6 +21,7 @@
 package net.majorkernelpanic.streaming;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 
 /**
@@ -62,22 +63,18 @@ public interface Stream {
 
     /**
      * Sets the destination ports of the stream.
-     * If an odd number is supplied for the destination port then the next
-     * lower even number will be used for RTP and it will be used for RTCP.
-     * If an even number is supplied, it will be used for RTP and the next odd
-     * number will be used for RTCP.
-     *
-     * @param dport The destination port
-     */
-    public void setDestinationPorts(int dport);
-
-    /**
-     * Sets the destination ports of the stream.
      *
      * @param rtpPort  Destination port that will be used for RTP
      * @param rtcpPort Destination port that will be used for RTCP
      */
     public void setDestinationPorts(int rtpPort, int rtcpPort);
+
+    /**
+     * If a TCP is used as the transport protocol for the RTP session,
+     * the output stream to which RTP packets will be written to must
+     * be specified with this method.
+     */
+    public void setOutputStream(OutputStream stream, byte channelIdentifier);
 
     /**
      * Returns a pair of source ports, the first one is the
@@ -91,6 +88,16 @@ public interface Stream {
      */
     public int[] getDestinationPorts();
 
+    /**
+     * Sets the destination ports of the stream.
+     * If an odd number is supplied for the destination port then the next
+     * lower even number will be used for RTP and it will be used for RTCP.
+     * If an even number is supplied, it will be used for RTP and the next odd
+     * number will be used for RTCP.
+     *
+     * @param dport The destination port
+     */
+    public void setDestinationPorts(int dport);
 
     /**
      * Returns the SSRC of the underlying {@link net.majorkernelpanic.streaming.rtp.RtpSocket}.

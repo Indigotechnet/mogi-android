@@ -39,13 +39,15 @@ public class VideoQuality {
      * Default video stream quality.
      */
     public final static VideoQuality DEFAULT_VIDEO_QUALITY = new VideoQuality(176, 144, 20, 500000);
-
+    public int framerate = 0;
+    public int bitrate = 0;
+    public int resX = 0;
+    public int resY = 0;
     /**
      * Represents a quality for a video stream.
      */
     public VideoQuality() {
     }
-
     /**
      * Represents a quality for a video stream.
      *
@@ -56,7 +58,6 @@ public class VideoQuality {
         this.resX = resX;
         this.resY = resY;
     }
-
     /**
      * Represents a quality for a video stream.
      *
@@ -70,23 +71,6 @@ public class VideoQuality {
         this.bitrate = bitrate;
         this.resX = resX;
         this.resY = resY;
-    }
-
-    public int framerate = 0;
-    public int bitrate = 0;
-    public int resX = 0;
-    public int resY = 0;
-
-    public boolean equals(VideoQuality quality) {
-        if (quality == null) return false;
-        return (quality.resX == this.resX &
-                quality.resY == this.resY &
-                quality.framerate == this.framerate &
-                quality.bitrate == this.bitrate);
-    }
-
-    public VideoQuality clone() {
-        return new VideoQuality(resX, resY, framerate, bitrate);
     }
 
     public static VideoQuality parseQuality(String str) {
@@ -144,6 +128,22 @@ public class VideoQuality {
         }
         Log.v(TAG, supportedFpsRangesStr);
         return maxFps;
+    }
+
+    public boolean equals(VideoQuality quality) {
+        if (quality == null) return false;
+        return (quality.resX == this.resX &
+                quality.resY == this.resY &
+                quality.framerate == this.framerate &
+                quality.bitrate == this.bitrate);
+    }
+
+    public VideoQuality clone() {
+        return new VideoQuality(resX, resY, framerate, bitrate);
+    }
+
+    public String toString() {
+        return resX + "x" + resY + " px, " + framerate + " fps, " + bitrate / 1000 + " kbps";
     }
 
 }

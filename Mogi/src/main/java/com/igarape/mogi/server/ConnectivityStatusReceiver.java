@@ -23,10 +23,13 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (NetworkUtils.canUpload(mConnectivityManager.getActiveNetworkInfo(), intent)) {
             StateMachine.getInstance().startServices(State.UPLOADING, context.getApplicationContext());
-        } else if (NetworkUtils.hasConnection((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))) {
-            StateMachine.getInstance().startServices(State.RECORDING_ONLINE, context.getApplicationContext());
         } else {
-            StateMachine.getInstance().startServices(State.RECORDING_OFFLINE, context.getApplicationContext());
+            boolean hasConnection = NetworkUtils.hasConnection((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+            if (hasConnection && !StateMachine.getInstance().isInState(State.STREAMING)) {
+                StateMachine.getInstance().startServices(State.RECORDING_ONLINE, context.getApplicationContext());
+            } else if (!hasConnection){
+                StateMachine.getInstance().startServices(State.RECORDING_OFFLINE, context.getApplicationContext());
+            }
         }
     }
 }

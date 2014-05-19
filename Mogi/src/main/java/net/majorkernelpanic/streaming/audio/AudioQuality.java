@@ -29,13 +29,14 @@ public class AudioQuality {
      * Default audio stream quality.
      */
     public final static AudioQuality DEFAULT_AUDIO_QUALITY = new AudioQuality(8000, 32000);
+    public int samplingRate = 0;
+    public int bitRate = 0;
 
     /**
      * Represents a quality for a video stream.
      */
     public AudioQuality() {
     }
-
     /**
      * Represents a quality for an audio stream.
      *
@@ -45,19 +46,6 @@ public class AudioQuality {
     public AudioQuality(int samplingRate, int bitRate) {
         this.samplingRate = samplingRate;
         this.bitRate = bitRate;
-    }
-
-    public int samplingRate = 0;
-    public int bitRate = 0;
-
-    public boolean equals(AudioQuality quality) {
-        if (quality == null) return false;
-        return (quality.samplingRate == this.samplingRate &
-                quality.bitRate == this.bitRate);
-    }
-
-    public AudioQuality clone() {
-        return new AudioQuality(samplingRate, bitRate);
     }
 
     public static AudioQuality parseQuality(String str) {
@@ -71,6 +59,16 @@ public class AudioQuality {
             }
         }
         return quality;
+    }
+
+    public boolean equals(AudioQuality quality) {
+        if (quality == null) return false;
+        return (quality.samplingRate == this.samplingRate &
+                quality.bitRate == this.bitRate);
+    }
+
+    public AudioQuality clone() {
+        return new AudioQuality(samplingRate, bitRate);
     }
 
 }

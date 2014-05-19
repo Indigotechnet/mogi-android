@@ -23,6 +23,7 @@ package net.majorkernelpanic.streaming.hw;
 import android.annotation.SuppressLint;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,16 +44,6 @@ public class CodecManager {
 
     private static Codec[] sEncoders = null;
     private static Codec[] sDecoders = null;
-
-    static class Codec {
-        public Codec(String name, Integer[] formats) {
-            this.name = name;
-            this.formats = formats;
-        }
-
-        public String name;
-        public Integer[] formats;
-    }
 
     /**
      * Lists all encoders that claim to support a color format that we know how to use.
@@ -91,6 +82,7 @@ public class CodecManager {
                         Codec codec = new Codec(codecInfo.getName(), (Integer[]) formats.toArray(new Integer[formats.size()]));
                         encoders.add(codec);
                     } catch (Exception e) {
+                        Log.wtf(TAG, e);
                     }
                 }
             }
@@ -137,6 +129,7 @@ public class CodecManager {
                         Codec codec = new Codec(codecInfo.getName(), (Integer[]) formats.toArray(new Integer[formats.size()]));
                         decoders.add(codec);
                     } catch (Exception e) {
+                        Log.wtf(TAG, e);
                     }
                 }
             }
@@ -154,6 +147,15 @@ public class CodecManager {
         }
 
         return sDecoders;
+    }
+
+    static class Codec {
+        public String name;
+        public Integer[] formats;
+        public Codec(String name, Integer[] formats) {
+            this.name = name;
+            this.formats = formats;
+        }
     }
 
 }

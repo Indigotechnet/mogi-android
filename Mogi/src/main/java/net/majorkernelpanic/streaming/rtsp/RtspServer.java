@@ -59,17 +59,11 @@ import java.util.regex.Pattern;
 public class RtspServer extends Service {
 
     public final static String TAG = "RtspServer";
-
-    /**
-     * The server name that will appear in responses.
-     */
-    public static String SERVER_NAME = "MajorKernelPanic RTSP Server";
-
     /**
      * Port used by default.
      */
     public static final int DEFAULT_RTSP_PORT = 8086;
-
+    protected int mPort = DEFAULT_RTSP_PORT;
     /**
      * Port already in use.
      */
@@ -99,37 +93,37 @@ public class RtspServer extends Service {
      * Key used in the SharedPreferences for the port used by the RTSP server.
      */
     public final static String KEY_PORT = "rtsp_port";
-
+    /**
+     * The server name that will appear in responses.
+     */
+    public static String SERVER_NAME = "MajorKernelPanic RTSP Server";
+    private final IBinder mBinder = new LocalBinder();
+    private final LinkedList<CallbackListener> mListeners = new LinkedList<CallbackListener>();
     protected SessionBuilder mSessionBuilder;
     protected SharedPreferences mSharedPreferences;
     protected boolean mEnabled = true;
-    protected int mPort = DEFAULT_RTSP_PORT;
     protected WeakHashMap<Session, Object> mSessions = new WeakHashMap<Session, Object>(2);
-
     private RequestListener mListenerThread;
-    private final IBinder mBinder = new LocalBinder();
     private boolean mRestart = false;
-    private final LinkedList<CallbackListener> mListeners = new LinkedList<CallbackListener>();
+    private OnSharedPreferenceChangeListener mOnSharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+            if (key.equals(KEY_PORT)) {
+                int port = Integer.parseInt(sharedPreferences.getString(KEY_PORT, String.valueOf(mPort)));
+                if (port != mPort) {
+                    mPort = port;
+                    mRestart = true;
+                    start();
+                }
+            } else if (key.equals(KEY_ENABLED)) {
+                mEnabled = sharedPreferences.getBoolean(KEY_ENABLED, mEnabled);
+                start();
+            }
+        }
+    };
 
     public RtspServer() {
-    }
-
-    /**
-     * Be careful: those callbacks won't necessarily be called from the ui thread !
-     */
-    public interface CallbackListener {
-
-        /**
-         * Called when an error occurs.
-         */
-        void onError(RtspServer server, Exception e, int error);
-
-        /**
-         * Called when streaming starts/stops.
-         */
-        void onMessage(RtspServer server, int message);
-
     }
 
     /**
@@ -267,33 +261,6 @@ public class RtspServer extends Service {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mOnSharedPreferenceChangeListener);
     }
 
-    private OnSharedPreferenceChangeListener mOnSharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-            if (key.equals(KEY_PORT)) {
-                int port = Integer.parseInt(sharedPreferences.getString(KEY_PORT, String.valueOf(mPort)));
-                if (port != mPort) {
-                    mPort = port;
-                    mRestart = true;
-                    start();
-                }
-            } else if (key.equals(KEY_ENABLED)) {
-                mEnabled = sharedPreferences.getBoolean(KEY_ENABLED, mEnabled);
-                start();
-            }
-        }
-    };
-
-    /**
-     * The Binder you obtain when a connection with the Service is established.
-     */
-    public class LocalBinder extends Binder {
-        public RtspServer getService() {
-            return RtspServer.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
@@ -334,6 +301,117 @@ public class RtspServer extends Service {
             session.setDestination(client.getInetAddress().getHostAddress());
         }
         return session;
+    }
+
+    /**
+     * Be careful: those callbacks won't necessarily be called from the ui thread !
+     */
+    public interface CallbackListener {
+
+        /**
+         * Called when an error occurs.
+         */
+        void onError(RtspServer server, Exception e, int error);
+
+        /**
+         * Called when streaming starts/stops.
+         */
+        void onMessage(RtspServer server, int message);
+
+    }
+
+    static class Request {
+
+        // Parse method & uri
+        public static final Pattern regexMethod = Pattern.compile("(\\w+) (\\S+) RTSP", Pattern.CASE_INSENSITIVE);
+        // Parse a request header
+        public static final Pattern rexegHeader = Pattern.compile("(\\S+):(.+)", Pattern.CASE_INSENSITIVE);
+
+        public String method;
+        public String uri;
+        public HashMap<String, String> headers = new HashMap<String, String>();
+
+        /**
+         * Parse the method, uri & headers of a RTSP request
+         */
+        public static Request parseRequest(BufferedReader input) throws IOException, IllegalStateException, SocketException {
+            Request request = new Request();
+            String line;
+            Matcher matcher;
+
+            // Parsing request method & uri
+            if ((line = input.readLine()) == null) throw new SocketException("Client disconnected");
+            matcher = regexMethod.matcher(line);
+            matcher.find();
+            request.method = matcher.group(1);
+            request.uri = matcher.group(2);
+
+            // Parsing headers of the request
+            while ((line = input.readLine()) != null && line.length() > 3) {
+                matcher = rexegHeader.matcher(line);
+                matcher.find();
+                request.headers.put(matcher.group(1).toLowerCase(Locale.US), matcher.group(2));
+            }
+            if (line == null) throw new SocketException("Client disconnected");
+
+            // It's not an error, it's just easier to follow what's happening in logcat with the request in red
+            Log.e(TAG, request.method + " " + request.uri);
+
+            return request;
+        }
+    }
+
+    static class Response {
+
+        // Status code definitions
+        public static final String STATUS_OK = "200 OK";
+        public static final String STATUS_BAD_REQUEST = "400 Bad Request";
+        public static final String STATUS_NOT_FOUND = "404 Not Found";
+        public static final String STATUS_INTERNAL_SERVER_ERROR = "500 Internal Server Error";
+        private final Request mRequest;
+        public String status = STATUS_INTERNAL_SERVER_ERROR;
+        public String content = "";
+        public String attributes = "";
+
+        public Response(Request request) {
+            this.mRequest = request;
+        }
+
+        public Response() {
+            // Be carefull if you modify the send() method because request might be null !
+            mRequest = null;
+        }
+
+        public void send(OutputStream output) throws IOException {
+            int seqid = -1;
+
+            try {
+                seqid = Integer.parseInt(mRequest.headers.get("cseq").replace(" ", ""));
+            } catch (Exception e) {
+                Log.e(TAG, "Error parsing CSeq: " + (e.getMessage() != null ? e.getMessage() : ""));
+            }
+
+            String response = "RTSP/1.0 " + status + "\r\n" +
+                    "Server: " + SERVER_NAME + "\r\n" +
+                    (seqid >= 0 ? ("Cseq: " + seqid + "\r\n") : "") +
+                    "Content-Length: " + content.length() + "\r\n" +
+                    attributes +
+                    "\r\n" +
+                    content;
+
+            Log.d(TAG, response.replace("\r", ""));
+
+            output.write(response.getBytes());
+        }
+    }
+
+    /**
+     * The Binder you obtain when a connection with the Service is established.
+     */
+    public class LocalBinder extends Binder {
+        public RtspServer getService() {
+            return RtspServer.this;
+        }
     }
 
     class RequestListener extends Thread implements Runnable {
@@ -602,93 +680,6 @@ public class RtspServer extends Service {
 
         }
 
-    }
-
-    static class Request {
-
-        // Parse method & uri
-        public static final Pattern regexMethod = Pattern.compile("(\\w+) (\\S+) RTSP", Pattern.CASE_INSENSITIVE);
-        // Parse a request header
-        public static final Pattern rexegHeader = Pattern.compile("(\\S+):(.+)", Pattern.CASE_INSENSITIVE);
-
-        public String method;
-        public String uri;
-        public HashMap<String, String> headers = new HashMap<String, String>();
-
-        /**
-         * Parse the method, uri & headers of a RTSP request
-         */
-        public static Request parseRequest(BufferedReader input) throws IOException, IllegalStateException, SocketException {
-            Request request = new Request();
-            String line;
-            Matcher matcher;
-
-            // Parsing request method & uri
-            if ((line = input.readLine()) == null) throw new SocketException("Client disconnected");
-            matcher = regexMethod.matcher(line);
-            matcher.find();
-            request.method = matcher.group(1);
-            request.uri = matcher.group(2);
-
-            // Parsing headers of the request
-            while ((line = input.readLine()) != null && line.length() > 3) {
-                matcher = rexegHeader.matcher(line);
-                matcher.find();
-                request.headers.put(matcher.group(1).toLowerCase(Locale.US), matcher.group(2));
-            }
-            if (line == null) throw new SocketException("Client disconnected");
-
-            // It's not an error, it's just easier to follow what's happening in logcat with the request in red
-            Log.e(TAG, request.method + " " + request.uri);
-
-            return request;
-        }
-    }
-
-    static class Response {
-
-        // Status code definitions
-        public static final String STATUS_OK = "200 OK";
-        public static final String STATUS_BAD_REQUEST = "400 Bad Request";
-        public static final String STATUS_NOT_FOUND = "404 Not Found";
-        public static final String STATUS_INTERNAL_SERVER_ERROR = "500 Internal Server Error";
-
-        public String status = STATUS_INTERNAL_SERVER_ERROR;
-        public String content = "";
-        public String attributes = "";
-
-        private final Request mRequest;
-
-        public Response(Request request) {
-            this.mRequest = request;
-        }
-
-        public Response() {
-            // Be carefull if you modify the send() method because request might be null !
-            mRequest = null;
-        }
-
-        public void send(OutputStream output) throws IOException {
-            int seqid = -1;
-
-            try {
-                seqid = Integer.parseInt(mRequest.headers.get("cseq").replace(" ", ""));
-            } catch (Exception e) {
-                Log.e(TAG, "Error parsing CSeq: " + (e.getMessage() != null ? e.getMessage() : ""));
-            }
-
-            String response = "RTSP/1.0 " + status + "\r\n" +
-                    "Server: " + SERVER_NAME + "\r\n" +
-                    (seqid >= 0 ? ("Cseq: " + seqid + "\r\n") : "") +
-                    "Content-Length: " + content.length() + "\r\n" +
-                    attributes +
-                    "\r\n" +
-                    content;
-
-            Log.d(TAG, response.replace("\r", ""));
-
-            output.write(response.getBytes());
-        }
     }
 
 }
