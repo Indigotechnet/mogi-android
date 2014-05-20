@@ -27,7 +27,12 @@
         android:layout_below="@+id/loggedUserLabel"
         android:layout_alignLeft="@+id/relativeLayout"
         android:layout_marginTop="16dp"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:textColorLink="#FFFFFF"
+        android:textIsSelectable="true" />
 
     <EditText
         android:layout_width="match_parent"
@@ -36,7 +41,11 @@
         android:hint="@string/password_hint"
         android:layout_below="@+id/txtLoginUser"
         android:layout_alignLeft="@+id/relativeLayout"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:textColorLink="#FFFFFF" />
 
     <RelativeLayout
         android:layout_width="match_parent"

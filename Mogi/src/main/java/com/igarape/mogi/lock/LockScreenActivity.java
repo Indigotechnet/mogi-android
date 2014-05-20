@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.igarape.mogi.R;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.util.SystemUiHider;
 import com.igarape.mogi.utils.Identification;
 
@@ -42,6 +46,7 @@ public class LockScreenActivity extends Activity {
         setContentView(R.layout.activity_lock_screen);
         TextView loggedUserLabel = (TextView) findViewById(R.id.loggedUserLabel);
         loggedUserLabel.setText(Identification.getUserName());
+
         Switch switchUnlock = (Switch) findViewById(R.id.switchUnlock);
         switchUnlock.setChecked(false);
         switchUnlock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -53,15 +58,25 @@ public class LockScreenActivity extends Activity {
             }
         });
 
+        ImageView icon = (ImageView) findViewById(R.id.lockScreenIcon);
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)){
+                    StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext());
+                    updateState();
+                } else if (StateMachine.getInstance().isInState(State.STREAMING)){
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+                    updateState();
+                }
+            }
+        });
+
         if (getIntent() != null && getIntent().hasExtra("kill") && getIntent().getExtras().getInt("kill") == 1) {
-            // Toast.makeText(this, "" + "kill activityy", Toast.LENGTH_SHORT).show();
             finish();
         }
 
         try {
-            // initialize receiver
-
-
             StateListener phoneStateListener = new StateListener();
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -70,6 +85,30 @@ public class LockScreenActivity extends Activity {
             // TODO: handle exception
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateState();
+    }
+
+    private void updateState() {
+        ImageView icon = (ImageView) findViewById(R.id.lockScreenIcon);
+        TextView text = (TextView) findViewById(R.id.lockTextState);
+        if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
+            icon.setImageResource(R.drawable.launcher_recording_off);
+            text.setText(getString(R.string.lock_text_recording_offline));
+        } else if (StateMachine.getInstance().isInState(State.STREAMING)){
+            icon.setImageResource(R.drawable.launcher_streaming);
+            text.setText(getString(R.string.lock_text_livestreaming));
+        } else if (StateMachine.getInstance().isInState(State.UPLOADING)){
+            icon.setImageResource(R.drawable.launcher_uploading);
+            text.setText(getString(R.string.lock_text_uploading));
+        } else {
+            icon.setImageResource(R.drawable.launcher_recording_on);
+            text.setText(getString(R.string.lock_text_recording));
+        }
     }
 
     class StateListener extends PhoneStateListener {

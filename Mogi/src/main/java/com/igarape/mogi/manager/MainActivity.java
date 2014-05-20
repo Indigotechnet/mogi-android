@@ -165,8 +165,8 @@ public class MainActivity extends BaseActivity {
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_BOOT_COMPLETED);
-//        lockScreenReceiver = new LockScreenReceiver();
-//        registerReceiver(lockScreenReceiver, filter);
+        lockScreenReceiver = new LockScreenReceiver();
+        registerReceiver(lockScreenReceiver, filter);
     }
 
 

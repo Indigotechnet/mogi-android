@@ -39,5 +39,9 @@
     <string name="location_status_uploading">Uploading</string>
     <string name="unauthorized_login">Login or Password invalid</string>
     <string name="no_server_login">Unable to contact the server</string>
+    <string name="lock_text_recording">Recording</string>
+    <string name="lock_text_livestreaming">Livestreaming</string>
+    <string name="lock_text_recording_offline">Livestreaming unavailable</string>
+    <string name="lock_text_uploading">Uploading</string>
 
 </resources>
