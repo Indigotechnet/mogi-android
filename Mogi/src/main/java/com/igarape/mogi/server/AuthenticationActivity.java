@@ -67,10 +67,11 @@ public class AuthenticationActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_auth);
+
         Identification.setAccessToken(this, null);
         StateMachine.getInstance().startServices(State.NOT_LOGGED, getBaseContext());
 
-        setContentView(R.layout.activity_auth);
         context = getApplicationContext();
 
         if (checkPlayServices()) {

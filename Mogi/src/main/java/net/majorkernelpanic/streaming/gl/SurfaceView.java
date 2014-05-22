@@ -91,6 +91,12 @@ public class SurfaceView extends android.view.SurfaceView implements Runnable, O
         getHolder().addCallback(this);
     }
 
+    public SurfaceView(Context context) {
+        super(context);
+        mHandler = new Handler();
+        getHolder().addCallback(this);
+    }
+
     public void setAspectRatioMode(int mode) {
         mAspectRatioMode = mode;
     }

@@ -5,10 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.igarape.mogi.BaseService;
 import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.recording.RecordingService;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.server.UploadService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by brunosiqueira on 07/05/2014.
@@ -17,63 +22,38 @@ public enum State {
 
     NOT_LOGGED {
         @Override
-        protected void start(Context context) {
-
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            return new ArrayList<Class<? extends BaseService>>();
         }
 
-        @Override
-        protected void stop(Context context) {
-
-        }
     },
     RECORDING_OFFLINE {
         @Override
-        protected void start(Context context) {
-            startSmartPolicingService(LocationService.class, context);
-            startSmartPolicingService(RecordingService.class, context);
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            return Arrays.asList(LocationService.class, RecordingService.class);
         }
 
-        @Override
-        protected void stop(Context context) {
-            stopSmartPolicingService(LocationService.class, context);
-            stopSmartPolicingService(RecordingService.class, context);
-        }
     },
     RECORDING_ONLINE {
         @Override
-        protected void start(Context context) {
-            startSmartPolicingService(LocationService.class, context);
-            startSmartPolicingService(RecordingService.class, context);
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            return Arrays.asList(LocationService.class, RecordingService.class);
         }
 
-        @Override
-        protected void stop(Context context) {
-            stopSmartPolicingService(LocationService.class, context);
-            stopSmartPolicingService(RecordingService.class, context);
-        }
     },
     STREAMING {
         @Override
-        protected void start(Context context) {
-            startSmartPolicingService(LocationService.class, context);
-            startSmartPolicingService(StreamingService.class, context);
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            return Arrays.asList(LocationService.class, StreamingService.class);
         }
 
-        @Override
-        protected void stop(Context context) {
-            stopSmartPolicingService(LocationService.class, context);
-            stopSmartPolicingService(StreamingService.class, context);
-        }
     },
     UPLOADING {
         @Override
-        protected void start(Context context) {
-            startSmartPolicingService(UploadService.class, context);
-        }
-
-        @Override
-        protected void stop(Context context) {
-            stopSmartPolicingService(UploadService.class, context);
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            List list = new ArrayList<Class<? extends BaseService>>();
+            list.add(UploadService.class);
+            return list;
         }
     };
     private static final String TAG = State.class.getName();
@@ -120,8 +100,22 @@ public enum State {
         return false;
     }
 
-    protected abstract void start(Context context);
 
-    protected abstract void stop(Context context);
+    protected abstract java.util.List<Class<? extends BaseService>> getServices();
+
+    protected void start(Context context){
+        for (Class<? extends BaseService> service: getServices()){
+            startSmartPolicingService(service, context);
+        }
+    };
+
+    protected void stop(Context context, State newState){
+        for (Class<? extends BaseService> service: getServices()){
+
+            if (!newState.getServices().contains(service)) {
+                stopSmartPolicingService(service, context);
+            }
+        }
+    };
 
 }

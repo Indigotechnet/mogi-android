@@ -94,7 +94,7 @@ public class MainActivity extends BaseActivity {
                 StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
                 Identification.setAccessToken(getApplicationContext(), null);
                 unregisterReceiver(connectivityReceiver);
-                finish();
+                startActivity(new Intent(getApplicationContext(),AuthenticationActivity.class));
             }
         });
     }

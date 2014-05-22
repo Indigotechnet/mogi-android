@@ -1,7 +1,6 @@
 package com.igarape.mogi.server;
 
 import android.app.Notification;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,10 +8,12 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.NetworkUtils;
+import com.igarape.mogi.utils.UploadProgressUtil;
 import com.igarape.mogi.utils.VideoUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -41,13 +42,15 @@ import java.util.Date;
 /**
  * Created by felipeamorim on 09/09/2013.
  */
-public class UploadService extends Service {
+public class UploadService extends BaseService {
     public static String TAG = UploadService.class.getName();
     public static boolean isUploading = false;
     private static int ServiceID = 4;
     private final GenericExtFilter filter = new GenericExtFilter(".mp4");
     private ArrayList<File> videos = new ArrayList<File>();
     private Intent intent;
+    private int totalVideos = 0;
+    private int completedVideos = 0;
 
     public IBinder onBind(Intent intent) {
         return null;
@@ -73,6 +76,8 @@ public class UploadService extends Service {
         }
         uploadLocations();
         if (VideoUtils.isRecordVideos()) {
+            totalVideos = videos.size();
+            completedVideos = 0;
             uploadVideos();
         }
         return super.onStartCommand(intent, flags, startId);
@@ -127,6 +132,8 @@ public class UploadService extends Service {
             private void deleteFile() {
                 File out = new File(FileUtils.getLocationsFilePath());
                 out.delete();
+                completedVideos++;
+                UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
                 Log.i(TAG, "location sent successfully");
             }
 
@@ -199,15 +206,17 @@ public class UploadService extends Service {
                 @Override
                 public void onFailure(String responseBody, Throwable error) {
                     Log.e(TAG, "video not uploaded: " + nextVideo.getName() + " - " + responseBody, error);
-                    stopSelf();
+                    uploadVideos();
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                     Log.e(TAG, "video not uploaded: " + nextVideo.getName(), error);
-                    stopSelf();
+                    uploadVideos();
                 }
             });
+        } else {
+            stopSelf();
         }
     }
 

@@ -30,7 +30,6 @@
         android:inputType="text"
         android:textColor="#FFFFFF"
         android:textColorHighlight="#FFFFFF"
-        android:textColorHint="#FFFFFF"
         android:textColorLink="#FFFFFF"
         android:textIsSelectable="true" />
 
@@ -44,7 +43,6 @@
         android:inputType="textPassword"
         android:textColor="#FFFFFF"
         android:textColorHighlight="#FFFFFF"
-        android:textColorHint="#FFFFFF"
         android:textColorLink="#FFFFFF" />
 
     <RelativeLayout

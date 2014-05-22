@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.utils.VideoUtils;
-
-import net.majorkernelpanic.streaming.gl.SurfaceView;
 
 public abstract class AbstractCameraService extends BaseService implements SurfaceHolder.Callback {
     public static int ServiceID = 3;
@@ -25,7 +24,7 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
         if (VideoUtils.isRecordVideos()) {
             // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
             mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-            mSurfaceView = new SurfaceView(this, null);
+        mSurfaceView = new SurfaceView(this);
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
                     1, 1,
                     WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,

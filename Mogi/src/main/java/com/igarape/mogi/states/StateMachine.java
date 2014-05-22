@@ -32,7 +32,7 @@ public class StateMachine {
         if (currentState.equals(state)) {
             return;
         }
-        currentState.stop(context);
+        currentState.stop(context, state);
         currentState = state;
         currentState.start(context);
         WidgetUtils.BeginUpdating(context);

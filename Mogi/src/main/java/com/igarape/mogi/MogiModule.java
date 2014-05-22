@@ -8,6 +8,7 @@ import com.igarape.mogi.recording.RecordingService;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
+import com.igarape.mogi.server.UploadService;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -24,6 +25,7 @@ import dagger.Provides;
                 RecordingService.class,
                 AuthenticationActivity.class,
                 StreamingService.class,
+                UploadService.class
         }
 )
 public class MogiModule {

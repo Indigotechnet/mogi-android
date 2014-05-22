@@ -3,6 +3,7 @@ package com.igarape.mogi.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.UploadProgressUtil;
 import com.igarape.mogi.utils.WidgetUtils;
 
 /**
@@ -26,6 +28,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+
         final int N = appWidgetIds.length;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
@@ -36,14 +39,15 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
 
             views.setViewVisibility(R.id.widget_streaming_dot, View.GONE);
             PendingIntent mainIntent = null;
-
+            PendingIntent settingsIntent = null;
             // User is not logged
             if (Identification.getAccessToken(context) == null) {
                 views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_offline);
                 views.setTextViewText(R.id.widget_status_title, "Login");
                 views.setTextColor(R.id.widget_status_title, Color.BLACK);
                 views.setViewVisibility(R.id.widget_action_button, View.INVISIBLE);
-                mainIntent = PendingIntent.getActivity(context, 0, new Intent(context, AuthenticationActivity.class), 0);
+                views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
+                settingsIntent = PendingIntent.getActivity(context, 0, new Intent(context, AuthenticationActivity.class), 0);
             } else {
                 views.setViewVisibility(R.id.widget_action_button, View.VISIBLE);
                 Intent actionIntent = null;
@@ -55,6 +59,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextViewText(R.id.widget_status_info,
                             "Streaming for " + StreamingService.Duration + "minutes");
                     views.setViewVisibility(R.id.widget_streaming_dot, View.VISIBLE);
+                    views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
 
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
@@ -62,6 +67,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_upload);
                     views.setTextViewText(R.id.widget_status_title, "Uploading");
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_blue));
+                    views.setViewVisibility(R.id.progressBarUpload, View.VISIBLE);
                     views.setTextViewText(R.id.widget_status_info,
                             "Uploading files to server");
                 } else {
@@ -71,22 +77,24 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_green));
                     views.setTextViewText(R.id.widget_status_info,
                             "Logged in for " + toNowInMinutes(Identification.getTimeLogin(context)));
+                    views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 }
                 if (actionIntent != null) {
                     mainIntent = PendingIntent.getService(context, appWidgetId, actionIntent, 0);
                 }
+                settingsIntent = PendingIntent.getActivity(
+                        context, appWidgetId, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
             }
 
-            PendingIntent settingsIntent = PendingIntent.getActivity(
-                    context, appWidgetId, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
 
             if (mainIntent != null) {
                 views.setOnClickPendingIntent(R.id.widget_action_bg, mainIntent);
                 views.setOnClickPendingIntent(R.id.widget_action_button, mainIntent);
             } else {
-                views.setOnClickPendingIntent(R.id.widget_action_bg, settingsIntent);
-                views.setOnClickPendingIntent(R.id.widget_action_button, settingsIntent);
+                views.setOnClickPendingIntent(R.id.widget_action_bg, null);
+                views.setOnClickPendingIntent(R.id.widget_action_button, null);
             }
 
             views.setOnClickPendingIntent(R.id.widget_settings_button, settingsIntent);
@@ -107,4 +115,22 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
         return String.valueOf(time);
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+
+
+
+        if(intent.getAction().contains(UploadProgressUtil.MOGI_UPLOAD_UPDATE)){
+            int total = intent.getExtras().getInt("total");
+            int completed = intent.getExtras().getInt("completed");
+
+            RemoteViews views =  new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
+            views.setProgressBar(R.id.progressBarUpload,total, completed,true);
+            ComponentName widget = new ComponentName(context, MogiAppWidgetProvider.class);
+            AppWidgetManager.getInstance(context).updateAppWidget(widget, views);
+        }
+
+
+    }
 }
