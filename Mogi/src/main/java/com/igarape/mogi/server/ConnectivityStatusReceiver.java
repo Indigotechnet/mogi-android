@@ -19,6 +19,9 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (StateMachine.getInstance().isInState(State.NOT_LOGGED)){
+            return;
+        }
         mConnectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (NetworkUtils.canUpload(mConnectivityManager.getActiveNetworkInfo(), intent)) {

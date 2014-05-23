@@ -22,6 +22,7 @@ import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.NetworkUtils;
 
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
@@ -45,9 +46,9 @@ public class MainActivity extends BaseActivity {
         if (Identification.getUserName() != null) {
             getActionBar().setTitle(Identification.getUserName());
         }
-        if (StateMachine.getInstance().isInState(State.NOT_LOGGED)) {
-            StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
-        }
+
+        defineInitialState();
+
         registerMyReceiver();
 
         locationTextView = (TextView) findViewById(R.id.location_status);
@@ -97,6 +98,17 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(getApplicationContext(),AuthenticationActivity.class));
             }
         });
+    }
+
+    private void defineInitialState() {
+        if (StateMachine.getInstance().isInState(State.NOT_LOGGED)) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (NetworkUtils.canUpload(mConnectivityManager.getActiveNetworkInfo(), getIntent())) {
+                StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
+            } else {
+                StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+            }
+        }
     }
 
     @Override
