@@ -3,12 +3,14 @@ package com.igarape.mogi.utils;
 import android.location.Location;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -19,6 +21,7 @@ public class FileUtils {
     public static final String LOCATIONS_TXT = "locations.txt";
     public static final String BATTERY_TXT = "battery.txt";
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private static final String TAG = FileUtils.class.getName();
 
     private static String path = "/mnt/extSdCard/smartpolicing/";
 
@@ -46,14 +49,14 @@ public class FileUtils {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat(DATE_FORMAT);
         df.setTimeZone(tz);
+        JSONObject json = null;
+        try {
+            json = LocationUtils.buildJson(location);
+            LogToFile(LOCATIONS_TXT, json.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "error recording location in file", e);
 
-        LogToFile(LOCATIONS_TXT,
-                location.getLatitude() + ";" +
-                        location.getLongitude() + ";" +
-                        location.getAccuracy() + ";" +
-                        location.getProvider() + ";" +
-                        df.format(new Date())
-        );
+        }
     }
 
     private static void LogToFile(String file, String data) {
@@ -62,7 +65,7 @@ public class FileUtils {
             writer.write(data + "\n");
             writer.close();
         } catch (IOException e) {
-            Log.e("FileUtils", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
     }
 

@@ -1,6 +1,8 @@
 package com.igarape.mogi.utils;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
@@ -9,14 +11,17 @@ import android.os.BatteryManager;
  * Created by brunosiqueira on 07/05/2014.
  */
 public class NetworkUtils {
-    public static boolean canUpload(NetworkInfo activeNetwork, Intent intent) {
+    public static boolean canUpload(Context context, NetworkInfo activeNetwork, Intent intent) {
         if (activeNetwork == null || intent == null) {
             return false;
         }
         boolean isConnected = activeNetwork.isConnectedOrConnecting();
         boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 
-        int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = context.registerReceiver(null, iFilter);
+
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL;

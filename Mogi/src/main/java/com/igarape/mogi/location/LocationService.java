@@ -217,12 +217,14 @@ public class LocationService extends BaseService {
             boolean isWifi = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
                     .isConnectedOrConnecting();
             if (is3g || isWifi) {
+
                 TimeZone tz = TimeZone.getTimeZone("UTC");
                 DateFormat df = new SimpleDateFormat(FileUtils.DATE_FORMAT);
                 df.setTimeZone(tz);
-
                 try {
-                    JSONObject locationJson = LocationUtils.buildJson(Double.toString(location.getLatitude()), Double.toString(location.getLongitude()), df.format(new Date()));
+                    JSONObject locationJson = LocationUtils.buildJson(location.getLatitude(), location.getLongitude(), df.format(new Date()),
+                            location.getAccuracy(), location.getExtras() == null ? null : location.getExtras().get("satellites"),
+                            location.getProvider(), location.getBearing(), location.getSpeed());
                     LocationUtils.sendLocation(locationJson, new JsonHttpResponseHandler() {
 
                         @Override

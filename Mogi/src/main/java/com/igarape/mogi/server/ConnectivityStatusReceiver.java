@@ -24,7 +24,7 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
         }
         mConnectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (NetworkUtils.canUpload(mConnectivityManager.getActiveNetworkInfo(), intent)) {
+        if (NetworkUtils.canUpload(context, mConnectivityManager.getActiveNetworkInfo(), intent)) {
             StateMachine.getInstance().startServices(State.UPLOADING, context.getApplicationContext());
         } else {
             boolean hasConnection = NetworkUtils.hasConnection((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));

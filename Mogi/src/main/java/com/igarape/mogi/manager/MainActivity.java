@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
 
         defineInitialState();
 
-        registerMyReceiver();
+        registerMyReceivers();
 
         locationTextView = (TextView) findViewById(R.id.location_status);
 
@@ -94,8 +94,8 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
                 Identification.setAccessToken(getApplicationContext(), null);
-                unregisterReceiver(connectivityReceiver);
-                startActivity(new Intent(getApplicationContext(),AuthenticationActivity.class));
+                unregisterMyReceivers();
+                finish();
             }
         });
     }
@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity {
     private void defineInitialState() {
         if (StateMachine.getInstance().isInState(State.NOT_LOGGED)) {
             ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (NetworkUtils.canUpload(mConnectivityManager.getActiveNetworkInfo(), getIntent())) {
+            if (NetworkUtils.canUpload(this, mConnectivityManager.getActiveNetworkInfo(), getIntent())) {
                 StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
             } else {
                 StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
@@ -156,11 +156,15 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
-        try {
-            unregisterReceiver(connectivityStatusReceiver);
-        } catch (IllegalArgumentException e) {
-            connectivityStatusReceiver = null;
-        }
+        unregisterMyReceivers();
+    }
+
+    private void unregisterMyReceivers() {
+//        try {
+//            unregisterReceiver(connectivityStatusReceiver);
+//        } catch (IllegalArgumentException e) {
+//            connectivityStatusReceiver = null;
+//        }
         try {
             unregisterReceiver(lockScreenReceiver);
         } catch (IllegalArgumentException e) {
@@ -169,10 +173,10 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void registerMyReceiver() {
-        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        connectivityStatusReceiver = new ConnectivityStatusReceiver();
-        registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
+    private void registerMyReceivers() {
+//        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+//        connectivityStatusReceiver = new ConnectivityStatusReceiver();
+//        registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);

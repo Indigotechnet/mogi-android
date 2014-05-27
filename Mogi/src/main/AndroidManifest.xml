@@ -57,12 +57,13 @@
                 <category android:name="com.igarape.mogi" />
             </intent-filter>
         </receiver>
-        <!-- <receiver android:name=".server.ConnectivityStatusReceiver"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/> -->
-        <!-- <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/> -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
+        <receiver android:name=".server.ConnectivityStatusReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
 
         <service android:name="com.igarape.mogi.gcm.GcmIntentService" />
         <service android:name="com.igarape.mogi.location.LocationService" />
@@ -96,7 +97,7 @@
             android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
             <!--<intent-filter>-->
 
-                <!--&lt;!&ndash; <action android:name="android.intent.action.MAIN" /> &ndash;&gt;-->
+                <!-- <action android:name="android.intent.action.MAIN" /> -->
 
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
@@ -105,7 +106,7 @@
             <!--android:name=".lock.StartLockScreenActivity"-->
             <!--android:theme="@style/Theme.Transparent" >-->
 
-            <!--&lt;!&ndash;-->
+
             <!--<intent-filter >-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 
@@ -117,7 +118,7 @@
 
 
             <!--</intent-filter>-->
-            <!--&ndash;&gt;-->
+            <!---->
         <!--</activity>-->
 
         <!--<service android:name="com.igarape.mogi.lock.LockScreenService" >-->

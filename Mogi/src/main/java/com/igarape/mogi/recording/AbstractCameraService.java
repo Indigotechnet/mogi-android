@@ -24,7 +24,7 @@ public abstract class AbstractCameraService extends BaseService implements Surfa
         if (VideoUtils.isRecordVideos()) {
             // Create new SurfaceView, set its size to 1x1, move it to the top left corner and set this service as a callback
             mWindowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        mSurfaceView = new SurfaceView(this);
+            mSurfaceView = new SurfaceView(this);
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(
                     1, 1,
                     WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,

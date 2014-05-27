@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.igarape.mogi.BaseService;
@@ -109,72 +108,73 @@ public class UploadService extends BaseService {
         }
 
         JSONArray locations = new JSONArray();
-        JSONObject curLoc;
         try {
             while ((line = br.readLine()) != null) {
-                values = line.split(";");
-                if (!TextUtils.isEmpty(values[0]) && !TextUtils.isEmpty(values[2]) && !TextUtils.isEmpty(values[4])) {
-                    locations.put(LocationUtils.buildJson(values[0], values[1], values[4]));
+                JSONObject json = new JSONObject(line);
+                if (json.getString("lat") != null && json.getString("lat").length() > 0) {
+                    locations.put(json);
                 }
             }
-            br.close();
+
+            LocationUtils.sendLocations(locations, new JsonHttpResponseHandler() {
+                private void deleteFile() {
+                    File out = new File(FileUtils.getLocationsFilePath());
+                    out.delete();
+                    completedVideos++;
+                    UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
+                    Log.i(TAG, "location sent successfully");
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                    deleteFile();
+                }
+
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {//
+                    deleteFile();
+                }
+
+                @Override
+                public void onFailure(Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
+                    Log.e(TAG, "location not sent successfully", e);
+                }
+            });
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "error reading location file", e);
         }
+        catch (JSONException e) {
+            Log.e(TAG, "error reading location file", e);
+        } finally {
+            try {
+                if (br != null){br.close();}
+            } catch (IOException e) {
 
-        br = null;
-        is = null;
-
-
-        LocationUtils.sendLocations(locations, new JsonHttpResponseHandler() {
-            private void deleteFile() {
-                File out = new File(FileUtils.getLocationsFilePath());
-                out.delete();
-                completedVideos++;
-                UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
-                Log.i(TAG, "location sent successfully");
             }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                deleteFile();
-            }
-
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {//
-                deleteFile();
-            }
-
-            @Override
-            public void onFailure(Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "location not sent successfully");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "location not sent successfully", e);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "location not sent successfully", e);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
-                Log.e(TAG, "location not sent successfully", e);
-            }
-        });
+        }
     }
 
 
     private void uploadVideos() {
 
         ConnectivityManager systemService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (videos.size() == 0 || NetworkUtils.canUpload(systemService.getActiveNetworkInfo(), this.intent)) {
+        if (videos.size() == 0 || NetworkUtils.canUpload(getApplicationContext(), systemService.getActiveNetworkInfo(), this.intent)) {
             isUploading = false;
             stopSelf();
             return;
