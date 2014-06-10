@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -58,17 +59,16 @@ public class LockScreenActivity extends Activity {
             }
         });
 
-        ImageView icon = (ImageView) findViewById(R.id.lockScreenIcon);
-        icon.setOnClickListener(new View.OnClickListener() {
+        Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
+        streamToogle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)){
-                    StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext());
-                    updateState();
-                } else if (StateMachine.getInstance().isInState(State.STREAMING)){
-                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
-                    updateState();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    StateMachine.getInstance().startServices(State.STREAMING,getApplicationContext());
+                } else {
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE,getApplicationContext());
                 }
+                updateState();
             }
         });
 
@@ -94,22 +94,48 @@ public class LockScreenActivity extends Activity {
     }
 
     private void updateState() {
-        ImageView icon = (ImageView) findViewById(R.id.lockScreenIcon);
+        ImageView headquarter = (ImageView) findViewById(R.id.headquarterImage);
+        ImageView linkImage = (ImageView) findViewById(R.id.linkImage);
+        Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
+
+        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
+        RelativeLayout mainUploadingLayout = (RelativeLayout) findViewById(R.id.mainUploadingLayout);
+
         TextView text = (TextView) findViewById(R.id.lockTextState);
         if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
-            icon.setImageResource(R.drawable.launcher_recording_off);
+            mainLayout.setVisibility(View.VISIBLE);
+            mainUploadingLayout.setVisibility(View.INVISIBLE);
+            streamToogle.setClickable(false);
+            streamToogle.setChecked(false);
+
+            headquarter.setImageResource(R.drawable.headquarters_grey);
+            linkImage.setImageResource(R.drawable.link_grey);
             text.setText(getString(R.string.lock_text_recording_offline));
         } else if (StateMachine.getInstance().isInState(State.STREAMING)){
-            icon.setImageResource(R.drawable.launcher_streaming);
+            mainLayout.setVisibility(View.VISIBLE);
+            mainUploadingLayout.setVisibility(View.INVISIBLE);
+            streamToogle.setClickable(true);
+
+            headquarter.setImageResource(R.drawable.headquarters_white);
+            linkImage.setImageResource(R.drawable.link_white);
             text.setText(getString(R.string.lock_text_livestreaming));
         } else if (StateMachine.getInstance().isInState(State.UPLOADING)){
-            icon.setImageResource(R.drawable.launcher_uploading);
-            text.setText(getString(R.string.lock_text_uploading));
+            mainLayout.setVisibility(View.INVISIBLE);
+            mainUploadingLayout.setVisibility(View.VISIBLE);
+            streamToogle.setClickable(true);
+
+
         } else {
-            icon.setImageResource(R.drawable.launcher_recording_on);
+            mainLayout.setVisibility(View.VISIBLE);
+            mainUploadingLayout.setVisibility(View.INVISIBLE);
+            streamToogle.setClickable(true);
+
+            headquarter.setImageResource(R.drawable.headquarters_white);
+            linkImage.setImageResource(R.drawable.link_grey);
             text.setText(getString(R.string.lock_text_recording));
         }
     }
+
 
     class StateListener extends PhoneStateListener {
         @Override

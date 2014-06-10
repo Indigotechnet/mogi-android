@@ -43,5 +43,8 @@
     <string name="lock_text_livestreaming">Livestreaming</string>
     <string name="lock_text_recording_offline">Livestreaming unavailable</string>
     <string name="lock_text_uploading">Uploading</string>
+    <string name="upload_progress">Uploading...</string>
+    <string name="headquarter_desc">Headquarter</string>
+    <string name="phone_desc">Phone</string>
 
 </resources>

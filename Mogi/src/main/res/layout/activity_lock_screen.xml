@@ -28,47 +28,114 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/mainLayout"
+        android:id="@+id/mainUploadingLayout"
+        style="@style/MainContent"
         android:layout_below="@+id/headerLayout"
-        style="@style/MainContent">
+        android:layout_above="@+id/switchLayout"
+        android:visibility="invisible"
+        >
 
         <ImageView
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/lock_icon_large_dimension"
-            android:id="@+id/lockScreenIcon"
-            android:src="@drawable/launcher_recording_on"
-            android:layout_marginTop="59dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/uploadImage"
+            android:src="@drawable/upload_white"
+            android:contentDescription="@string/upload_progress"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/upload_progress"
+            android:id="@+id/textView"
+
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/uploadImage"
+            style="@style/AppTheme" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/mainLayout"
+        android:layout_below="@+id/headerLayout"
+        style="@style/MainContent" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/headquarter_desc"
+            android:id="@+id/headquarterImage"
+            android:src="@drawable/headquarters_white"
+            android:layout_marginTop="47dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:contentDescription="State of the app" />
+            android:layout_toRightOf="@+id/lockTextState" />
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="@android:dimen/notification_large_icon_width"
-            android:id="@+id/switchLayout"
-            style="@style/SideContent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linkImage"
+            android:contentDescription="@string/headquarter_desc"
+            android:src="@drawable/link_white"
+            android:layout_alignBottom="@+id/headquarterImage"
+            android:layout_centerHorizontal="true" />
 
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/switchUnlock"
-                android:checked="false"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
-        </RelativeLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:contentDescription="@string/phone_desc"
+            android:layout_height="wrap_content"
+            android:id="@+id/phoneImage"
+            android:src="@drawable/phone_white"
+            android:longClickable="false"
+            android:layout_above="@+id/lockTextState"
+            android:layout_toLeftOf="@+id/lockTextState" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/lock_text_recording"
             android:id="@+id/lockTextState"
-            android:layout_marginTop="43dp"
             style="@style/AppTheme"
-            android:layout_below="@+id/lockScreenIcon"
+            android:layout_marginTop="27dp"
+            android:layout_below="@+id/headquarterImage"
+            android:layout_centerHorizontal="true" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/streamToogle"
+            android:checked="false"
+            android:thumb="@drawable/switch_bg"
+            android:track="@drawable/track_bg"
+            android:thumbTextPadding="65dp"
+            android:switchMinWidth="100dp"
+            android:textOff="OFF"
+            android:textOn="ON"
+            android:textSize="15dp"
+            android:layout_marginTop="29dp"
+            android:layout_below="@+id/lockTextState"
+            android:layout_centerHorizontal="true" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="@android:dimen/notification_large_icon_width"
+        android:id="@+id/switchLayout"
+        style="@style/SideContent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/switchUnlock"
+            android:checked="false"
+            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
