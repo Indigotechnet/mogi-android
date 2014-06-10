@@ -115,6 +115,7 @@ public class LockScreenActivity extends Activity {
             mainLayout.setVisibility(View.VISIBLE);
             mainUploadingLayout.setVisibility(View.INVISIBLE);
             streamToogle.setClickable(true);
+            streamToogle.setChecked(true);
 
             headquarter.setImageResource(R.drawable.headquarters_white);
             linkImage.setImageResource(R.drawable.link_white);
@@ -123,12 +124,13 @@ public class LockScreenActivity extends Activity {
             mainLayout.setVisibility(View.INVISIBLE);
             mainUploadingLayout.setVisibility(View.VISIBLE);
             streamToogle.setClickable(true);
-
+            streamToogle.setChecked(false);
 
         } else {
             mainLayout.setVisibility(View.VISIBLE);
             mainUploadingLayout.setVisibility(View.INVISIBLE);
             streamToogle.setClickable(true);
+            streamToogle.setChecked(false);
 
             headquarter.setImageResource(R.drawable.headquarters_white);
             linkImage.setImageResource(R.drawable.link_grey);
