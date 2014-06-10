@@ -55,31 +55,31 @@ public class UserUtils {
         ApiClient.delete("/streams", new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                Log.i(TAG, "notifyStreamingStarted sent successfully");
+                Log.i(TAG, "notifyStreamingStop sent successfully");
             }
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {//
-                Log.i(TAG, "notifyStreamingStarted sent successfully");
+                Log.i(TAG, "notifyStreamingStop sent successfully");
             }
 
             @Override
             public void onFailure(Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "notifyStreamingStarted not sent successfully");
+                Log.e(TAG, "notifyStreamingStop not sent successfully");
             }
 
             @Override
             public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "notifyStreamingStarted not sent successfully");
+                Log.e(TAG, "notifyStreamingStop not sent successfully");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
-                Log.e(TAG, "notifyStreamingStarted not sent successfully");
+                Log.e(TAG, "notifyStreamingStop not sent successfully");
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
-                Log.e(TAG, "notifyStreamingStarted not sent successfully");
+                Log.e(TAG, "notifyStreamingStop not sent successfully");
             }
         });
     }
