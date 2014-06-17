@@ -77,6 +77,7 @@ public class UploadService extends BaseService {
         if (VideoUtils.isRecordVideos()) {
             totalVideos = videos.size();
             completedVideos = 0;
+            UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
             uploadVideos();
         }
         return super.onStartCommand(intent, flags, startId);
@@ -120,8 +121,6 @@ public class UploadService extends BaseService {
                 private void deleteFile() {
                     File out = new File(FileUtils.getLocationsFilePath());
                     out.delete();
-                    completedVideos++;
-                    UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
                     Log.i(TAG, "location sent successfully");
                 }
 
@@ -174,7 +173,7 @@ public class UploadService extends BaseService {
     private void uploadVideos() {
 
         ConnectivityManager systemService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (videos.size() == 0 || NetworkUtils.canUpload(getApplicationContext(), systemService.getActiveNetworkInfo(), this.intent)) {
+        if (videos.size() == 0 || !NetworkUtils.canUpload(getApplicationContext(), systemService.getActiveNetworkInfo(), this.intent)) {
             isUploading = false;
             stopSelf();
             return;
@@ -200,6 +199,8 @@ public class UploadService extends BaseService {
                 public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                     Log.i(TAG, "video uploaded: " + nextVideo.getName());
                     nextVideo.delete();
+                    completedVideos++;
+                    UploadProgressUtil.sendUpdate(getApplicationContext(), totalVideos, completedVideos);
                     uploadVideos();
                 }
 

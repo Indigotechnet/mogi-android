@@ -16,7 +16,6 @@ import com.igarape.mogi.R;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.UserUtils;
 import com.igarape.mogi.utils.VideoUtils;
-import com.igarape.mogi.utils.WidgetUtils;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
@@ -31,7 +30,6 @@ import net.majorkernelpanic.streaming.video.VideoQuality;
  */
 public class StreamingService extends BaseService implements RtspClient.Callback, Session.Callback, SurfaceHolder.Callback {
     public static String TAG = StreamingService.class.getName();
-    public static int Duration = 0;
     private static Session mSession;
     private static RtspClient mClient;
     private static boolean IsStreaming = false;

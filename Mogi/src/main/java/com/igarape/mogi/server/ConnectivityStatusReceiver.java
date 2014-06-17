@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.igarape.mogi.lock.LockScreenActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.NetworkUtils;
@@ -34,5 +36,6 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
                 StateMachine.getInstance().startServices(State.RECORDING_OFFLINE, context.getApplicationContext());
             }
         }
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(LockScreenActivity.RECEIVE_LOCK_UPDATE));
     }
 }

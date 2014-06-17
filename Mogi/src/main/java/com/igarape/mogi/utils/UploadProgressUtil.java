@@ -4,7 +4,9 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.igarape.mogi.lock.LockScreenActivity;
 import com.igarape.mogi.widget.MogiAppWidgetProvider;
 
 /**
@@ -25,5 +27,11 @@ public class UploadProgressUtil {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         context.sendBroadcast(intent);
 
+        intent = new Intent(context, LockScreenActivity.class);
+        intent.setAction(MOGI_UPLOAD_UPDATE);
+        intent.putExtra("total", total);
+        intent.putExtra("completed", completed);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

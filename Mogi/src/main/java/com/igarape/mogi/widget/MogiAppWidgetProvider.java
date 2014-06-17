@@ -12,7 +12,6 @@ import android.widget.RemoteViews;
 
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
-import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.recording.ToggleStreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.states.State;
@@ -44,22 +43,22 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             if (Identification.getAccessToken(context) == null) {
                 views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_offline);
                 views.setTextViewText(R.id.widget_status_title, "Login");
+                views.setTextViewText(R.id.widget_status_info, "");
                 views.setTextColor(R.id.widget_status_title, Color.BLACK);
                 views.setViewVisibility(R.id.widget_action_button, View.INVISIBLE);
-                views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
                 settingsIntent = PendingIntent.getActivity(context, 0, new Intent(context, AuthenticationActivity.class), 0);
             } else {
                 views.setViewVisibility(R.id.widget_action_button, View.VISIBLE);
                 Intent actionIntent = null;
+
                 if (StateMachine.getInstance().isInState(State.STREAMING)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_pause_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
                     views.setTextViewText(R.id.widget_status_title, "Streaming");
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_red));
                     views.setTextViewText(R.id.widget_status_info,
-                            "Streaming for " + StreamingService.Duration + "minutes");
+                            "Streaming");
                     views.setViewVisibility(R.id.widget_streaming_dot, View.VISIBLE);
-                    views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
 
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
@@ -67,7 +66,6 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_upload);
                     views.setTextViewText(R.id.widget_status_title, "Uploading");
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_blue));
-                    views.setViewVisibility(R.id.progressBarUpload, View.VISIBLE);
                     views.setTextViewText(R.id.widget_status_info,
                             "Uploading files to server");
                 } else {
@@ -77,7 +75,6 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_green));
                     views.setTextViewText(R.id.widget_status_info,
                             "Logged in for " + toNowInMinutes(Identification.getTimeLogin(context)));
-                    views.setViewVisibility(R.id.progressBarUpload, View.INVISIBLE);
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 }
                 if (actionIntent != null) {
@@ -122,11 +119,16 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
 
 
         if(intent.getAction().contains(UploadProgressUtil.MOGI_UPLOAD_UPDATE)){
+
             int total = intent.getExtras().getInt("total");
             int completed = intent.getExtras().getInt("completed");
 
             RemoteViews views =  new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
-            views.setProgressBar(R.id.progressBarUpload,total, completed,true);
+            if (total == completed){
+                views.setTextViewText(R.id.widget_status_info, context.getString(R.string.upload_progress_finish));
+            } else {
+                views.setTextViewText(R.id.widget_status_info, context.getString(R.string.upload_progress_info,completed, total));
+            }
             ComponentName widget = new ComponentName(context, MogiAppWidgetProvider.class);
             AppWidgetManager.getInstance(context).updateAppWidget(widget, views);
         }

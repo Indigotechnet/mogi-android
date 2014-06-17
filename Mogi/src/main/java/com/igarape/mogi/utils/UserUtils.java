@@ -1,9 +1,14 @@
 package com.igarape.mogi.utils;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.igarape.mogi.server.ApiClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -48,6 +53,31 @@ public class UserUtils {
                 Log.e(TAG, "notifyStreamingStarted not sent successfully");
             }
         });
+    }
+
+    public static void applyUserImage(final Activity activity, final ImageView userImage) {
+        if (Identification.getUserImage() != null) {
+            DisplayMetrics dm = new DisplayMetrics();
+            activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+            userImage.setMinimumHeight(dm.heightPixels);
+            userImage.setMinimumWidth(dm.widthPixels);
+            userImage.setImageBitmap(Identification.getUserImage());
+        } else {
+            ApiClient.get("/pictures/small/show", null, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Bitmap bm = BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length);
+                    Identification.setUserImage(bm);
+                    DisplayMetrics dm = new DisplayMetrics();
+                    activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                    userImage.setMinimumHeight(dm.heightPixels);
+                    userImage.setMinimumWidth(dm.widthPixels);
+                    userImage.setImageBitmap(bm);
+                }
+            });
+        }
     }
 
     public static void notifyStreamingStop(){

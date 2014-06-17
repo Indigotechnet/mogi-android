@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.igarape.mogi.BaseActivity;
@@ -23,6 +23,7 @@ import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.NetworkUtils;
+import com.igarape.mogi.utils.UserUtils;
 
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
@@ -43,16 +44,16 @@ public class MainActivity extends BaseActivity {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
-        if (Identification.getUserName() != null) {
-            getActionBar().setTitle(Identification.getUserName());
-        }
 
         defineInitialState();
 
         registerMyReceivers();
 
-        locationTextView = (TextView) findViewById(R.id.location_status);
+        locationTextView = (TextView) findViewById(R.id.screen_info);
 
+        ImageView userImage = (ImageView) findViewById(R.id.userImage);
+        UserUtils.applyUserImage(this, userImage);
+        ((TextView)findViewById(R.id.loggedUserLabel)).setText(Identification.getUserName());
         ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,16 +139,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void changeLocationStatusGUI() {
-
         if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)) {
             locationTextView.setText(getString(R.string.location_status_online));
-            locationTextView.setBackgroundColor(Color.GREEN);
         } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)) {
             locationTextView.setText(getString(R.string.location_status_offline));
-            locationTextView.setBackgroundColor(Color.RED);
         } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
             locationTextView.setText(getString(R.string.location_status_uploading));
-            locationTextView.setBackgroundColor(Color.BLUE);
         }
 
     }

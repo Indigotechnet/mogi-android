@@ -77,4 +77,10 @@
         <item name="android:background">@color/bg_blue_block</item>
         <item name="android:textColor">@color/text_blue_block</item>
     </style>
+
+    <style name="SwitchTextAppearance" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">35dp</item>
+
+    </style>
 </resources>

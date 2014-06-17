@@ -2,6 +2,7 @@ package com.igarape.mogi.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class Identification {
     private static String streamingPassword = "";
     private static String streamingPath = "";
     private static String userName = null;
+    private static Bitmap userImage = null;
 
     public synchronized static String id(Context context) {
         if (uniqueID == null) {
@@ -52,6 +54,9 @@ public class Identification {
         editor.putLong(PREF_TIME_LOGIN, java.lang.System.currentTimeMillis());
         editor.commit();
         accessToken = token;
+        if (accessToken == null){
+            setUserImage(null);
+        }
     }
 
     public synchronized static long getTimeLogin(Context context) {
@@ -120,5 +125,13 @@ public class Identification {
 
     public static String getUserName() {
         return userName;
+    }
+
+    public static Bitmap getUserImage() {
+        return userImage;
+    }
+
+    public static void setUserImage(Bitmap userImage) {
+        Identification.userImage = userImage;
     }
 }

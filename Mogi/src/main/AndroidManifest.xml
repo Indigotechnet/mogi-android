@@ -86,7 +86,7 @@
         <activity
             android:name="com.igarape.mogi.manager.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
             android:screenOrientation="portrait" >
             </activity>
         <activity
@@ -95,42 +95,7 @@
             android:screenOrientation="portrait"
             android:taskAffinity="com.igarape.mogi.lock.LockScreenActivity"
             android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
-            <!--<intent-filter>-->
-
-                <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
-        <!--<activity-->
-            <!--android:name=".lock.StartLockScreenActivity"-->
-            <!--android:theme="@style/Theme.Transparent" >-->
-
-
-            <!--<intent-filter >-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-                <!--<category android:name="android.intent.category.HOME" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-
-
-            <!--</intent-filter>-->
-            <!---->
-        <!--</activity>-->
-
-        <!--<service android:name="com.igarape.mogi.lock.LockScreenService" >-->
-        <!--</service>-->
-
-        <!--<receiver-->
-            <!--android:name="com.igarape.mogi.lock.LockScreenReceiver"-->
-            <!--android:enabled="true" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
     </application>
 
 </manifest>

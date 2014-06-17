@@ -1,7 +1,13 @@
 package com.igarape.mogi.lock;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
@@ -18,6 +24,11 @@ import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.util.SystemUiHider;
 import com.igarape.mogi.utils.Identification;
+import com.igarape.mogi.utils.UploadProgressUtil;
+import com.igarape.mogi.utils.UserUtils;
+
+import java.io.InputStream;
+import java.net.URL;
 
 
 /**
@@ -35,16 +46,47 @@ public class LockScreenActivity extends Activity {
 //
 //        super.onAttachedToWindow();
 //    }
+    public static final String RECEIVE_LOCK_UPDATE = "com.igarape.mogi.lock.UPDATE";
+
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(RECEIVE_LOCK_UPDATE)) {
+                updateState();
+            } else if (intent.getAction().equals(UploadProgressUtil.MOGI_UPLOAD_UPDATE)) {
+                int total = intent.getExtras().getInt("total");
+                int completed = intent.getExtras().getInt("completed");
+                TextView uploadInfo = (TextView) findViewById(R.id.lock_screen_info);
+                if (total == completed){
+                    uploadInfo.setText(getString(R.string.upload_progress_finish));
+                } else {
+                    uploadInfo.setText(getString(R.string.upload_progress_info,completed, total));
+                }
+            }
+        }
+    };
+    private LocalBroadcastManager bManager;
 
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        bManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_LOCK_UPDATE);
+        intentFilter.addAction(UploadProgressUtil.MOGI_UPLOAD_UPDATE);
+        bManager.registerReceiver(bReceiver, intentFilter);
+
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
 
         setContentView(R.layout.activity_lock_screen);
+        ImageView userImage = (ImageView) findViewById(R.id.userImage);
+        UserUtils.applyUserImage(this, userImage);
+
         TextView loggedUserLabel = (TextView) findViewById(R.id.loggedUserLabel);
         loggedUserLabel.setText(Identification.getUserName());
 
@@ -72,6 +114,8 @@ public class LockScreenActivity extends Activity {
             }
         });
 
+
+
         if (getIntent() != null && getIntent().hasExtra("kill") && getIntent().getExtras().getInt("kill") == 1) {
             finish();
         }
@@ -87,6 +131,17 @@ public class LockScreenActivity extends Activity {
 
     }
 
+
+
+    private static Drawable getImageFromWeb(String url) {
+        try {
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "src name");
+            return d;
+        } catch (Exception e) {
+            return null;
+        }
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -97,10 +152,11 @@ public class LockScreenActivity extends Activity {
         ImageView headquarter = (ImageView) findViewById(R.id.headquarterImage);
         ImageView linkImage = (ImageView) findViewById(R.id.linkImage);
         Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
+        TextView uploadInfo = (TextView) findViewById(R.id.lock_screen_info);
 
         RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
         RelativeLayout mainUploadingLayout = (RelativeLayout) findViewById(R.id.mainUploadingLayout);
-
+        uploadInfo.setText("");
         TextView text = (TextView) findViewById(R.id.lockTextState);
         if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
             mainLayout.setVisibility(View.VISIBLE);
@@ -138,6 +194,11 @@ public class LockScreenActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        updateState();
+    }
 
     class StateListener extends PhoneStateListener {
         @Override
@@ -205,7 +266,7 @@ public class LockScreenActivity extends Activity {
         }
         if ((event.getKeyCode() == KeyEvent.KEYCODE_HOME)) {
 
-            System.out.println("alokkkkkkkkkkkkkkkkk");
+
             return true;
         }
         return false;
@@ -214,5 +275,6 @@ public class LockScreenActivity extends Activity {
 
     public void onDestroy() {
         super.onDestroy();
+        bManager.unregisterReceiver(bReceiver);
     }
 }
