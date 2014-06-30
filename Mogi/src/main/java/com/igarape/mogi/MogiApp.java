@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
 
+import com.deploygate.sdk.DeployGate;
 import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.FileUtils;
 import com.squareup.otto.Bus;
@@ -15,13 +16,6 @@ import javax.inject.Singleton;
 
 import dagger.ObjectGraph;
 import dagger.Provides;
-import org.acra.*;
-import org.acra.annotation.*;
-
-@ReportsCrashes(
-        formKey = "", // This is required for backward compatibility but not used
-        formUri = "https://collector.tracepot.com/70782685"
-)
 
 /**
  * Created by felipeamorim on 08/07/2013.
@@ -40,8 +34,7 @@ public class MogiApp extends Application {
         FileUtils.setPath(getAlbumStorageDir("smartpolicing").getAbsolutePath());
         ApiClient.setAppContext(this.getApplicationContext());
 
-        // The following line triggers the initialization of ACRA
-        ACRA.init(this);
+        DeployGate.install(this);
     }
 
     public File getAlbumStorageDir(String albumName) {
