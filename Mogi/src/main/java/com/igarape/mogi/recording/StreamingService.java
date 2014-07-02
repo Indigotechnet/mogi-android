@@ -37,6 +37,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
     private WindowManager mWindowManager;
     private int ServiceID = 5;
     private SurfaceHolder mSurfaceHolder;
+    private boolean bitrateStarted;
 
 
     @Override
@@ -93,7 +94,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        this.bitrateStarted = false;
         SessionBuilder builder = SessionBuilder.getInstance()
                 .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContext(getApplicationContext())
@@ -126,10 +127,8 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         mSession.startPreview();
         mClient.startStream();
         IsStreaming = true;
-        /**
-         * Here we`ll tell node(server) that user is streaming
-         */
-        UserUtils.notifyStreamingStart();
+
+
     }
 
     @Override
@@ -139,6 +138,13 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
     @Override
     public void onBitrareUpdate(long bitrate) {
+        if (bitrate > 0 && !bitrateStarted) {
+            bitrateStarted = true;
+            /**
+             * Here we`ll tell node(server) that user is streaming
+             */
+            UserUtils.notifyStreamingStart();
+        }
         Log.i(TAG, bitrate / 1000 + " kbps");
     }
 
