@@ -27,10 +27,10 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "serverUrl", "\"http://mogi.igarape.org/api\""
+            buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
         }
         release {
-            buildConfigField "String", "serverUrl", "\"http://mogi.igarape.org/api\""
+            buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
         }
     }
 }
