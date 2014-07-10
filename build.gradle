@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath 'com.deploygate:gradle:0.6'
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 apply plugin: 'deploygate'
@@ -16,17 +16,15 @@ deploygate {
     token = "5afbb059e2def63d028b1bc3e0cdd85923ed0dfe"
 
     apks {
-        release {
-            sourceFile = file("Mogi/Mogi.apk")
+        general {
+            sourceFile = file("Mogi/Mogi-general-release.apk")
+            message = "General Release"
+            releaseNote = "General Release"
         }
-
-        debug {
-            sourceFile = file("Mogi/Mogi.apk")
-
-            //Below is optional
-//            message = "test upload2 sample"
-//            distributionKey = "[distribution_key]"
-//            releaseNote = "release note sample"
+        capeTown {
+            sourceFile = file("Mogi/Mogi-capeTown-release.apk")
+            message = "Cape Town Release"
+            releaseNote = "Cape Town Release"
         }
     }
 }

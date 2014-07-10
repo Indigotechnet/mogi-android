@@ -71,7 +71,12 @@ public class UploadService extends BaseService {
         this.intent = intent;
         if (videos == null || videos.size() == 0) {
             File dir = new File(FileUtils.getPath());
-            videos = new ArrayList<File>(Arrays.asList(dir.listFiles(filter)));
+            File[] files = dir.listFiles(filter);
+            if (files != null && files.length > 0) {
+                videos = new ArrayList<File>(Arrays.asList(files));
+            } else {
+                videos = new ArrayList<File>();
+            }
         }
         uploadLocations();
         if (VideoUtils.isRecordVideos()) {

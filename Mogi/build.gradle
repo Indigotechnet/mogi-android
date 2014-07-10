@@ -24,13 +24,15 @@ android {
         minSdkVersion 16
         targetSdkVersion 19
     }
-
-    buildTypes {
-        debug {
+    productFlavors {
+        local {
+            buildConfigField "String", "serverUrl", "\"http://api.mogidocs.co.za\""
+        }
+        general {
             buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
         }
-        release {
-            buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
+        capeTown {
+            buildConfigField "String", "serverUrl", "\"http://api.mogidocs.co.za\""
         }
     }
 }
