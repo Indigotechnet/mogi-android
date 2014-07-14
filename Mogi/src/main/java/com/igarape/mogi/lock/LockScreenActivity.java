@@ -20,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.igarape.mogi.R;
+import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.util.SystemUiHider;
@@ -39,19 +40,10 @@ import java.net.URL;
  */
 public class LockScreenActivity extends Activity {
 
-//    @Override
-//    public void onAttachedToWindow() {
-//        // TODO Auto-generated method stub
-//        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-//
-//        super.onAttachedToWindow();
-//    }
-    public static final String RECEIVE_LOCK_UPDATE = "com.igarape.mogi.lock.UPDATE";
-
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(RECEIVE_LOCK_UPDATE)) {
+            if(intent.getAction().equals(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE)) {
                 updateState();
             } else if (intent.getAction().equals(UploadProgressUtil.MOGI_UPLOAD_UPDATE)) {
                 int total = intent.getExtras().getInt("total");
@@ -73,7 +65,7 @@ public class LockScreenActivity extends Activity {
 
         bManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVE_LOCK_UPDATE);
+        intentFilter.addAction(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE);
         intentFilter.addAction(UploadProgressUtil.MOGI_UPLOAD_UPDATE);
         bManager.registerReceiver(bReceiver, intentFilter);
 

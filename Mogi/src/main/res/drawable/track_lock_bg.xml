@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:drawable="@drawable/tools_background_rectangle" />
-    <item android:state_activated="true" android:drawable="@drawable/tools_background_rectangle" />
-    <item                               android:drawable="@drawable/tools_background_rectangle"/>
+    <item android:state_enabled="false" android:drawable="@drawable/img_tools_slider" />
+    <item android:state_activated="true" android:drawable="@drawable/img_tools_slider" />
+    <item                               android:drawable="@drawable/img_tools_slider"/>
 </selector>

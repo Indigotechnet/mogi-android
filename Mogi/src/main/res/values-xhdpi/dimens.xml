@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="min_width_toggle">320dp</dimen>
+    <dimen name="padding_icon_toggle">23dp</dimen>
+
+</resources>

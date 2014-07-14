@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,16 +24,24 @@ import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.NetworkUtils;
+import com.igarape.mogi.utils.UploadProgressUtil;
 import com.igarape.mogi.utils.UserUtils;
 
 public class MainActivity extends BaseActivity {
     public static String TAG = MainActivity.class.getName();
 
-    private BroadcastReceiver connectivityReceiver = null;
+    private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE)) {
+                updateLocationStatusGUI();
+            }
+        }
+    };
     private TextView locationTextView;
     private ConnectivityStatusReceiver connectivityStatusReceiver;
     private LockScreenReceiver lockScreenReceiver;
-
+    private LocalBroadcastManager bManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +53,9 @@ public class MainActivity extends BaseActivity {
             startActivity(new Intent(this, AuthenticationActivity.class));
             finish();
         }
-
         defineInitialState();
+
+        bManager = LocalBroadcastManager.getInstance(this);
 
         registerMyReceivers();
 
@@ -115,30 +125,25 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (connectivityReceiver == null) {
-            connectivityReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    changeLocationStatusGUI();
-                }
-            };
 
-        }
-        registerReceiver(connectivityReceiver, new IntentFilter(
-                ConnectivityManager.CONNECTIVITY_ACTION));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE);
+        intentFilter.addAction(UploadProgressUtil.MOGI_UPLOAD_UPDATE);
+        bManager.registerReceiver(connectivityReceiver, intentFilter);
+        updateLocationStatusGUI();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         try {
-            unregisterReceiver(connectivityReceiver);
+            bManager.unregisterReceiver(connectivityReceiver);
         } catch (IllegalArgumentException e) {
             connectivityReceiver = null;
         }
     }
 
-    private void changeLocationStatusGUI() {
+    private void updateLocationStatusGUI() {
         if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)) {
             locationTextView.setText(getString(R.string.location_status_online));
         } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)) {
@@ -157,11 +162,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void unregisterMyReceivers() {
-//        try {
-//            unregisterReceiver(connectivityStatusReceiver);
-//        } catch (IllegalArgumentException e) {
-//            connectivityStatusReceiver = null;
-//        }
         try {
             unregisterReceiver(lockScreenReceiver);
         } catch (IllegalArgumentException e) {
@@ -171,9 +171,6 @@ public class MainActivity extends BaseActivity {
 
 
     private void registerMyReceivers() {
-//        IntentFilter mBatteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-//        connectivityStatusReceiver = new ConnectivityStatusReceiver();
-//        registerReceiver(connectivityStatusReceiver, mBatteryLevelFilter);
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);

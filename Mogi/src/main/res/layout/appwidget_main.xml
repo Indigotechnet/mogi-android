@@ -33,12 +33,13 @@
 
         <RelativeLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/bg_white_block"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:layout_weight="0.03">
+            android:layout_weight="0.03"
+            android:nestedScrollingEnabled="false">
 
             <ImageView
                 android:layout_alignParentLeft="true"

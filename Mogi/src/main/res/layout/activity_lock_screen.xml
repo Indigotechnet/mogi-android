@@ -29,9 +29,8 @@
             style="@style/SideContent"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/userImage"
-            android:autoText="false"
             android:layout_marginTop="5dp"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textIsSelectable="false" />
 
         <TextView
@@ -84,34 +83,43 @@
         android:layout_below="@+id/headerLayout"
         style="@style/MainContent" >
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/headquarter_desc"
-            android:id="@+id/headquarterImage"
-            android:src="@drawable/headquarters_white"
-            android:layout_marginTop="47dp"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/lockTextState" />
+            android:id="@+id/connectionLayout"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:gravity="center"
+            android:paddingTop="30dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/headquarter_desc"
+                android:id="@+id/headquarterImage"
+                android:src="@drawable/headquarters_white"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/linkImage" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/linkImage"
-            android:contentDescription="@string/headquarter_desc"
-            android:src="@drawable/link_white"
-            android:layout_alignBottom="@+id/headquarterImage"
-            android:layout_centerHorizontal="true" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/linkImage"
+                android:contentDescription="@string/headquarter_desc"
+                android:src="@drawable/link_white"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/phoneImage"
+                android:paddingTop="25dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:contentDescription="@string/phone_desc"
-            android:layout_height="wrap_content"
-            android:id="@+id/phoneImage"
-            android:src="@drawable/phone_white"
-            android:longClickable="false"
-            android:layout_above="@+id/lockTextState"
-            android:layout_toLeftOf="@+id/lockTextState" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:contentDescription="@string/phone_desc"
+                android:layout_height="wrap_content"
+                android:id="@+id/phoneImage"
+                android:src="@drawable/phone_white"
+                android:longClickable="false" />
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -119,8 +127,8 @@
             android:text="@string/lock_text_recording"
             android:id="@+id/lockTextState"
             style="@style/AppTheme"
-            android:layout_marginTop="27dp"
-            android:layout_below="@+id/headquarterImage"
+            android:layout_marginTop="28dp"
+            android:layout_below="@+id/connectionLayout"
             android:layout_centerHorizontal="true" />
 
         <Switch
@@ -148,7 +156,8 @@
         style="@style/SideContent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:gravity="center_vertical">
 
         <Switch
             android:layout_width="wrap_content"
@@ -162,8 +171,8 @@
 
             android:textOff="."
             android:textOn="."
-            android:switchMinWidth="370dp"
-            android:thumbTextPadding="27dp" />
+            android:switchMinWidth="@dimen/min_width_toggle"
+            android:thumbTextPadding="@dimen/padding_icon_toggle"/>
 
     </RelativeLayout>
 

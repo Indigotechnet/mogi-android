@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.igarape.mogi.lock.LockScreenActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.NetworkUtils;
@@ -15,6 +14,14 @@ import com.igarape.mogi.utils.NetworkUtils;
  * Created by felipeamorim on 26/07/2013.
  */
 public class ConnectivityStatusReceiver extends BroadcastReceiver {
+    //    @Override
+    //    public void onAttachedToWindow() {
+    //        // TODO Auto-generated method stub
+    //        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+    //
+    //        super.onAttachedToWindow();
+    //    }
+    public static final String RECEIVE_NETWORK_UPDATE = "com.igarape.mogi.server.NETWORK_UPDATE";
     public static int ServiceID = 1;
 
     private ConnectivityManager mConnectivityManager;
@@ -36,6 +43,7 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
                 StateMachine.getInstance().startServices(State.RECORDING_OFFLINE, context.getApplicationContext());
             }
         }
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(LockScreenActivity.RECEIVE_LOCK_UPDATE));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(RECEIVE_NETWORK_UPDATE));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(RECEIVE_NETWORK_UPDATE));
     }
 }

@@ -26,7 +26,7 @@ android {
     }
     productFlavors {
         local {
-            buildConfigField "String", "serverUrl", "\"http://api.mogidocs.co.za\""
+            buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
         }
         general {
             buildConfigField "String", "serverUrl", "\"http://mogi-api.igarape.org\""
