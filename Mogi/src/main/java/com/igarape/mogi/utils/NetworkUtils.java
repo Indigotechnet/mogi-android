@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 
+import com.igarape.mogi.BuildConfig;
+
 /**
  * Created by brunosiqueira on 07/05/2014.
  */
@@ -26,7 +28,7 @@ public class NetworkUtils {
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL;
 
-        return isCharging && isConnected && isWiFi;
+        return isCharging && isConnected && (isWiFi || !BuildConfig.requireWifiUpload);
     }
 
     public static boolean hasConnection(ConnectivityManager mConnectivityManager) {
