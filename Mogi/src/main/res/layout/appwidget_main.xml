@@ -38,8 +38,7 @@
             android:background="@color/bg_white_block"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:layout_weight="0.03"
-            android:nestedScrollingEnabled="false">
+            android:layout_weight="0.03">
 
             <ImageView
                 android:layout_alignParentLeft="true"
