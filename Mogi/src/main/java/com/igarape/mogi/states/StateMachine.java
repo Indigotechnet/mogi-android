@@ -2,7 +2,9 @@ package com.igarape.mogi.states;
 
 import android.content.Context;
 
+import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.WidgetUtils;
+import com.loopj.android.http.RequestParams;
 
 /**
  * Created by brunosiqueira on 06/05/2014.
@@ -32,6 +34,10 @@ public class StateMachine {
         if (currentState.equals(state)) {
             return;
         }
+        RequestParams params = new RequestParams();
+        params.add("previousState", currentState.toString());
+        params.add("nextState", state.toString());
+        ApiClient.post("/histories", params);
         currentState.stop(context, state);
         currentState = state;
         currentState.start(context);

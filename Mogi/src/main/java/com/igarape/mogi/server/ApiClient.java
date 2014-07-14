@@ -84,5 +84,8 @@ public class ApiClient {
         appContext = context;
     }
 
+    public static void post(String url, RequestParams params) {
+        client.post(getServerUrl(url), params, new AsyncHttpResponseHandler());
+    }
 }
 
