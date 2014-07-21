@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.igarape.mogi.server.ApiClient;
@@ -75,6 +76,12 @@ public class UserUtils {
                     userImage.setMinimumHeight(dm.heightPixels);
                     userImage.setMinimumWidth(dm.widthPixels);
                     userImage.setImageBitmap(bm);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    userImage.setVisibility(View.GONE);
+                    super.onFailure(statusCode, headers, responseBody, error);
                 }
             });
         }
