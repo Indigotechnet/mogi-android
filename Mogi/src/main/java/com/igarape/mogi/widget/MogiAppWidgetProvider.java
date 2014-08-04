@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 
 import com.igarape.mogi.R;
 import com.igarape.mogi.manager.MainActivity;
+import com.igarape.mogi.pause.CountDownService;
 import com.igarape.mogi.recording.ToggleStreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.states.State;
@@ -120,8 +121,8 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
 
         if(intent.getAction().contains(UploadProgressUtil.MOGI_UPLOAD_UPDATE)){
 
-            int total = intent.getExtras().getInt("total");
-            int completed = intent.getExtras().getInt("completed");
+            int total = intent.getExtras().getInt(UploadProgressUtil.TOTAL);
+            int completed = intent.getExtras().getInt(UploadProgressUtil.COMPLETED);
 
             RemoteViews views =  new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
             if (total == completed){
@@ -132,7 +133,12 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
             ComponentName widget = new ComponentName(context, MogiAppWidgetProvider.class);
             AppWidgetManager.getInstance(context).updateAppWidget(widget, views);
         }
+        else if (intent.getAction().equals(CountDownService.MOGI_COUNTDOWN_PAUSE)) {
+            RemoteViews views =  new RemoteViews(context.getPackageName(), R.layout.appwidget_main);
+            int time = intent.getExtras().getInt("missingTime");
 
+            views.setTextViewText(R.id.widget_status_info, context.getString(R.string.countdown_info,time));
+        }
 
     }
 }

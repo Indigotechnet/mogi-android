@@ -3,10 +3,12 @@ package com.igarape.mogi.states;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.location.LocationService;
+import com.igarape.mogi.pause.CountDownService;
 import com.igarape.mogi.recording.RecordingService;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.server.UploadService;
@@ -26,6 +28,12 @@ public enum State {
             return new ArrayList<Class<? extends BaseService>>();
         }
 
+    },
+    PAUSED {
+        @Override
+        protected java.util.List<Class<? extends BaseService>> getServices() {
+            return Arrays.asList(LocationService.class, CountDownService.class);
+        }
     },
     RECORDING_OFFLINE {
         @Override
@@ -58,13 +66,17 @@ public enum State {
     };
     private static final String TAG = State.class.getName();
 
-    private static void startSmartPolicingService(final Class clazz, final Context context) {
+    private static void startSmartPolicingService(final Class clazz, final Context context, final Bundle extras) {
         try {
-            Thread td = new Thread() {
+            final Thread td = new Thread() {
                 @Override
                 public void run() {
                     if (!isMyServiceRunning(clazz, context)) {
-                        context.startService(new Intent(context, clazz));
+                        Intent intent = new Intent(context, clazz);
+                        if (extras != null) {
+                            intent.putExtras(extras);
+                        }
+                        context.startService(intent);
                     }
                 }
             };
@@ -103,9 +115,9 @@ public enum State {
 
     protected abstract java.util.List<Class<? extends BaseService>> getServices();
 
-    protected void start(Context context){
+    protected void start(Context context, Bundle extras){
         for (Class<? extends BaseService> service: getServices()){
-            startSmartPolicingService(service, context);
+            startSmartPolicingService(service, context, extras);
         }
     };
 

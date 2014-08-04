@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.igarape.mogi.location.LocationService;
 import com.igarape.mogi.manager.MainActivity;
+import com.igarape.mogi.pause.CountDownService;
 import com.igarape.mogi.recording.RecordingService;
 import com.igarape.mogi.recording.StreamingService;
 import com.igarape.mogi.server.AuthenticationActivity;
@@ -25,7 +26,8 @@ import dagger.Provides;
                 RecordingService.class,
                 AuthenticationActivity.class,
                 StreamingService.class,
-                UploadService.class
+                UploadService.class,
+                CountDownService.class
         }
 )
 public class MogiModule {

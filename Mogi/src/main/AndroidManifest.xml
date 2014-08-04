@@ -72,6 +72,7 @@
         <service android:name="com.igarape.mogi.recording.StreamingService" />
         <service android:name="com.igarape.mogi.server.UploadService" />
         <service android:name="com.igarape.mogi.recording.ToggleStreamingService" />
+        <service android:name=".pause.CountDownService" />
 
         <activity
             android:name="com.igarape.mogi.server.AuthenticationActivity"

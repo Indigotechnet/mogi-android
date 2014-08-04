@@ -9,9 +9,10 @@ import android.util.Log;
 
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
+import com.igarape.mogi.states.State;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.LocationUtils;
-import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.UploadProgressUtil;
 import com.igarape.mogi.utils.VideoUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -178,7 +179,7 @@ public class UploadService extends BaseService {
     private void uploadVideos() {
 
         ConnectivityManager systemService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (videos.size() == 0 || !NetworkUtils.canUpload(getApplicationContext(), systemService.getActiveNetworkInfo(), this.intent)) {
+        if (videos.size() == 0 || !StateMachine.getInstance().isInState(State.UPLOADING)) {
             isUploading = false;
             stopSelf();
             return;

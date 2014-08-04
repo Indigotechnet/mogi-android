@@ -8,7 +8,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
-import com.igarape.mogi.utils.NetworkUtils;
 
 /**
  * Created by felipeamorim on 26/07/2013.
@@ -28,22 +27,14 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (StateMachine.getInstance().isInState(State.NOT_LOGGED)){
+        if (StateMachine.getInstance().isInState(State.NOT_LOGGED) ||
+                StateMachine.getInstance().isInState(State.PAUSED)){
             return;
         }
-        mConnectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (NetworkUtils.canUpload(context, mConnectivityManager.getActiveNetworkInfo(), intent)) {
-            StateMachine.getInstance().startServices(State.UPLOADING, context.getApplicationContext());
-        } else {
-            boolean hasConnection = NetworkUtils.hasConnection((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
-            if (hasConnection && !StateMachine.getInstance().isInState(State.STREAMING)) {
-                StateMachine.getInstance().startServices(State.RECORDING_ONLINE, context.getApplicationContext());
-            } else if (!hasConnection){
-                StateMachine.getInstance().startServices(State.RECORDING_OFFLINE, context.getApplicationContext());
-            }
-        }
+        StateMachine.goToActiveState(context, intent);
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(RECEIVE_NETWORK_UPDATE));
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(RECEIVE_NETWORK_UPDATE));
     }
+
+
 }

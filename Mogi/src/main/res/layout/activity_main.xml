@@ -56,6 +56,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/headerLayout"
+        android:id="@+id/main_layout"
         style="@style/MainContent">
 
         <Button
@@ -73,6 +74,14 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="12dp" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pause"
+            android:id="@+id/pause_button"
+            android:layout_below="@+id/force_upload"
+            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 
 

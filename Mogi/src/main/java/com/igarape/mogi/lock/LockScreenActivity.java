@@ -20,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.igarape.mogi.R;
+import com.igarape.mogi.pause.CountDownService;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
@@ -40,20 +41,28 @@ import java.net.URL;
  */
 public class LockScreenActivity extends Activity {
 
+    public static final String MOGI_UPDATE_INTERFACE = "mogi.update.interface";
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE)) {
                 updateState();
             } else if (intent.getAction().equals(UploadProgressUtil.MOGI_UPLOAD_UPDATE)) {
-                int total = intent.getExtras().getInt("total");
-                int completed = intent.getExtras().getInt("completed");
+                int total = intent.getExtras().getInt(UploadProgressUtil.TOTAL);
+                int completed = intent.getExtras().getInt(UploadProgressUtil.COMPLETED);
                 TextView uploadInfo = (TextView) findViewById(R.id.lock_screen_info);
                 if (total == completed){
                     uploadInfo.setText(getString(R.string.upload_progress_finish));
                 } else {
                     uploadInfo.setText(getString(R.string.upload_progress_info,completed, total));
                 }
+            }  else if (intent.getAction().equals(CountDownService.MOGI_COUNTDOWN_PAUSE)) {
+                long time = intent.getExtras().getLong(CountDownService.COUNT_DOWN_TIME);
+
+                TextView info = (TextView) findViewById(R.id.lock_screen_info);
+                info.setText(getString(R.string.countdown_info,time));
+            } else if  (intent.getAction().equals(MOGI_UPDATE_INTERFACE)) {
+                updateState();
             }
         }
     };
@@ -67,6 +76,8 @@ public class LockScreenActivity extends Activity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE);
         intentFilter.addAction(UploadProgressUtil.MOGI_UPLOAD_UPDATE);
+        intentFilter.addAction(CountDownService.MOGI_COUNTDOWN_PAUSE);
+        intentFilter.addAction(MOGI_UPDATE_INTERFACE);
         bManager.registerReceiver(bReceiver, intentFilter);
 
 
@@ -76,6 +87,7 @@ public class LockScreenActivity extends Activity {
 
 
         setContentView(R.layout.activity_lock_screen);
+        hideSystemUI();
         ImageView userImage = (ImageView) findViewById(R.id.userImage);
         UserUtils.applyUserImage(this, userImage);
 
@@ -106,7 +118,13 @@ public class LockScreenActivity extends Activity {
             }
         });
 
-
+        findViewById(R.id.pause_icon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StateMachine.goToActiveState(getApplicationContext(), getIntent());
+                updateState();
+            }
+        });
 
         if (getIntent() != null && getIntent().hasExtra("kill") && getIntent().getExtras().getInt("kill") == 1) {
             finish();
@@ -146,12 +164,14 @@ public class LockScreenActivity extends Activity {
         Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
         TextView uploadInfo = (TextView) findViewById(R.id.lock_screen_info);
 
-        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
+        RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.main_layout);
         RelativeLayout mainUploadingLayout = (RelativeLayout) findViewById(R.id.mainUploadingLayout);
+        RelativeLayout pauseLayout = (RelativeLayout) findViewById(R.id.pause_layout);
         uploadInfo.setText("");
         TextView text = (TextView) findViewById(R.id.lockTextState);
         if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)){
             mainLayout.setVisibility(View.VISIBLE);
+            pauseLayout.setVisibility(View.INVISIBLE);
             mainUploadingLayout.setVisibility(View.INVISIBLE);
             streamToogle.setClickable(false);
             streamToogle.setChecked(false);
@@ -162,6 +182,7 @@ public class LockScreenActivity extends Activity {
         } else if (StateMachine.getInstance().isInState(State.STREAMING)){
             mainLayout.setVisibility(View.VISIBLE);
             mainUploadingLayout.setVisibility(View.INVISIBLE);
+            pauseLayout.setVisibility(View.INVISIBLE);
             streamToogle.setClickable(true);
             streamToogle.setChecked(true);
 
@@ -170,12 +191,19 @@ public class LockScreenActivity extends Activity {
             text.setText(getString(R.string.lock_text_livestreaming));
         } else if (StateMachine.getInstance().isInState(State.UPLOADING)){
             mainLayout.setVisibility(View.INVISIBLE);
+            pauseLayout.setVisibility(View.INVISIBLE);
             mainUploadingLayout.setVisibility(View.VISIBLE);
             streamToogle.setClickable(true);
             streamToogle.setChecked(false);
-
+        } else if (StateMachine.getInstance().isInState(State.PAUSED)){
+            mainLayout.setVisibility(View.INVISIBLE);
+            mainUploadingLayout.setVisibility(View.INVISIBLE);
+            pauseLayout.setVisibility(View.VISIBLE);
+            streamToogle.setClickable(true);
+            streamToogle.setChecked(false);
         } else {
             mainLayout.setVisibility(View.VISIBLE);
+            pauseLayout.setVisibility(View.INVISIBLE);
             mainUploadingLayout.setVisibility(View.INVISIBLE);
             streamToogle.setClickable(true);
             streamToogle.setChecked(false);
@@ -269,4 +297,18 @@ public class LockScreenActivity extends Activity {
         super.onDestroy();
         bManager.unregisterReceiver(bReceiver);
     }
+
+    private void hideSystemUI() {
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                         );
+    }
+
 }

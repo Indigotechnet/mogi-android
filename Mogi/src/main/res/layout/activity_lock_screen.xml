@@ -86,7 +86,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/mainLayout"
+        android:id="@+id/main_layout"
         android:layout_below="@+id/headerLayout"
         style="@style/MainContent" >
 
@@ -181,6 +181,35 @@
             android:switchMinWidth="@dimen/min_width_toggle"
             android:thumbTextPadding="@dimen/padding_icon_toggle"/>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/headerLayout"
+        android:layout_above="@+id/switchLayout"
+        android:gravity="center"
+        android:id="@+id/pause_layout"
+        android:visibility="visible">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pause_icon"
+            android:src="@drawable/pause_icon"
+            android:contentDescription="@string/pause_state"
+            android:visibility="invisible" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pause_state"
+            android:id="@+id/pause_info"
+            style="@style/AppTheme"
+
+            android:layout_below="@+id/pause_icon"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_marginLeft="40dp" />
     </RelativeLayout>
 
 </RelativeLayout>
