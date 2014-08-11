@@ -69,6 +69,13 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_blue));
                     views.setTextViewText(R.id.widget_status_info,
                             "Uploading files to server");
+                } else if (StateMachine.getInstance().isInState(State.PAUSED)) {
+                    views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_paused_button);
+                    views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
+                    views.setTextViewText(R.id.widget_status_title, "Paused");
+                    views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_orange));
+                    views.setTextViewText(R.id.widget_status_info,
+                            "Paused temporarily");
                 } else {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_play_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_play);

@@ -192,13 +192,12 @@
         android:id="@+id/pause_layout"
         android:visibility="visible">
 
-        <ImageButton
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/pause_icon"
             android:src="@drawable/pause_icon"
-            android:contentDescription="@string/pause_state"
-            android:visibility="invisible" />
+            android:contentDescription="@string/pause_state" />
 
         <TextView
             android:layout_width="wrap_content"

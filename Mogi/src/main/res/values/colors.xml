@@ -16,6 +16,7 @@
     <color name="widget_status_red">#A00505</color>
     <color name="widget_status_green">#235514</color>
     <color name="widget_status_blue">#477dbc</color>
+    <color name="widget_status_orange">#f8941e</color>
 
     <!-- Solid red (rec dot) -->
     <color name="red_solid">#FF0000</color>

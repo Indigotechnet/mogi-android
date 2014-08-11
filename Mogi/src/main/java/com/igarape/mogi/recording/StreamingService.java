@@ -98,7 +98,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
         SessionBuilder builder = SessionBuilder.getInstance()
                 .setCamera(Camera.CameraInfo.CAMERA_FACING_BACK)
                 .setContext(getApplicationContext())
-                .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+                .setAudioEncoder(SessionBuilder.AUDIO_AAC)
                 .setAudioQuality(new AudioQuality(8000, 16000))
                 .setVideoEncoder(SessionBuilder.VIDEO_H264)
                 .setSurfaceView(mSurfaceView)
