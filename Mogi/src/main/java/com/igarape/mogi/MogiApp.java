@@ -34,7 +34,7 @@ public class MogiApp extends Application {
         FileUtils.setPath(getAlbumStorageDir("smartpolicing").getAbsolutePath());
         ApiClient.setAppContext(this.getApplicationContext());
 
-        DeployGate.install(this);
+        DeployGate.install(this, null, true);
     }
 
     public File getAlbumStorageDir(String albumName) {
