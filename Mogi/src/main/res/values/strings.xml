@@ -17,7 +17,7 @@
     <string name="logout">Logout</string>
     <string name="force_upload">Begin upload</string>
     <string name="dialog_upload_no_network">There\'s no active bandwidth to send data</string>
-    <string name="dialog_upload_not_wifi">A wireless connection is required</string>
+    <string name="dialog_upload_not_enable">Can not upload right now. Try again later.</string>
     <string name="dialog_upload_not_charging">The device must be charging</string>
     <string name="login_title">Login to SmartPolicing</string>
     <string name="status_online">Connected</string>

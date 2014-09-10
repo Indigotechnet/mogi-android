@@ -64,7 +64,8 @@
             android:text="@string/force_upload"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="false" />
+            android:layout_alignParentEnd="false"
+            android:drawableLeft="@drawable/ic_upload"/>
 
         <Button
             android:id="@+id/logout"
@@ -73,7 +74,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"
+            android:drawableRight="@drawable/logout_red"/>
 
         <Button
             android:layout_width="fill_parent"
@@ -81,7 +83,10 @@
             android:text="@string/pause"
             android:id="@+id/pause_button"
             android:layout_below="@+id/force_upload"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:drawableLeft="@drawable/ic_pause"
+            android:visibility="invisible"
+            />
     </RelativeLayout>
 
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 
+import com.igarape.mogi.BuildConfig;
 import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.WidgetUtils;
@@ -55,7 +56,9 @@ public class StateMachine {
     public static void goToActiveState(Context context, Intent intent) {
         ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (NetworkUtils.canUpload(context, mConnectivityManager.getActiveNetworkInfo(), intent)) {
-            getInstance().startServices(State.UPLOADING, context.getApplicationContext());
+            if (BuildConfig.requireWifiUpload) {
+                getInstance().startServices(State.UPLOADING, context.getApplicationContext());
+            }
         } else {
             boolean hasConnection = NetworkUtils.hasConnection((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
             if (hasConnection && !getInstance().isInState(State.STREAMING)) {

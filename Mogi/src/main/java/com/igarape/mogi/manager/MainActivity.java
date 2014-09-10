@@ -19,6 +19,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.igarape.mogi.BaseActivity;
+import com.igarape.mogi.BuildConfig;
 import com.igarape.mogi.R;
 import com.igarape.mogi.lock.LockScreenReceiver;
 import com.igarape.mogi.pause.CountDownService;
@@ -42,12 +43,12 @@ public class MainActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(ConnectivityStatusReceiver.RECEIVE_NETWORK_UPDATE)) {
                 updateState();
-                findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+                //TODO findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
             } else if (intent.getAction().equals(UploadProgressUtil.MOGI_UPLOAD_UPDATE)) {
                 int total = intent.getExtras().getInt(UploadProgressUtil.TOTAL);
                 int completed = intent.getExtras().getInt(UploadProgressUtil.COMPLETED);
                 TextView uploadInfo = (TextView) findViewById(R.id.screen_info);
-                findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+                //TODO findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
                 if (total == completed){
                     uploadInfo.setText(getString(R.string.upload_progress_finish));
                 } else {
@@ -58,7 +59,7 @@ public class MainActivity extends BaseActivity {
 
                 TextView info = (TextView) findViewById(R.id.screen_info);
                 info.setText(getString(R.string.countdown_info,time));
-                findViewById(R.id.pause_button).setVisibility(View.INVISIBLE);
+                //TODO findViewById(R.id.pause_button).setVisibility(View.INVISIBLE);
             }
         }
     };
@@ -89,41 +90,35 @@ public class MainActivity extends BaseActivity {
         ImageView userImage = (ImageView) findViewById(R.id.userImage);
         UserUtils.applyUserImage(this, userImage);
         ((TextView)findViewById(R.id.loggedUserLabel)).setText(Identification.getUserName());
-        ((Button) findViewById(R.id.force_upload)).setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        Button force_upload_button = (Button) findViewById(R.id.force_upload);
 
-                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-                if (activeNetwork == null) {
-                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                    return;
+        if (BuildConfig.requireWifiUpload){
+            force_upload_button.setVisibility(View.INVISIBLE);
+        } else {
+            force_upload_button.setOnClickListener(new Button.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                    NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+                    if (activeNetwork == null) {
+                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                        return;
+                    }
+                    if (!activeNetwork.isConnectedOrConnecting()) {
+                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
+                        return;
+                    }
+
+                    if (!(NetworkUtils.canUpload(getApplicationContext(), activeNetwork, getIntent()))) {
+                        AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_enable);
+                        return;
+                    }
+
+                    StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
                 }
-                if (!activeNetwork.isConnectedOrConnecting()) {
-                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_no_network);
-                    return;
-                }
-
-                if (!(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)) {
-                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_wifi);
-                    return;
-                }
-                IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-                Intent batteryStatus = registerReceiver(null, ifilter);
-
-                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-
-                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        status == BatteryManager.BATTERY_STATUS_FULL;
-
-                if (!isCharging) {
-                    AlertUtils.showAlertDialog(MainActivity.this, R.string.force_upload, R.string.dialog_upload_not_charging);
-                    return;
-                }
-
-                sendBroadcast(new Intent(MainActivity.this, ConnectivityStatusReceiver.class));
-            }
-        });
+            });
+        }
         final Button pauseButton = (Button) findViewById(R.id.pause_button);
         pauseButton.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -189,7 +184,8 @@ public class MainActivity extends BaseActivity {
     private void defineInitialState() {
         if (StateMachine.getInstance().isInState(State.NOT_LOGGED)) {
             ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (NetworkUtils.canUpload(this, mConnectivityManager.getActiveNetworkInfo(), getIntent())) {
+            if (NetworkUtils.canUpload(this, mConnectivityManager.getActiveNetworkInfo(), getIntent())
+                    && BuildConfig.requireWifiUpload) {
                 StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
             } else {
                 StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
@@ -221,16 +217,16 @@ public class MainActivity extends BaseActivity {
 
     private void updateState() {
         if (StateMachine.getInstance().isInState(State.RECORDING_ONLINE)) {
-            findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+            //TODO findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
             locationTextView.setText(getString(R.string.status_online));
         } else if (StateMachine.getInstance().isInState(State.RECORDING_OFFLINE)) {
-            findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+            //TODO findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
             locationTextView.setText(getString(R.string.status_offline));
         } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
-            findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
+            //TODO findViewById(R.id.pause_button).setVisibility(View.VISIBLE);
             locationTextView.setText(getString(R.string.status_uploading));
         } else if (StateMachine.getInstance().isInState(State.PAUSED)) {
-            findViewById(R.id.pause_button).setVisibility(View.INVISIBLE);
+            //TODO findViewById(R.id.pause_button).setVisibility(View.INVISIBLE);
             locationTextView.setText(getString(R.string.status_paused));
         }
 
