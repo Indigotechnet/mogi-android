@@ -32,8 +32,6 @@
     <string name="notification_record_title">Smart Policing Camera</string>
     <string name="notification_record_description">Recording on SDCard</string>
     <string name="title_activity_lock_streen">LockStreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_bar">BarActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="status_uploading">Uploading</string>
@@ -55,5 +53,12 @@
     <string name="pause_state">Recording Paused</string>
     <string name="click_login">Click on the right to login</string>
     <string name="status_paused">Paused temporarily</string>
+    <string name="widget_upload_info_start">Uploading files to server</string>
+    <string name="widget_upload_title">Uploading</string>
+    <string name="widget_streaming_title">Streaming</string>
+    <string name="widget_paused_title">Paused</string>
+    <string name="widget_active_title">Active</string>
+    <string name="widget_paused_info">Paused temporarily</string>
+    <string name="widget_logged_time_info">Logged in for %1$s minutes</string>
 
 </resources>

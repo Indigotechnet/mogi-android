@@ -55,7 +55,7 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                 if (StateMachine.getInstance().isInState(State.STREAMING)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_pause_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
-                    views.setTextViewText(R.id.widget_status_title, "Streaming");
+                    views.setTextViewText(R.id.widget_status_title,  context.getString(R.string.widget_streaming_title));
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_red));
                     views.setTextViewText(R.id.widget_status_info,
                             "Streaming");
@@ -65,24 +65,24 @@ public class MogiAppWidgetProvider extends AppWidgetProvider {
                 } else if (StateMachine.getInstance().isInState(State.UPLOADING)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_upload_button);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_upload);
-                    views.setTextViewText(R.id.widget_status_title, "Uploading");
+                    views.setTextViewText(R.id.widget_status_title, context.getString(R.string.widget_upload_title));
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_blue));
                     views.setTextViewText(R.id.widget_status_info,
-                            "Uploading files to server");
+                            context.getString(R.string.widget_upload_info_start));
                 } else if (StateMachine.getInstance().isInState(State.PAUSED)) {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_paused_button);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_pause);
-                    views.setTextViewText(R.id.widget_status_title, "Paused");
+                    views.setTextViewText(R.id.widget_status_title,  context.getString(R.string.widget_paused_title));
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_orange));
                     views.setTextViewText(R.id.widget_status_info,
-                            "Paused temporarily");
+                            context.getString(R.string.widget_paused_info));
                 } else {
                     views.setInt(R.id.widget_action_bg, "setBackgroundResource", R.drawable.bg_play_button_normal);
                     views.setImageViewResource(R.id.widget_action_button, R.drawable.ic_play);
-                    views.setTextViewText(R.id.widget_status_title, "Active");
+                    views.setTextViewText(R.id.widget_status_title,  context.getString(R.string.widget_active_title));
                     views.setTextColor(R.id.widget_status_title, context.getResources().getColor(R.color.widget_status_green));
                     views.setTextViewText(R.id.widget_status_info,
-                            "Logged in for " + toNowInMinutes(Identification.getTimeLogin(context)));
+                            context.getString(R.string.widget_logged_time_info, toNowInMinutes(Identification.getTimeLogin(context))));
                     actionIntent = new Intent(context, ToggleStreamingService.class);
                 }
                 if (actionIntent != null) {
