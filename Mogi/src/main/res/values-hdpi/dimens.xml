@@ -3,5 +3,6 @@
 
     <dimen name="min_width_toggle">320dp</dimen>
     <dimen name="padding_icon_toggle">23dp</dimen>
+    <dimen name="stream_toggle_width">32dp</dimen>
 
 </resources>

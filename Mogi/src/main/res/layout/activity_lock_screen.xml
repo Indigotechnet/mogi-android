@@ -147,11 +147,11 @@
             android:track="@drawable/track_bg"
             android:textOff="OFF"
             android:textOn="ON"
-            android:layout_marginTop="29dp"
+            android:layout_marginTop="25dp"
             android:layout_below="@+id/lockTextState"
             android:layout_centerHorizontal="true"
             android:switchTextAppearance="@style/SwitchTextAppearance"
-            android:thumbTextPadding="45dp" />
+            android:thumbTextPadding="@dimen/stream_toggle_width" />
 
 
     </RelativeLayout>
