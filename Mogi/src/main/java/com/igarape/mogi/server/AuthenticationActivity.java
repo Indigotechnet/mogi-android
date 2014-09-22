@@ -70,7 +70,7 @@ public class AuthenticationActivity extends Activity {
         setContentView(R.layout.activity_auth);
 
         Identification.setAccessToken(this, null);
-        StateMachine.getInstance().startServices(State.NOT_LOGGED, getBaseContext());
+        StateMachine.getInstance().startServices(State.NOT_LOGGED, getBaseContext(), null);
 
         context = getApplicationContext();
 

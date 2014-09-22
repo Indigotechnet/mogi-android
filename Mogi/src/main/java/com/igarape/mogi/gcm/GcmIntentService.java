@@ -37,9 +37,9 @@ public class GcmIntentService extends IntentService {
 
                 String key = extras.getString("collapse_key");
                 if (KEY_STREAMING_START.equals(key)) {
-                    StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext());
+                    StateMachine.getInstance().startServices(State.STREAMING, getApplicationContext(), null);
                 } else {
-                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext(), null);
                 }
             }
         }

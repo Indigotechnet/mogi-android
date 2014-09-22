@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.igarape.mogi.BaseActivity;
 import com.igarape.mogi.BuildConfig;
@@ -27,6 +28,7 @@ import com.igarape.mogi.server.AuthenticationActivity;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
+import com.igarape.mogi.states.StateResponseHandler;
 import com.igarape.mogi.utils.AlertUtils;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.NetworkUtils;
@@ -76,7 +78,7 @@ public class MainActivity extends BaseActivity {
 
         // Not logged, go to Auth
         if (Identification.getAccessToken(this) == null) {
-            startActivity(new Intent(this, AuthenticationActivity.class));
+
             finish();
         }
         defineInitialState();
@@ -115,7 +117,18 @@ public class MainActivity extends BaseActivity {
                         return;
                     }
 
-                    StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
+                    StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext(), new StateResponseHandler() {
+                        @Override
+                        public void successResponse() {
+
+                        }
+
+                        @Override
+                        public void waitingResponse() {
+                            super.waitingResponse();
+                            Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             });
         }
@@ -148,7 +161,18 @@ public class MainActivity extends BaseActivity {
                                     Bundle bundle = new Bundle();
                                     bundle.putInt(CountDownService.COUNT_DOWN_TIME,
                                             TEN_MINUTES);
-                                    StateMachine.getInstance().startServices(State.PAUSED, getApplicationContext(), bundle);
+                                    StateMachine.getInstance().startServices(State.PAUSED, getApplicationContext(), bundle, new StateResponseHandler() {
+                                        @Override
+                                        public void successResponse() {
+
+                                        }
+
+                                        @Override
+                                        public void waitingResponse() {
+                                            super.waitingResponse();
+                                            Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
                                     popupWindow.dismiss();
                                 }
                             });
@@ -159,7 +183,18 @@ public class MainActivity extends BaseActivity {
                                     Bundle bundle = new Bundle();
                                     bundle.putInt(CountDownService.COUNT_DOWN_TIME,
                                             FIVE_MINUTES);
-                                    StateMachine.getInstance().startServices(State.PAUSED, getApplicationContext(), bundle);
+                                    StateMachine.getInstance().startServices(State.PAUSED, getApplicationContext(), bundle, new StateResponseHandler() {
+                                        @Override
+                                        public void successResponse() {
+
+                                        }
+
+                                        @Override
+                                        public void waitingResponse() {
+                                            super.waitingResponse();
+                                            Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
                                     popupWindow.dismiss();
                                 }
                             });
@@ -173,10 +208,21 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.logout).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
-                Identification.setAccessToken(getApplicationContext(), null);
-                unregisterMyReceivers();
-                finish();
+                StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext(), new StateResponseHandler() {
+                    @Override
+                    public void successResponse() {
+                        Identification.setAccessToken(getApplicationContext(), null);
+                        unregisterMyReceivers();
+                        finish();
+                    }
+
+                    @Override
+                    public void waitingResponse() {
+                        super.waitingResponse();
+                        Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                    }
+                } );
+
             }
         });
     }
@@ -186,9 +232,9 @@ public class MainActivity extends BaseActivity {
             ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             if (NetworkUtils.canUpload(this, mConnectivityManager.getActiveNetworkInfo(), getIntent())
                     && BuildConfig.requireWifiUpload) {
-                StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
+                StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext(),null);
             } else {
-                StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+                StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext(),null);
             }
         }
     }
@@ -235,8 +281,19 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext());
-        unregisterMyReceivers();
+        StateMachine.getInstance().startServices(State.NOT_LOGGED, getApplicationContext(), new StateResponseHandler() {
+            @Override
+            public void successResponse() {
+                startActivity(new Intent(MainActivity.this.getApplicationContext(), AuthenticationActivity.class));
+            }
+
+            @Override
+            public void waitingResponse() {
+                super.waitingResponse();
+                Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void unregisterMyReceivers() {

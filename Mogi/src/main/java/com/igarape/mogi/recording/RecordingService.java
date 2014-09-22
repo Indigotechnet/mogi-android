@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.igarape.mogi.R;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
 import com.igarape.mogi.utils.VideoUtils;
 
@@ -56,6 +57,12 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
 
             mWindowManager.removeView(mSurfaceView);
         }
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        super.surfaceCreated(surfaceHolder);
+        StateMachine.getInstance().setWaiting(false);
     }
 
     @Override

@@ -54,9 +54,10 @@
          <string name = "status_paused"> Pausado temporariamente </string>
     <string name="widget_upload_info_start">Enviando vídeos</string>
     <string name="widget_upload_title">Enviando</string>
-    <string name="widget_streaming_title">Transmissão ao Vivo</string>
+    <string name="widget_streaming_title">Ao Vivo</string>
     <string name="widget_paused_title">Pausado</string>
     <string name="widget_active_title">Ativo</string>
     <string name="widget_paused_info">Pausado temporariamente</string>
     <string name="widget_logged_time_info">Ativo há %1$s minutos</string>
+    <string name="action_waiting_error">Tente novamente em alguns segundos.</string>
 </resources>

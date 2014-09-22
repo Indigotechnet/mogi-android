@@ -13,6 +13,7 @@ import android.view.WindowManager;
 
 import com.igarape.mogi.BaseService;
 import com.igarape.mogi.R;
+import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.UserUtils;
 import com.igarape.mogi.utils.VideoUtils;
@@ -166,7 +167,7 @@ public class StreamingService extends BaseService implements RtspClient.Callback
 
     @Override
     public void onSessionStarted() {
-
+        StateMachine.getInstance().setWaiting(false);
     }
 
     @Override

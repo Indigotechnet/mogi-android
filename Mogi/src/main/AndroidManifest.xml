@@ -44,6 +44,7 @@
         <receiver android:name="com.igarape.mogi.widget.MogiAppWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_WAITING" />
             </intent-filter>
 
             <meta-data
@@ -87,6 +88,7 @@
         </activity>
         <activity
             android:name="com.igarape.mogi.manager.MainActivity"
+            android:launchMode="singleTask"
             android:label="@string/title_activity_main"
             android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
             android:screenOrientation="portrait" >

@@ -58,9 +58,9 @@ public class CountDownService extends BaseService {
             public void onFinish() {
                 ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 if (NetworkUtils.canUpload(getApplicationContext(), mConnectivityManager.getActiveNetworkInfo(), intent)) {
-                    StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext());
+                    StateMachine.getInstance().startServices(State.UPLOADING, getApplicationContext(), null);
                 } else {
-                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext());
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE, getApplicationContext(), null);
                 }
 
                 Intent intent = new Intent(getApplicationContext(), LockScreenActivity.class);

@@ -37,6 +37,11 @@ public enum State {
     },
     RECORDING_OFFLINE {
         @Override
+        public boolean isWaitToBeReady() {
+            return true;
+        }
+
+        @Override
         protected java.util.List<Class<? extends BaseService>> getServices() {
             return Arrays.asList(LocationService.class, RecordingService.class);
         }
@@ -44,12 +49,22 @@ public enum State {
     },
     RECORDING_ONLINE {
         @Override
+        public boolean isWaitToBeReady() {
+            return true;
+        }
+
+        @Override
         protected java.util.List<Class<? extends BaseService>> getServices() {
             return Arrays.asList(LocationService.class, RecordingService.class);
         }
 
     },
     STREAMING {
+        @Override
+        public boolean isWaitToBeReady() {
+            return true;
+        }
+
         @Override
         protected java.util.List<Class<? extends BaseService>> getServices() {
             return Arrays.asList(LocationService.class, StreamingService.class);
@@ -66,6 +81,7 @@ public enum State {
     };
     private static final String TAG = State.class.getName();
 
+    private boolean waitToBeReady = false;
     private static void startSmartPolicingService(final Class clazz, final Context context, final Bundle extras) {
         try {
             final Thread td = new Thread() {
@@ -129,5 +145,9 @@ public enum State {
             }
         }
     };
+
+    public boolean isWaitToBeReady() {
+        return waitToBeReady;
+    }
 
 }

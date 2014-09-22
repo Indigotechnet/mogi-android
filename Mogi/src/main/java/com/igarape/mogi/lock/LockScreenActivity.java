@@ -18,12 +18,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.igarape.mogi.R;
 import com.igarape.mogi.pause.CountDownService;
 import com.igarape.mogi.server.ConnectivityStatusReceiver;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
+import com.igarape.mogi.states.StateResponseHandler;
 import com.igarape.mogi.util.SystemUiHider;
 import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.UploadProgressUtil;
@@ -105,24 +107,58 @@ public class LockScreenActivity extends Activity {
             }
         });
 
-        Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
+        final Switch streamToogle = (Switch) findViewById(R.id.streamToogle);
         streamToogle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    StateMachine.getInstance().startServices(State.STREAMING,getApplicationContext());
+                    StateMachine.getInstance().startServices(State.STREAMING,getApplicationContext(), new StateResponseHandler() {
+                        @Override
+                        public void successResponse() {
+                            updateState();
+                        }
+
+                        @Override
+                        public void waitingResponse() {
+                            super.waitingResponse();
+                            Toast.makeText(LockScreenActivity.this, LockScreenActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                            streamToogle.setChecked(false);
+                        }
+                    });
                 } else {
-                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE,getApplicationContext());
+                    StateMachine.getInstance().startServices(State.RECORDING_ONLINE,getApplicationContext(), new StateResponseHandler() {
+                        @Override
+                        public void successResponse() {
+                            updateState();
+                        }
+
+                        @Override
+                        public void waitingResponse() {
+                            super.waitingResponse();
+                            Toast.makeText(LockScreenActivity.this, LockScreenActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                            streamToogle.setChecked(true);
+                        }
+                    });
                 }
-                updateState();
+
             }
         });
 
         findViewById(R.id.pause_icon).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StateMachine.goToActiveState(getApplicationContext(), getIntent());
-                updateState();
+                StateMachine.goToActiveState(getApplicationContext(), getIntent(), new StateResponseHandler() {
+                    @Override
+                    public void successResponse() {
+                        updateState();
+                    }
+
+                    @Override
+                    public void waitingResponse() {
+                        super.waitingResponse();
+                        Toast.makeText(LockScreenActivity.this, LockScreenActivity.this.getString(R.string.action_waiting_error), Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 

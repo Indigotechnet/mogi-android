@@ -60,5 +60,6 @@
     <string name="widget_active_title">Active</string>
     <string name="widget_paused_info">Paused temporarily</string>
     <string name="widget_logged_time_info">Logged in for %1$s minutes</string>
+    <string name="action_waiting_error">Try again in a few seconds.</string>
 
 </resources>
