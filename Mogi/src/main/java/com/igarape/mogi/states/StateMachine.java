@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.igarape.mogi.BuildConfig;
 import com.igarape.mogi.server.ApiClient;
+import com.igarape.mogi.utils.HistoryUtils;
 import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 import com.loopj.android.http.RequestParams;
@@ -52,11 +53,17 @@ public class StateMachine {
             return;
         }
 
-        registerHistory(state);
+        HistoryUtils.registerHistory(currentState, state);
         currentState.stop(context, state);
+
+        //If has the same services, don't have to start waiting again.
+        if (!state.getServices().equals(currentState.getServices())) {
+            waiting = currentState.isWaitToBeReady();
+        }
+
         currentState = state;
 
-        waiting = currentState.isWaitToBeReady();
+
         currentState.start(context, extras);
 
         WidgetUtils.BeginUpdating(context);
@@ -64,12 +71,6 @@ public class StateMachine {
         if (handler != null) {handler.successResponse();}
     }
 
-    private void registerHistory(State state) {
-        RequestParams params = new RequestParams();
-        params.add("previousState", currentState.toString());
-        params.add("nextState", state.toString());
-        ApiClient.post("/histories", params);
-    }
 
     public static void goToActiveState(Context context, Intent intent, StateResponseHandler handler) {
         ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

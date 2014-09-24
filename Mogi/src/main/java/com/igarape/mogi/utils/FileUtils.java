@@ -19,6 +19,7 @@ import java.util.TimeZone;
 public class FileUtils {
 
     public static final String LOCATIONS_TXT = "locations.txt";
+    public static final String HISTORY_TXT = "history.txt";
     public static final String BATTERY_TXT = "battery.txt";
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static final String TAG = FileUtils.class.getName();
@@ -46,19 +47,17 @@ public class FileUtils {
     }
 
     public static void LogLocation(Location location) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        df.setTimeZone(tz);
-        JSONObject json = null;
         try {
-            json = LocationUtils.buildJson(location);
-            LogToFile(LOCATIONS_TXT, json.toString());
+            LogToFile(LOCATIONS_TXT, LocationUtils.buildJson(location).toString());
         } catch (JSONException e) {
             Log.e(TAG, "error recording location in file", e);
 
         }
     }
+    public static void LogHistory(JSONObject history) {
 
+        LogToFile(HISTORY_TXT, history.toString());
+    }
     private static void LogToFile(String file, String data) {
         try {
             FileWriter writer = new FileWriter(getPath() + file, true);
@@ -73,4 +72,7 @@ public class FileUtils {
         return getPath() + LOCATIONS_TXT;
     }
 
+    public static String getHistoriesFilePath() {
+        return getPath() + HISTORY_TXT;
+    }
 }

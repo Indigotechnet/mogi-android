@@ -12,6 +12,7 @@ import com.igarape.mogi.R;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.HistoryUtils;
 import com.igarape.mogi.utils.LocationUtils;
 import com.igarape.mogi.utils.UploadProgressUtil;
 import com.igarape.mogi.utils.VideoUtils;
@@ -80,6 +81,7 @@ public class UploadService extends BaseService {
             }
         }
         uploadLocations();
+        uploadHistory();
         if (VideoUtils.isRecordVideos()) {
             totalVideos = videos.size();
             completedVideos = 0;
@@ -87,6 +89,86 @@ public class UploadService extends BaseService {
             uploadVideos();
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void uploadHistory() {
+        InputStream is;
+        BufferedReader br;
+        String line;
+        String[] values;
+        File file = new File(FileUtils.getHistoriesFilePath());
+        if (!file.exists()) {
+            if (videos.isEmpty()) {
+                isUploading = false;
+            }
+            return;
+        }
+        try {
+            is = new FileInputStream(file);
+            br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+        } catch (FileNotFoundException e) {
+            return;
+        }
+
+        JSONArray histories = new JSONArray();
+        try {
+            while ((line = br.readLine()) != null) {
+                JSONObject json = new JSONObject(line);
+                if (json.getString("previousState") != null) {
+                    histories.put(json);
+                }
+            }
+
+            HistoryUtils.sendHistories(histories, new JsonHttpResponseHandler() {
+                private void deleteFile() {
+                    File out = new File(FileUtils.getHistoriesFilePath());
+                    out.delete();
+                    Log.i(TAG, "histories sent successfully");
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                    deleteFile();
+                }
+
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {//
+                    deleteFile();
+                }
+
+                @Override
+                public void onFailure(Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "histories not sent successfully");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "histories not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
+                    Log.e(TAG, "histories not sent successfully", e);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
+                    Log.e(TAG, "histories not sent successfully", e);
+                }
+            });
+        } catch (IOException e) {
+            Log.e(TAG, "error reading histories file", e);
+        }
+        catch (JSONException e) {
+            Log.e(TAG, "error reading histories file", e);
+        } finally {
+            try {
+                if (br != null){br.close();}
+            } catch (IOException e) {
+
+            }
+        }
     }
 
     @Override

@@ -15,7 +15,8 @@ import com.igarape.mogi.server.UploadService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by brunosiqueira on 07/05/2014.
@@ -24,15 +25,15 @@ public enum State {
 
     NOT_LOGGED {
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            return new ArrayList<Class<? extends BaseService>>();
+        protected Set<Class<? extends BaseService>> getServices() {
+            return new HashSet<Class<? extends BaseService>>();
         }
 
     },
     PAUSED {
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            return Arrays.asList(LocationService.class, CountDownService.class);
+        protected Set<Class<? extends BaseService>> getServices() {
+            return new HashSet<Class<? extends BaseService>>(Arrays.asList(LocationService.class, CountDownService.class));
         }
     },
     RECORDING_OFFLINE {
@@ -42,8 +43,8 @@ public enum State {
         }
 
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            return Arrays.asList(LocationService.class, RecordingService.class);
+        protected Set<Class<? extends BaseService>> getServices() {
+            return new HashSet<Class<? extends BaseService>>(Arrays.asList(LocationService.class, RecordingService.class));
         }
 
     },
@@ -54,8 +55,8 @@ public enum State {
         }
 
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            return Arrays.asList(LocationService.class, RecordingService.class);
+        protected Set<Class<? extends BaseService>> getServices() {
+            return new HashSet<Class<? extends BaseService>>(Arrays.asList(LocationService.class, RecordingService.class));
         }
 
     },
@@ -66,15 +67,15 @@ public enum State {
         }
 
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            return Arrays.asList(LocationService.class, StreamingService.class);
+        protected Set<Class<? extends BaseService>> getServices() {
+            return new HashSet<Class<? extends BaseService>>(Arrays.asList(LocationService.class, StreamingService.class));
         }
 
     },
     UPLOADING {
         @Override
-        protected java.util.List<Class<? extends BaseService>> getServices() {
-            List list = new ArrayList<Class<? extends BaseService>>();
+        protected Set<Class<? extends BaseService>> getServices() {
+            Set list = new HashSet<Class<? extends BaseService>>();
             list.add(UploadService.class);
             return list;
         }
@@ -129,7 +130,7 @@ public enum State {
     }
 
 
-    protected abstract java.util.List<Class<? extends BaseService>> getServices();
+    protected abstract Set<Class<? extends BaseService>> getServices();
 
     protected void start(Context context, Bundle extras){
         for (Class<? extends BaseService> service: getServices()){
