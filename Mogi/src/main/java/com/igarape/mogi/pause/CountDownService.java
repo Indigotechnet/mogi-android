@@ -1,7 +1,5 @@
 package com.igarape.mogi.pause;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -14,7 +12,6 @@ import com.igarape.mogi.manager.MainActivity;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.NetworkUtils;
-import com.igarape.mogi.widget.MogiAppWidgetProvider;
 
 /**
  * Created by brunosiqueira on 30/07/2014.
@@ -31,17 +28,8 @@ public class CountDownService extends BaseService {
         timer = new CountDownTimer(countDownTime, 10000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Intent intent = new Intent(getApplicationContext(), MogiAppWidgetProvider.class);
-                intent.setAction(MOGI_COUNTDOWN_PAUSE);
                 long time = millisUntilFinished / 1000;
-                intent.putExtra(COUNT_DOWN_TIME, time);
-
-                int[] ids = AppWidgetManager.getInstance(getApplicationContext())
-                        .getAppWidgetIds(new ComponentName(getApplicationContext(), MogiAppWidgetProvider.class));
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                getApplicationContext().sendBroadcast(intent);
-
-                intent = new Intent(getApplicationContext(), LockScreenActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LockScreenActivity.class);
                 intent.setAction(MOGI_COUNTDOWN_PAUSE);
                 intent.putExtra(COUNT_DOWN_TIME, time);
 

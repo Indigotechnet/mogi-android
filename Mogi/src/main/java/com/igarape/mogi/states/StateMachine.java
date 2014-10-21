@@ -6,11 +6,8 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import com.igarape.mogi.BuildConfig;
-import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.HistoryUtils;
 import com.igarape.mogi.utils.NetworkUtils;
-import com.igarape.mogi.utils.WidgetUtils;
-import com.loopj.android.http.RequestParams;
 
 /**
  * Created by brunosiqueira on 06/05/2014.
@@ -63,10 +60,7 @@ public class StateMachine {
 
         currentState = state;
 
-
         currentState.start(context, extras);
-
-        WidgetUtils.BeginUpdating(context);
 
         if (handler != null) {handler.successResponse();}
     }
