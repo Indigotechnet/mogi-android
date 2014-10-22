@@ -9,10 +9,14 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
+import org.apache.http.client.utils.URIUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,7 +41,7 @@ public class HistoryUtils {
         return json;
     }
 
-    public static void registerHistory(State currentState, State nextState) {
+    public static void registerHistory(final String userLogin, State currentState, State nextState) {
 
         try {
             final JSONObject history = buildJson(currentState, nextState);
@@ -45,25 +49,25 @@ public class HistoryUtils {
                 @Override
                 public void onFailure(Throwable e, JSONObject errorResponse) {
                     Log.e(TAG, "history not sent successfully");
-                    FileUtils.LogHistory(history);
+                    FileUtils.LogHistory(userLogin, history);
                 }
 
                 @Override
                 public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
                     Log.e(TAG, "history not sent successfully", e);
-                    FileUtils.LogHistory(history);
+                    FileUtils.LogHistory(userLogin, history);
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
                     Log.e(TAG, "history not sent successfully", e);
-                    FileUtils.LogHistory(history);
+                    FileUtils.LogHistory(userLogin, history);
                 }
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
                     Log.e(TAG, "history not sent successfully", e);
-                    FileUtils.LogHistory(history);
+                    FileUtils.LogHistory(userLogin, history);
                 }
             });
 
@@ -71,8 +75,14 @@ public class HistoryUtils {
             e.printStackTrace();
         }
     }
-
+    /**
+     * @deprecated Implement {@link #sendHistories(org.json.JSONArray, String, com.loopj.android.http.JsonHttpResponseHandler)} instead.
+     * */
     public static void sendHistories(JSONArray histories, JsonHttpResponseHandler onSuccess) {
         ApiClient.post("/histories", histories, onSuccess);
+    }
+
+    public static void sendHistories(JSONArray histories,String login, JsonHttpResponseHandler onSuccess) {
+        ApiClient.post("/histories/" + login, histories, onSuccess);
     }
 }

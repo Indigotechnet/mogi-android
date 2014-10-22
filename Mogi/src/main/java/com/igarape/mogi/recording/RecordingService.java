@@ -1,6 +1,7 @@
 package com.igarape.mogi.recording;
 
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -13,6 +14,7 @@ import android.view.SurfaceHolder;
 import com.igarape.mogi.R;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.VideoUtils;
 
 import java.io.File;
@@ -87,7 +89,7 @@ public class RecordingService extends AbstractCameraService implements SurfaceHo
             mMediaRecorder.setVideoFrameRate(15);
 
 
-            mLastFileRecorded = FileUtils.getPath() +
+            mLastFileRecorded = FileUtils.getPath(Identification.getUserLogin(this)) +
                     DateFormat.format("yyyy-MM-dd_kk-mm-ss", new Date().getTime()) +
                     ".mp4";
 

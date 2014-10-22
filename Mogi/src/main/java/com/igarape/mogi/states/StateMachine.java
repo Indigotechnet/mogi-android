@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.igarape.mogi.BuildConfig;
 import com.igarape.mogi.server.ApiClient;
 import com.igarape.mogi.utils.HistoryUtils;
+import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.NetworkUtils;
 import com.igarape.mogi.utils.WidgetUtils;
 import com.loopj.android.http.RequestParams;
@@ -53,7 +54,7 @@ public class StateMachine {
             return;
         }
 
-        HistoryUtils.registerHistory(currentState, state);
+        HistoryUtils.registerHistory(Identification.getUserLogin(context),currentState, state);
         currentState.stop(context, state);
 
         //If has the same services, don't have to start waiting again.

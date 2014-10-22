@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;

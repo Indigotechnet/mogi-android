@@ -16,7 +16,6 @@ public class Identification {
     private static final String PREF_TIME_LOGIN = "PREF_TIME_LOGIN";
     private static String uniqueID = null;
     private static String accessToken = null;
-    private static String userLogin = null;
     private static String serverIpAddress = "";
     private static Integer streamingPort = 1935;
     private static String streamingUser = "";
@@ -65,14 +64,12 @@ public class Identification {
     }
 
     public synchronized static String getUserLogin(Context context) {
-        if (userLogin == null) {
-            SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
-            userLogin = sharedPrefs.getString(PREF_USER_LOGIN, null);
-        }
-        return userLogin;
+        SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
+        return sharedPrefs.getString(PREF_USER_LOGIN, null);
     }
 
     public synchronized static void setUserLogin(Context context, String login) {
+
         SharedPreferences sharedPrefs = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString(PREF_USER_LOGIN, login);

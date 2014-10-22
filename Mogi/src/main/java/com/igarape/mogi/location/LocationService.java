@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +18,7 @@ import com.igarape.mogi.R;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.utils.FileUtils;
+import com.igarape.mogi.utils.Identification;
 import com.igarape.mogi.utils.LocationUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -37,18 +37,16 @@ import java.util.TimeZone;
  */
 public class LocationService extends BaseService {
     public static final int CALL_GPS_INTERVAL = 1000;
-    public static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private static final long INTERVAL = 10000;
     private static final String TAG = LocationService.class.getName();
     public static int ServiceID = 2;
-    private LocationManager mLocationManager;
-    private LocationListener mLocationListener;
+
     private Location mLastKnownLocation;
     private long lastLocationTime;
 
     private LocationClient mLocationClient;
-    private Location mLastLocation;
     private LocationCallback mLocationCallback;
+    private String mUserLogin;
 
 
     @Override
@@ -60,7 +58,7 @@ public class LocationService extends BaseService {
                 .build();
 
         startForeground(ServiceID, notification);
-
+        mUserLogin = Identification.getUserLogin(this);
         if (mLocationClient == null) {
             mLocationCallback = new LocationCallback();
             mLocationClient = new LocationClient(this, mLocationCallback, mLocationCallback);
@@ -235,34 +233,34 @@ public class LocationService extends BaseService {
                         @Override
                         public void onFailure(Throwable e, JSONObject errorResponse) {
                             Log.e(TAG, "location not sent successfully");
-                            FileUtils.LogLocation(location);
+                            FileUtils.LogLocation(mUserLogin, location);
                         }
 
                         @Override
                         public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
                             Log.e(TAG, "location not sent successfully", e);
-                            FileUtils.LogLocation(location);
+                            FileUtils.LogLocation(mUserLogin, location);
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
                             Log.e(TAG, "location not sent successfully", e);
-                            FileUtils.LogLocation(location);
+                            FileUtils.LogLocation(mUserLogin, location);
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
                             Log.e(TAG, "location not sent successfully", e);
-                            FileUtils.LogLocation(location);
+                            FileUtils.LogLocation(mUserLogin, location);
                         }
                     });
                 } catch (JSONException e) {
                     Log.e(TAG, "error sending location", e);
-                    FileUtils.LogLocation(location);
+                    FileUtils.LogLocation(mUserLogin, location);
                 }
             } else {
                 // Parse to file
-                FileUtils.LogLocation(location);
+                FileUtils.LogLocation(mUserLogin, location);
             }
         }
     }

@@ -31,6 +31,7 @@ public class ApiClient {
         client.setTimeout(DEFAULT_TIMEOUT);
         client.setMaxConnections(5);
         client.addHeader("Content-Type", "multipart/form-data");
+        client.addHeader("Accept-Encoding", "gzip,deflate");
     }
 
     private static String globalToken;

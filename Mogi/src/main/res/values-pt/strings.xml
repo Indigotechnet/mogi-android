@@ -23,7 +23,7 @@
          <string name = "status_offline"> Sem rede </string>
          <string name = "start_upload"> Iniciar upload dos vídeos e localizações? Esta ação irá parar a gravação de vídeo. </string>
          <string name = "yes"> Sim </string>
-         <string name = "cancelar"> Cancelar </string>
+         <string name = "cancel"> Cancelar </string>
          <string name = "notification_upload_title"> SmartPolicing Upload </string>
          <string name = "notification_upload_description"> Enviando dados... </string>
          <string name = "notification_location_title"> SmartPolicing Localização </string>

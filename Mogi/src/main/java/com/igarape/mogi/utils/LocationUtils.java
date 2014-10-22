@@ -55,12 +55,20 @@ public class LocationUtils {
         }
         return json;
     }
-
+    /**
+     * @deprecated Implement {@link #sendLocations(org.json.JSONArray, String, com.loopj.android.http.JsonHttpResponseHandler)}  instead.
+     * */
     public static void sendLocations(JSONArray locations, JsonHttpResponseHandler onSuccess) {
         ApiClient.post("/locations", locations, onSuccess);
     }
 
+    public static void sendLocations(JSONArray locations,String login, JsonHttpResponseHandler onSuccess) {
+        ApiClient.post("/locations/" + login, locations, onSuccess);
+    }
+
+
     public static void sendLocation(JSONObject locationJson, JsonHttpResponseHandler onSuccess) {
         ApiClient.post("/locations", locationJson, onSuccess);
     }
+
 }
