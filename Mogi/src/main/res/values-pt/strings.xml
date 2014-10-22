@@ -34,7 +34,7 @@
          <string name = "title_activity_bar"> BarActivity </string>
          <string name = "hello_world"> Olá, mundo! </string>
          <string name = "status_uploading"> Upload </string>
-         <string name = "unauthorized_login"> Entrar ou senha inválida </string>
+         <string name = "unauthorized_login"> Usuário ou senha inválida </string>
          <string name = "no_server_login"> Não é possível contatar o servidor </string>
          <string name = "lock_text_recording"> Gravar </string>
          <string name = "lock_text_livestreaming"> livestreaming </string>

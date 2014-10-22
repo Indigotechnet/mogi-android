@@ -8,7 +8,6 @@ import android.os.IBinder;
 import com.igarape.mogi.states.State;
 import com.igarape.mogi.states.StateMachine;
 import com.igarape.mogi.states.StateResponseHandler;
-import com.igarape.mogi.utils.WidgetUtils;
 
 /**
  * Created by felipeamorim on 19/10/2013.
@@ -33,7 +32,6 @@ public class ToggleStreamingService extends Service {
                 @Override
                 public void waitingResponse() {
                     super.waitingResponse();
-                    WidgetUtils.WaitingStateWidget(context);
                 }
             });
         } else {
@@ -46,7 +44,6 @@ public class ToggleStreamingService extends Service {
                 @Override
                 public void waitingResponse() {
                     super.waitingResponse();
-                    WidgetUtils.WaitingStateWidget(context);
                 }
             });
         }
