@@ -21,6 +21,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import android.view.inputmethod.InputMethodManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.igarape.mogi.MogiApp;
 import com.igarape.mogi.R;
@@ -85,6 +86,28 @@ public class AuthenticationActivity extends Activity {
 
         txtId = (EditText) findViewById(R.id.txtLoginUser);
         txtId.setText(Identification.getUserLogin(this));
+        
+        /**
+         * Appears a hack
+         * On login_activity I added
+         * android:focusable="true"
+         * android:focusableInTouchMode="true"
+         */
+        txtId.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    txtId.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputMethodManager keyboard = (InputMethodManager)
+                                    getSystemService(Context.INPUT_METHOD_SERVICE);
+                            keyboard.showSoftInput(txtId, 0);
+                        }
+                    },200);
+                }
+            }
+        });
 
         txtPwd = (EditText) findViewById(R.id.txtLoginPassword);
 
